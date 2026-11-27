@@ -4798,9 +4798,11 @@ body {
   object-position: center 68% !important;
   transform: translateY(-9%) scale(1.04);
   transform-origin: center center;
+  transition: opacity 0.36s cubic-bezier(0.22, 1, 0.36, 1) !important;
 }
 
 .stage-image-doctor.is-visible {
+  opacity: 1 !important;
   transform: translateY(-9%) scale(1.04) !important;
 }
 

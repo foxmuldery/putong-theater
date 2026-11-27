@@ -1276,13 +1276,12 @@
 
     if (currentMode === 'redflag') {
       el.stageHeroImg.classList.remove('is-visible');
-      el.stageDoctorImg.classList.add('is-visible');
       el.theaterCard.hidden = true;
       el.redFlagCard.hidden = false;
       el.playbillText.textContent = '大橘猫猫医生 · 安心问诊中';
       renderCareTriageView();
     } else {
-      el.stageDoctorImg.classList.remove('is-visible');
+      setDoctorPose(null);
       el.stageHeroImg.classList.add('is-visible');
       el.redFlagCard.hidden = true;
       el.theaterCard.hidden = false;
@@ -1495,6 +1494,13 @@
     };
   }
 
+  function setDoctorPose(pose) {
+    const layers = document.querySelectorAll('.stage-image-doctor[data-doctor-pose]');
+    layers.forEach((img) => {
+      img.classList.toggle('is-visible', Boolean(pose) && img.dataset.doctorPose === pose);
+    });
+  }
+
   function renderCareTriageView() {
     const triageView = document.getElementById('careTriageView');
     const resultView = document.getElementById('careResultView');
@@ -1512,6 +1518,8 @@
     if (careTriageState.step < questions.length) {
       triageView.hidden = false;
       resultView.hidden = true;
+      const stepPoseMap = ['diet', 'default', 'checkup'];
+      setDoctorPose(stepPoseMap[careTriageState.step] || 'default');
       const cur = questions[careTriageState.step];
       if (stepBadge) stepBadge.textContent = `大橘猫小问诊 · ${careTriageState.step + 1}/${questions.length}`;
       if (qText) qText.textContent = cur.question;
@@ -1539,10 +1547,11 @@
       return;
     }
 
-    // Completed all 3 steps -> render personalized conclusion
+    // Completed all 3 steps -> render personalized conclusion + matching doctor pose
     triageView.hidden = true;
     resultView.hidden = false;
     const verdict = evaluateCareTriage(careTriageState.reason, careTriageState.answers);
+    setDoctorPose(verdict.level === 'safe' ? 'relieved' : 'earnest');
     if (resultBadge) {
       resultBadge.textContent = verdict.badge;
       resultBadge.dataset.level = verdict.level;
