@@ -1,0 +1,4153 @@
+/* ==========================================================================
+   《噗通剧场》— Handmade Needle-Felted Wool Toy Theater UI
+   Warm linen & wool felt craft · Zero harsh neon · Tactile stitched surfaces
+   ========================================================================== */
+
+:root {
+  --felt-cream: #FAF3E4;
+  --felt-cream-soft: rgba(250, 243, 228, 0.93);
+  --felt-card-toy: #FBF4E4;
+  --felt-linen: #F2E7D3;
+  --felt-espresso: #3E2D20;
+  --felt-espresso-muted: #725B47;
+  --felt-espresso-soft: rgba(62, 45, 32, 0.68);
+  --felt-stitch: rgba(138, 102, 68, 0.36);
+  --felt-stitch-strong: rgba(138, 102, 68, 0.56);
+  --felt-terracotta: #D96E47;
+  --felt-terracotta-dark: #BA5532;
+  --felt-honey: #D9A043;
+  --felt-sage: #6D8265;
+
+  /* Calm Medical Red-Flag Mode Palette (Orange Tabby Cat Doctor Lantern) */
+  --care-surface: rgba(234, 236, 229, 0.96);
+  --care-card: #EAECE5;
+  --care-border: rgba(84, 105, 89, 0.38);
+  --care-ink: #2C3830;
+  --care-ink-muted: #56665B;
+  --care-primary: #4B6654;
+  --care-primary-dark: #3B5343;
+  --care-amber: #B47B34;
+
+  /* Springs */
+  --spring-wool: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-silk: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --font-sans: "PingFang SC", "SF Pro Rounded", "Hiragino Sans GB", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+  --font-editorial: "Songti SC", "Hiragino Mincho ProN", "STSong", "PingFang SC", Georgia, serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  font-family: var(--font-sans);
+  color: var(--felt-espresso);
+  background: #DFD2BE;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Desktop workbench linen mat */
+.workbench-backdrop {
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(circle at 22% 18%, rgba(255, 250, 238, 0.72), transparent 46%),
+    radial-gradient(circle at 80% 82%, rgba(196, 173, 142, 0.45), transparent 50%),
+    repeating-linear-gradient(
+      45deg,
+      rgba(138, 102, 68, 0.025) 0px,
+      rgba(138, 102, 68, 0.025) 2px,
+      transparent 2px,
+      transparent 8px
+    ),
+    #E2D6C3;
+  z-index: 0;
+}
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Centered 430x932 Mobile Stage on Desktop, Full-bleed on Mobile */
+.phone-shell {
+  position: relative;
+  z-index: 1;
+  width: 430px;
+  height: 932px;
+  max-height: 96vh;
+  aspect-ratio: 430 / 932;
+  border-radius: 44px;
+  overflow: hidden;
+  background: #EFE4CE;
+  box-shadow:
+    0 28px 70px rgba(58, 40, 24, 0.24),
+    0 6px 18px rgba(58, 40, 24, 0.14),
+    0 0 0 8px rgba(250, 243, 228, 0.72),
+    0 0 0 9.5px rgba(138, 102, 68, 0.22);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: background-color 0.6s var(--ease-silk), box-shadow 0.6s var(--ease-silk);
+}
+
+.phone-shell[data-mode="redflag"] {
+  background: #DDE1D7;
+  box-shadow:
+    0 28px 70px rgba(34, 46, 38, 0.24),
+    0 6px 18px rgba(34, 46, 38, 0.14),
+    0 0 0 8px rgba(234, 236, 229, 0.78),
+    0 0 0 9.5px rgba(84, 105, 89, 0.25);
+}
+
+@media (max-width: 500px), (max-height: 760px) {
+  body {
+    background: #EFE4CE;
+  }
+  .workbench-backdrop {
+    display: none;
+  }
+  .phone-shell {
+    width: 100vw;
+    height: 100dvh;
+    max-height: none;
+    aspect-ratio: auto;
+    border-radius: 0;
+    box-shadow: none;
+  }
+}
+
+/* ==========================================================================
+   Full-Bleed Handcrafted Wool-Felt Theater Stage
+   ========================================================================== */
+.stage-viewport {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.stage-image {
+  position: absolute;
+  inset: -14px;
+  width: calc(100% + 28px);
+  height: calc(100% + 28px);
+  object-fit: cover;
+  object-position: center 47%;
+  opacity: 0;
+  transform: translate3d(var(--parallax-x, 0px), var(--parallax-y, 0px), 0) scale(1.02);
+  transition:
+    opacity 0.65s var(--ease-silk),
+    transform 0.35s ease-out;
+  will-change: opacity, transform;
+}
+
+.stage-image.is-visible {
+  opacity: 1;
+  animation: gentleWoolBreath 9s ease-in-out infinite alternate;
+}
+
+@keyframes gentleWoolBreath {
+  0% {
+    transform: translate3d(var(--parallax-x, 0px), var(--parallax-y, 0px), 0) scale(1.018);
+  }
+  100% {
+    transform: translate3d(var(--parallax-x, 0px), calc(var(--parallax-y, 0px) - 2px), 0) scale(1.032);
+  }
+}
+
+/* Subtle top/bottom veils ONLY in safe zones — center 16%..69% stays 100% untouched */
+.stage-top-veil {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 17%;
+  background: linear-gradient(180deg, rgba(250, 243, 228, 0.56) 0%, rgba(250, 243, 228, 0) 100%);
+  transition: background 0.6s var(--ease-silk);
+}
+
+.stage-bottom-veil {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 31%;
+  background: linear-gradient(0deg, rgba(246, 238, 222, 0.72) 0%, rgba(246, 238, 222, 0.22) 68%, rgba(246, 238, 222, 0) 100%);
+  transition: background 0.6s var(--ease-silk);
+}
+
+.phone-shell[data-mode="redflag"] .stage-top-veil {
+  background: linear-gradient(180deg, rgba(162, 169, 152, 0.45) 0%, rgba(162, 169, 152, 0) 100%);
+}
+
+.phone-shell[data-mode="redflag"] .stage-bottom-veil {
+  background: linear-gradient(0deg, rgba(226, 229, 220, 0.84) 0%, rgba(226, 229, 220, 0.25) 68%, rgba(226, 229, 220, 0) 100%);
+}
+
+/* ==========================================================================
+   TOP 14% SAFE ZONE (Top Stitched Bar + Playbill Ticket)
+   ========================================================================== */
+.top-safe-zone {
+  position: relative;
+  z-index: 5;
+  padding: 18px 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.top-stitched-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.brand-patch {
+  appearance: none;
+  border: 1.5px dashed var(--felt-stitch);
+  background: var(--felt-cream-soft);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 18px;
+  padding: 6px 12px 6px 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--felt-espresso);
+  cursor: pointer;
+  box-shadow: 0 3px 10px rgba(74, 52, 33, 0.08);
+  transition: transform 0.24s var(--spring-wool), background-color 0.4s ease, border-color 0.4s ease;
+}
+
+.brand-patch:active {
+  transform: scale(0.95);
+}
+
+.brand-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--felt-terracotta);
+  box-shadow: 0 0 0 2.5px rgba(217, 110, 71, 0.24);
+  flex-shrink: 0;
+  transition: background-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+.phone-shell[data-mode="redflag"] .brand-patch {
+  background: rgba(234, 236, 229, 0.92);
+  border-color: var(--care-border);
+  color: var(--care-ink);
+}
+
+.phone-shell[data-mode="redflag"] .brand-dot {
+  background: var(--care-amber);
+  box-shadow: 0 0 0 2.5px rgba(180, 123, 52, 0.28);
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.12;
+}
+
+.brand-text strong {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.brand-text small {
+  font-size: 10px;
+  color: var(--felt-espresso-muted);
+  letter-spacing: 0.04em;
+  margin-top: 1px;
+}
+
+.top-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.felt-pill,
+.felt-icon-pill {
+  appearance: none;
+  border: 1.5px dashed var(--felt-stitch);
+  background: var(--felt-cream-soft);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: var(--felt-espresso);
+  border-radius: 999px;
+  height: 36px;
+  padding: 0 11px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  box-shadow: 0 3px 10px rgba(74, 52, 33, 0.07);
+  transition: transform 0.25s var(--spring-wool), background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+.felt-icon-pill {
+  width: 36px;
+  padding: 0;
+}
+
+.felt-pill:active,
+.felt-icon-pill:active {
+  transform: scale(0.93);
+}
+
+.icon-svg {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
+
+.felt-icon-pill .icon-sound-off {
+  display: none;
+}
+
+.felt-icon-pill[aria-pressed="false"] {
+  opacity: 0.65;
+}
+
+.felt-icon-pill[aria-pressed="false"] .icon-sound-on {
+  display: none;
+}
+
+.felt-icon-pill[aria-pressed="false"] .icon-sound-off {
+  display: block;
+}
+
+.timer-pill {
+  font-variant-numeric: tabular-nums;
+  min-width: 78px;
+}
+
+.timer-pill.is-running {
+  background: #FCEAE2;
+  border-color: rgba(217, 110, 71, 0.65);
+  color: var(--felt-terracotta-dark);
+  animation: gentleTimerPulse 2.2s ease-in-out infinite;
+}
+
+.timer-pill.is-overtime {
+  background: #F9DCD2;
+  border-color: var(--felt-terracotta);
+  color: #9A3B1E;
+}
+
+@keyframes gentleTimerPulse {
+  0%, 100% {
+    box-shadow: 0 3px 10px rgba(217, 110, 71, 0.14);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(217, 110, 71, 0.18), 0 4px 12px rgba(217, 110, 71, 0.22);
+  }
+}
+
+.phone-shell[data-mode="redflag"] .felt-pill,
+.phone-shell[data-mode="redflag"] .felt-icon-pill {
+  background: rgba(234, 236, 229, 0.9);
+  border-color: var(--care-border);
+  color: var(--care-ink);
+}
+
+/* Floating Stitched Playbill Ticket Row */
+.playbill-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.playbill-ticket {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  background: rgba(251, 244, 229, 0.9);
+  border: 1.5px dashed rgba(148, 110, 71, 0.42);
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--felt-espresso);
+  letter-spacing: 0.02em;
+  box-shadow: 0 4px 12px rgba(74, 52, 33, 0.08);
+  transition: opacity 0.4s ease, transform 0.4s var(--spring-wool), background-color 0.4s ease;
+}
+
+.ticket-notch {
+  position: absolute;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #E9DEC9;
+  transform: translateY(-50%);
+}
+
+.ticket-notch-left {
+  left: -5px;
+}
+
+.ticket-notch-right {
+  right: -5px;
+}
+
+.phone-shell[data-mode="redflag"] .playbill-ticket {
+  background: rgba(234, 236, 229, 0.88);
+  border-color: var(--care-border);
+  color: var(--care-ink);
+}
+
+.phone-shell[data-mode="redflag"] .ticket-notch {
+  background: #A7AD9B;
+}
+
+.mini-stitched-chip {
+  appearance: none;
+  border: 1px dashed rgba(138, 102, 68, 0.4);
+  background: rgba(250, 243, 228, 0.82);
+  color: var(--felt-espresso-muted);
+  border-radius: 999px;
+  padding: 5px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: transform 0.2s var(--spring-wool), background-color 0.2s ease, opacity 0.3s ease;
+}
+
+.mini-stitched-chip:active {
+  transform: scale(0.94);
+}
+
+.phone-shell[data-mode="redflag"] .mini-stitched-chip {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   Hemorrhoid-Guard Toast (>= 8:00)
+   ========================================================================== */
+.guard-toast {
+  position: absolute;
+  top: 66px;
+  left: 16px;
+  right: 16px;
+  z-index: 15;
+  animation: toastDropIn 0.45s var(--spring-wool);
+}
+
+.guard-toast[hidden] {
+  display: none;
+}
+
+@keyframes toastDropIn {
+  from {
+    opacity: 0;
+    transform: translateY(-16px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.guard-toast-inner {
+  background: #FDF6E8;
+  border: 1.5px dashed rgba(217, 110, 71, 0.58);
+  border-radius: 22px;
+  padding: 13px 14px 14px;
+  box-shadow:
+    0 14px 32px rgba(66, 40, 20, 0.2),
+    inset 0 0 0 3px rgba(255, 252, 245, 0.7);
+}
+
+.guard-toast-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.stitched-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  border: 1px dashed transparent;
+}
+
+.tag-warn {
+  background: #FDE5DA;
+  color: #AE4522;
+  border-color: rgba(174, 69, 34, 0.35);
+}
+
+.tag-gold {
+  background: #FBF0D2;
+  color: #8A5D12;
+  border-color: rgba(168, 120, 32, 0.38);
+}
+
+.toast-close-btn {
+  appearance: none;
+  border: none;
+  background: rgba(138, 102, 68, 0.12);
+  color: var(--felt-espresso);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.guard-toast-quote {
+  margin: 0 0 11px;
+  font-family: var(--font-editorial);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.45;
+  color: var(--felt-espresso);
+}
+
+.guard-toast-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.toast-action-primary,
+.toast-action-secondary {
+  appearance: none;
+  border-radius: 12px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: transform 0.2s var(--spring-wool);
+}
+
+.toast-action-primary {
+  flex: 1;
+  border: none;
+  background: var(--felt-terracotta);
+  color: #FFFDF8;
+}
+
+.toast-action-secondary {
+  border: 1.2px dashed var(--felt-stitch-strong);
+  background: #F7EFE0;
+  color: var(--felt-espresso);
+}
+
+.toast-action-primary:active,
+.toast-action-secondary:active {
+  transform: scale(0.95);
+}
+
+/* ==========================================================================
+   BOTTOM 28% SAFE ZONE: Stitched Theater Bulletin & Calm Medical Care Card
+   ========================================================================== */
+.bottom-safe-zone {
+  position: relative;
+  z-index: 5;
+  padding: 0 15px 18px;
+}
+
+.bulletin-card,
+.care-card {
+  position: relative;
+  border-radius: 26px;
+  padding: 14px 16px 15px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  animation: cardSettleIn 0.42s var(--ease-silk);
+}
+
+.bulletin-card[hidden],
+.care-card[hidden] {
+  display: none;
+}
+
+@keyframes cardSettleIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.bulletin-card {
+  background: var(--felt-cream-soft);
+  border: 1.5px solid rgba(255, 250, 240, 0.85);
+  box-shadow:
+    0 14px 30px rgba(68, 46, 26, 0.14),
+    inset 0 0 0 4px rgba(250, 243, 228, 0.65);
+}
+
+/* Delicate hand-stitched inset outline */
+.bulletin-card::after,
+.care-card::after {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border-radius: 20px;
+  pointer-events: none;
+}
+
+.bulletin-card::after {
+  border: 1.5px dashed var(--felt-stitch);
+}
+
+.bulletin-card.is-fresh-pop {
+  animation: woolCardPop 0.55s var(--spring-wool);
+}
+
+@keyframes woolCardPop {
+  0% {
+    transform: scale(0.95);
+  }
+  55% {
+    transform: scale(1.025);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.bulletin-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.bulletin-left-meta {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+
+.mini-felt-thumb {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  object-fit: cover;
+  background: var(--felt-card-toy);
+  border: 1.2px dashed rgba(138, 102, 68, 0.32);
+  flex-shrink: 0;
+}
+
+.meta-kicker {
+  display: block;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--felt-espresso-muted);
+  letter-spacing: 0.03em;
+}
+
+.meta-sub {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--felt-espresso);
+  margin-top: 1px;
+}
+
+.stage-stamp {
+  flex-shrink: 0;
+  padding: 4px 10px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  border: 1.5px dashed;
+  transform: rotate(-2.5deg);
+}
+
+.stage-stamp[data-tone="gold"] {
+  background: #FDF1CE;
+  color: #8F5E0E;
+  border-color: rgba(173, 121, 24, 0.52);
+}
+
+.stage-stamp[data-tone="dry"] {
+  background: #F5E7D7;
+  color: #7E4E26;
+  border-color: rgba(145, 93, 47, 0.48);
+}
+
+.stage-stamp[data-tone="soft"] {
+  background: #FDE5DA;
+  color: #AE4522;
+  border-color: rgba(186, 78, 42, 0.5);
+}
+
+.bulletin-headline {
+  margin: 0 0 8px;
+  font-family: var(--font-editorial);
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.38;
+  color: var(--felt-espresso);
+  letter-spacing: 0.01em;
+}
+
+.bulletin-stats {
+  margin: 0 0 12px;
+  padding-top: 8px;
+  border-top: 1px dashed rgba(138, 102, 68, 0.26);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--felt-espresso-muted);
+  letter-spacing: 0.02em;
+}
+
+.bulletin-actions {
+  display: grid;
+  grid-template-columns: 1.45fr 1fr 0.92fr;
+  gap: 8px;
+}
+
+/* Tactile Felt Buttons */
+.btn-primary-felt,
+.btn-secondary-felt,
+.btn-care-primary,
+.btn-care-secondary {
+  appearance: none;
+  border-radius: 16px;
+  height: 44px;
+  padding: 0 12px;
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  cursor: pointer;
+  transition: transform 0.24s var(--spring-wool), box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.btn-primary-felt {
+  border: 1.5px solid rgba(255, 246, 238, 0.24);
+  background: linear-gradient(180deg, #E17952 0%, var(--felt-terracotta) 100%);
+  color: #FFFDF8;
+  box-shadow:
+    0 6px 14px rgba(217, 110, 71, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28);
+}
+
+.btn-primary-felt:active {
+  transform: scale(0.95);
+  background: var(--felt-terracotta-dark);
+}
+
+.btn-plus {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.btn-secondary-felt {
+  border: 1.5px dashed var(--felt-stitch-strong);
+  background: #F6ECDA;
+  color: var(--felt-espresso);
+}
+
+.btn-secondary-felt:active {
+  transform: scale(0.95);
+  background: #EFE1C8;
+}
+
+.btn-subtle-warn {
+  color: #8E472D;
+  border-color: rgba(168, 92, 62, 0.42);
+  background: #F8EAE1;
+}
+
+.btn-full {
+  width: 100%;
+  height: 48px;
+  font-size: 15px;
+}
+
+/* ==========================================================================
+   Calm Medical Red-Flag Care Card (Doctor Bear Mode)
+   ========================================================================== */
+.care-card {
+  background: var(--care-surface);
+  border: 1.5px solid rgba(246, 248, 244, 0.9);
+  box-shadow:
+    0 14px 32px rgba(34, 48, 39, 0.16),
+    inset 0 0 0 4px rgba(234, 236, 229, 0.65);
+  color: var(--care-ink);
+}
+
+.care-card::after {
+  border: 1.5px dashed var(--care-border);
+}
+
+.care-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.care-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 700;
+  background: rgba(75, 102, 84, 0.14);
+  color: var(--care-primary-dark);
+  border: 1px dashed rgba(75, 102, 84, 0.36);
+}
+
+.care-dept {
+  font-size: 11px;
+  font-weight: 700;
+  color: #8A5D20;
+}
+
+.care-title {
+  margin: 0 0 7px;
+  font-family: var(--font-editorial);
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--care-ink);
+}
+
+.care-desc {
+  margin: 0 0 7px;
+  font-size: 12.5px;
+  line-height: 1.52;
+  color: var(--care-ink-muted);
+}
+
+.care-disclaimer {
+  margin: 0 0 11px;
+  font-size: 10.5px;
+  color: rgba(44, 56, 48, 0.56);
+  letter-spacing: 0.02em;
+}
+
+.care-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.btn-care-primary {
+  width: 100%;
+  height: 43px;
+  border: none;
+  background: linear-gradient(180deg, #56735F 0%, var(--care-primary) 100%);
+  color: #F7FAF7;
+  box-shadow: 0 6px 14px rgba(59, 83, 67, 0.24);
+}
+
+.btn-care-primary:active {
+  transform: scale(0.96);
+  background: var(--care-primary-dark);
+}
+
+.btn-care-secondary {
+  width: 100%;
+  height: 37px;
+  border: 1.3px dashed var(--care-border);
+  background: rgba(246, 248, 244, 0.8);
+  color: var(--care-ink-muted);
+  font-size: 12.5px;
+}
+
+.btn-care-secondary:active {
+  transform: scale(0.96);
+}
+
+/* ==========================================================================
+   Modal Bottom Sheets (5s Logger, Insights, Doctor Report, Privacy)
+   ========================================================================== */
+.sheet-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  background: rgba(46, 33, 21, 0.36);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  animation: fadeIn 0.24s ease;
+}
+
+.sheet-scrim[hidden] {
+  display: none;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.felt-sheet {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 25;
+  max-height: 87%;
+  background: #FAF3E4;
+  border-top-left-radius: 30px;
+  border-top-right-radius: 30px;
+  border-top: 2px dashed rgba(138, 102, 68, 0.42);
+  box-shadow: 0 -16px 40px rgba(48, 31, 16, 0.22);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: sheetSlideUp 0.38s var(--ease-silk);
+}
+
+.felt-sheet[hidden] {
+  display: none;
+}
+
+@keyframes sheetSlideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.sheet-handle {
+  width: 42px;
+  height: 4px;
+  border-radius: 99px;
+  background: rgba(138, 102, 68, 0.28);
+  margin: 10px auto 4px;
+  flex-shrink: 0;
+}
+
+.sheet-header {
+  padding: 6px 18px 12px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  border-bottom: 1px dashed rgba(138, 102, 68, 0.22);
+  flex-shrink: 0;
+}
+
+.sheet-title {
+  margin: 0;
+  font-family: var(--font-editorial);
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--felt-espresso);
+}
+
+.sheet-subtitle {
+  margin: 3px 0 0;
+  font-size: 12px;
+  color: var(--felt-espresso-muted);
+}
+
+.sheet-header-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.duration-chip {
+  appearance: none;
+  border: 1.2px dashed var(--felt-stitch-strong);
+  background: #F4E9D4;
+  color: var(--felt-espresso);
+  border-radius: 999px;
+  padding: 5px 10px;
+  font-size: 11.5px;
+  font-family: var(--font-sans);
+  cursor: pointer;
+}
+
+.sheet-close-btn {
+  appearance: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1.2px dashed var(--felt-stitch);
+  background: #F4E9D4;
+  color: var(--felt-espresso);
+  font-size: 19px;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.sheet-scroll-body {
+  padding: 14px 18px 18px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.sheet-scroll-body::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sheet-scroll-body::-webkit-scrollbar-thumb {
+  background: rgba(138, 102, 68, 0.25);
+  border-radius: 99px;
+}
+
+.sheet-footer {
+  padding: 12px 18px 20px;
+  border-top: 1px dashed rgba(138, 102, 68, 0.22);
+  background: #FAF3E4;
+  flex-shrink: 0;
+}
+
+.sheet-footer-split {
+  display: grid;
+  grid-template-columns: 1.25fr 0.85fr;
+  gap: 10px;
+}
+
+/* ==========================================================================
+   5-Second Logging Drawer: Bristol 1-7 Seamless #FBF4E4 Felt Cards
+   ========================================================================== */
+.form-block {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.block-label-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.step-index {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 7px;
+  background: #EFE2CA;
+  border: 1px dashed rgba(138, 102, 68, 0.45);
+  font-size: 10.5px;
+  font-weight: 800;
+  color: var(--felt-espresso);
+}
+
+.block-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--felt-espresso);
+}
+
+.bristol-rail {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 6px 2px 10px;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+}
+
+.bristol-rail::-webkit-scrollbar {
+  display: none;
+}
+
+/* Seamless #FBF4E4 wool-felt badge cards — melts 100% with bristol_1..7.jpg! */
+.bristol-card {
+  appearance: none;
+  flex: 0 0 98px;
+  scroll-snap-align: center;
+  background: var(--felt-card-toy);
+  border: 1.5px dashed rgba(138, 102, 68, 0.34);
+  border-radius: 20px;
+  padding: 7px 6px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  color: var(--felt-espresso);
+  font-family: var(--font-sans);
+  box-shadow: 0 4px 10px rgba(74, 52, 33, 0.06);
+  transition:
+    transform 0.32s var(--spring-wool),
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.bristol-card-img-wrap {
+  width: 78px;
+  height: 78px;
+  border-radius: 14px;
+  background: var(--felt-card-toy);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bristol-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.05);
+  transition: transform 0.36s var(--spring-wool);
+  pointer-events: none;
+}
+
+.bristol-card-num {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--felt-espresso-muted);
+}
+
+.bristol-card-name {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--felt-espresso);
+  white-space: nowrap;
+}
+
+.bristol-card.is-selected {
+  background: var(--felt-card-toy);
+  border: 2px solid var(--felt-terracotta);
+  transform: translateY(-4px) scale(1.04);
+  box-shadow:
+    0 10px 20px rgba(217, 110, 71, 0.2),
+    0 0 0 3px rgba(217, 110, 71, 0.14);
+}
+
+.bristol-card.is-selected .bristol-card-num {
+  color: var(--felt-terracotta-dark);
+}
+
+.bristol-card.is-bouncing .bristol-card-img {
+  animation: woolToySquash 0.52s var(--spring-wool);
+}
+
+@keyframes woolToySquash {
+  0% { transform: scale(1.05, 1.05); }
+  28% { transform: scale(1.16, 0.92) translateY(3px); }
+  58% { transform: scale(0.98, 1.15) translateY(-4px); }
+  80% { transform: scale(1.08, 1.02); }
+  100% { transform: scale(1.05, 1.05); }
+}
+
+.bristol-caption-card {
+  background: var(--felt-card-toy);
+  border: 1.5px dashed rgba(138, 102, 68, 0.36);
+  border-radius: 16px;
+  padding: 10px 12px;
+}
+
+.caption-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 3px;
+}
+
+.caption-top strong {
+  font-size: 13.5px;
+  color: var(--felt-espresso);
+}
+
+.status-tag {
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.status-good {
+  background: #E8F0E0;
+  color: #46663B;
+}
+
+.status-dry {
+  background: #F4E6D2;
+  color: #845123;
+}
+
+.status-soft {
+  background: #FBE4D8;
+  color: #A84422;
+}
+
+.caption-advice {
+  margin: 0;
+  font-size: 12px;
+  color: var(--felt-espresso-muted);
+}
+
+/* Step 2: 6-Color Health Radar */
+.color-radar-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.color-swatch-btn {
+  appearance: none;
+  background: #F6ECDA;
+  border: 1.5px dashed rgba(138, 102, 68, 0.34);
+  border-radius: 15px;
+  padding: 8px 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  text-align: left;
+  color: var(--felt-espresso);
+  font-family: var(--font-sans);
+  transition: transform 0.22s var(--spring-wool), border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.color-swatch-btn:active {
+  transform: scale(0.95);
+}
+
+.color-swatch-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.24),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.2),
+    0 0 0 2px rgba(250, 243, 228, 0.9);
+}
+
+.color-swatch-copy {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.18;
+}
+
+.color-swatch-copy strong {
+  font-size: 11.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.color-swatch-copy small {
+  font-size: 10px;
+  color: var(--felt-espresso-muted);
+}
+
+.color-swatch-btn.is-redflag small {
+  color: #9A3B2B;
+  font-weight: 700;
+}
+
+.color-swatch-btn.is-selected {
+  background: #FDF7EA;
+  border: 2px solid var(--felt-terracotta);
+  box-shadow: 0 5px 12px rgba(217, 110, 71, 0.16);
+}
+
+.color-swatch-btn.is-redflag.is-selected {
+  background: #EDF0E9;
+  border-color: var(--care-primary);
+  box-shadow: 0 5px 12px rgba(75, 102, 84, 0.18);
+}
+
+.inline-calm-notice {
+  background: #EAECE5;
+  border: 1.3px dashed var(--care-border);
+  border-radius: 14px;
+  padding: 9px 11px;
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--care-ink);
+}
+
+/* Step 3: Trigger Tags & Ease */
+.trigger-chips-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.trigger-chip {
+  appearance: none;
+  border: 1.3px dashed rgba(138, 102, 68, 0.4);
+  background: #F6ECDA;
+  color: var(--felt-espresso);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: transform 0.22s var(--spring-wool), background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.trigger-chip:active {
+  transform: scale(0.93);
+}
+
+.trigger-chip.is-active {
+  background: #FCE6DC;
+  border: 1.5px solid var(--felt-terracotta);
+  color: #A43E1D;
+}
+
+.ease-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 4px;
+}
+
+.ease-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--felt-espresso-muted);
+}
+
+.ease-pills {
+  display: inline-flex;
+  gap: 6px;
+}
+
+.ease-pill {
+  appearance: none;
+  border: 1.2px dashed var(--felt-stitch);
+  background: #F6ECDA;
+  color: var(--felt-espresso);
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  cursor: pointer;
+}
+
+.ease-pill.is-active {
+  background: var(--felt-espresso);
+  color: #FAF3E4;
+  border-color: var(--felt-espresso);
+}
+
+/* ==========================================================================
+   14-Day Insights Sheet (肠道背刺榜)
+   ========================================================================== */
+.kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.kpi-tile {
+  background: var(--felt-card-toy);
+  border: 1.3px dashed var(--felt-stitch);
+  border-radius: 16px;
+  padding: 10px 8px;
+  text-align: center;
+}
+
+.kpi-tile strong {
+  display: block;
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--felt-espresso);
+}
+
+.kpi-tile span {
+  display: block;
+  margin-top: 2px;
+  font-size: 10.5px;
+  color: var(--felt-espresso-muted);
+}
+
+.stitched-panel {
+  background: #FBF4E4;
+  border: 1.4px dashed var(--felt-stitch);
+  border-radius: 20px;
+  padding: 13px 14px;
+}
+
+.panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.panel-head h3 {
+  margin: 0;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--felt-espresso);
+}
+
+.panel-legend {
+  font-size: 10.5px;
+  color: var(--felt-espresso-muted);
+}
+
+/* 14-day Trend Wool Plot */
+.trend-chart {
+  position: relative;
+  height: 132px;
+  padding: 8px 6px 22px 24px;
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 4px;
+  background:
+    linear-gradient(
+      180deg,
+      transparent 0%,
+      transparent 35%,
+      rgba(217, 160, 67, 0.14) 35%,
+      rgba(217, 160, 67, 0.14) 63%,
+      transparent 63%,
+      transparent 100%
+    );
+  border-radius: 14px;
+  border: 1px dashed rgba(138, 102, 68, 0.22);
+}
+
+.trend-y-axis {
+  position: absolute;
+  left: 6px;
+  top: 8px;
+  bottom: 22px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  font-size: 9.5px;
+  font-weight: 700;
+  color: rgba(114, 91, 71, 0.65);
+  pointer-events: none;
+}
+
+.trend-col {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  cursor: pointer;
+}
+
+.trend-stem {
+  position: absolute;
+  bottom: 2px;
+  width: 1.5px;
+  top: 4px;
+  border-left: 1.2px dashed rgba(138, 102, 68, 0.16);
+}
+
+.trend-dot-btn {
+  appearance: none;
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid #FAF3E4;
+  cursor: pointer;
+  transform: translateY(50%);
+  box-shadow: 0 2px 6px rgba(62, 45, 32, 0.18);
+  transition: transform 0.24s var(--spring-wool);
+}
+
+.trend-dot-btn.is-active {
+  transform: translateY(50%) scale(1.45);
+  z-index: 2;
+}
+
+.trend-dot-good { background: #C89333; }
+.trend-dot-dry { background: #8E623A; }
+.trend-dot-soft { background: #D96E47; }
+.trend-dot-redflag { background: #4B6654; }
+
+.trend-day-label {
+  position: absolute;
+  bottom: -18px;
+  font-size: 9px;
+  color: var(--felt-espresso-muted);
+  white-space: nowrap;
+}
+
+.trend-detail-pill {
+  margin-top: 10px;
+  padding: 8px 11px;
+  border-radius: 12px;
+  background: #FAF3E4;
+  border: 1px dashed rgba(138, 102, 68, 0.3);
+  font-size: 11.5px;
+  color: var(--felt-espresso);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.trend-detail-thumb {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--felt-card-toy);
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+/* Correlation Bars */
+.correlation-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.corr-item {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.corr-row-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.corr-row-top strong {
+  color: var(--felt-espresso);
+}
+
+.corr-row-top span {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--felt-terracotta-dark);
+}
+
+.corr-item.is-positive .corr-row-top span {
+  color: #4A6A46;
+}
+
+.corr-track {
+  height: 9px;
+  border-radius: 99px;
+  background: rgba(138, 102, 68, 0.14);
+  overflow: hidden;
+}
+
+.corr-fill {
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, #E38961, var(--felt-terracotta));
+  transition: width 0.55s var(--ease-silk);
+}
+
+.corr-item.is-positive .corr-fill {
+  background: linear-gradient(90deg, #87A37E, #5C7C55);
+}
+
+.corr-desc {
+  margin: 0;
+  font-size: 11px;
+  color: var(--felt-espresso-muted);
+}
+
+/* Collapsible Paid-Poop Easter Egg */
+.easter-egg-panel {
+  padding: 0;
+  overflow: hidden;
+}
+
+.easter-egg-trigger {
+  appearance: none;
+  width: 100%;
+  border: none;
+  background: transparent;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--felt-espresso);
+  font-family: var(--font-sans);
+  cursor: pointer;
+}
+
+.chevron-text {
+  font-size: 11px;
+  color: var(--felt-espresso-muted);
+  padding: 2px 8px;
+  border-radius: 99px;
+  background: rgba(138, 102, 68, 0.1);
+}
+
+.easter-egg-body {
+  padding: 0 14px 13px;
+  border-top: 1px dashed rgba(138, 102, 68, 0.24);
+}
+
+.easter-egg-body[hidden] {
+  display: none;
+}
+
+.egg-amount-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.egg-label {
+  display: block;
+  font-size: 11px;
+  color: var(--felt-espresso-muted);
+}
+
+.egg-value {
+  font-family: var(--font-editorial);
+  font-size: 26px;
+  color: var(--felt-espresso);
+}
+
+.egg-note {
+  margin: 6px 0 0;
+  font-size: 11.5px;
+  line-height: 1.48;
+  color: var(--felt-espresso-muted);
+}
+
+/* ==========================================================================
+   30-Day Clean Clinical Doctor Report Sheet (Zero Jokes!)
+   ========================================================================== */
+.doctor-sheet {
+  background: #F6F7F4;
+  border-top-color: rgba(75, 102, 84, 0.4);
+  color: var(--care-ink);
+}
+
+.doctor-sheet .sheet-footer {
+  background: #F6F7F4;
+  border-top-color: rgba(75, 102, 84, 0.2);
+}
+
+.doctor-header {
+  border-bottom-color: rgba(75, 102, 84, 0.2);
+}
+
+.clinical-kicker {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--care-primary);
+  margin-bottom: 2px;
+}
+
+.doctor-sheet .sheet-title {
+  color: var(--care-ink);
+}
+
+.doctor-sheet .sheet-subtitle {
+  color: var(--care-ink-muted);
+}
+
+.clinical-alert-banner {
+  background: #F6EBE8;
+  border: 1.2px solid rgba(158, 52, 46, 0.28);
+  border-radius: 14px;
+  padding: 10px 12px;
+  font-size: 12px;
+  line-height: 1.48;
+  color: #6B2622;
+}
+
+.clinical-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.clinical-metric-box {
+  background: #FFFFFF;
+  border: 1px solid rgba(75, 102, 84, 0.16);
+  border-radius: 14px;
+  padding: 10px 11px;
+}
+
+.clinical-metric-box span {
+  display: block;
+  font-size: 10.5px;
+  color: var(--care-ink-muted);
+}
+
+.clinical-metric-box strong {
+  display: block;
+  margin-top: 3px;
+  font-size: 14px;
+  color: var(--care-ink);
+}
+
+.clinical-table-wrap {
+  background: #FFFFFF;
+  border: 1px solid rgba(75, 102, 84, 0.16);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.clinical-table-title {
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(75, 102, 84, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.clinical-table-title h3 {
+  margin: 0;
+  font-size: 13px;
+  color: var(--care-ink);
+}
+
+.clinical-table-title span {
+  font-size: 10.5px;
+  color: var(--care-ink-muted);
+}
+
+.clinical-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+
+.clinical-table th,
+.clinical-table td {
+  padding: 8px 6px;
+  text-align: left;
+  border-bottom: 1px solid rgba(75, 102, 84, 0.1);
+  vertical-align: top;
+}
+
+.clinical-table th {
+  background: #EFF2ED;
+  font-weight: 700;
+  color: var(--care-ink-muted);
+  font-size: 10px;
+}
+
+.clinical-table tr.is-redflag-row td {
+  background: #FDF2F0;
+  color: #7A241E;
+  font-weight: 600;
+}
+
+.clinical-footnote {
+  margin: 0;
+  font-size: 10.5px;
+  line-height: 1.48;
+  color: var(--care-ink-muted);
+}
+
+/* ==========================================================================
+   Privacy & Icon Camouflage Sheet
+   ========================================================================== */
+.trust-pill-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 9px;
+}
+
+.trust-card {
+  background: var(--felt-card-toy);
+  border: 1.4px dashed var(--felt-stitch);
+  border-radius: 16px;
+  padding: 11px 12px;
+}
+
+.trust-card strong {
+  display: block;
+  font-size: 13px;
+  color: var(--felt-espresso);
+}
+
+.trust-card span {
+  display: block;
+  margin-top: 3px;
+  font-size: 11px;
+  line-height: 1.38;
+  color: var(--felt-espresso-muted);
+}
+
+.toggle-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.toggle-panel h3 {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--felt-espresso);
+}
+
+.panel-subtext {
+  margin: 3px 0 0;
+  font-size: 11.5px;
+  color: var(--felt-espresso-muted);
+}
+
+.felt-switch {
+  appearance: none;
+  width: 50px;
+  height: 28px;
+  border-radius: 99px;
+  border: 1.5px dashed rgba(138, 102, 68, 0.42);
+  background: #E7DAC4;
+  padding: 3px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  transition: background-color 0.25s ease, border-color 0.25s ease;
+  flex-shrink: 0;
+}
+
+.felt-switch-knob {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #FFFDF8;
+  box-shadow: 0 2px 5px rgba(62, 45, 32, 0.22);
+  transition: transform 0.28s var(--spring-wool);
+}
+
+.felt-switch[aria-checked="true"] {
+  background: var(--felt-terracotta);
+  border-color: var(--felt-terracotta-dark);
+}
+
+.felt-switch[aria-checked="true"] .felt-switch-knob {
+  transform: translateX(21px);
+}
+
+.home-preview-dock {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 11px;
+  background: #FAF3E4;
+  border: 1.2px dashed rgba(138, 102, 68, 0.32);
+  border-radius: 16px;
+  margin-bottom: 10px;
+}
+
+.app-icon-tile {
+  width: 54px;
+  height: 54px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 6px 14px rgba(62, 45, 32, 0.14);
+  border: 1.5px dashed rgba(255, 255, 255, 0.65);
+}
+
+.app-icon-tile svg {
+  width: 32px;
+  height: 32px;
+}
+
+.preview-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.preview-meta strong {
+  font-size: 14px;
+  color: var(--felt-espresso);
+}
+
+.preview-meta span {
+  font-size: 11.5px;
+  color: var(--felt-espresso-muted);
+}
+
+.camouflage-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.camo-option-btn {
+  appearance: none;
+  border: 1.4px dashed rgba(138, 102, 68, 0.36);
+  background: #FAF3E4;
+  border-radius: 15px;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  cursor: pointer;
+  text-align: left;
+  color: var(--felt-espresso);
+  font-family: var(--font-sans);
+  transition: transform 0.22s var(--spring-wool), border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.camo-option-btn:active {
+  transform: scale(0.96);
+}
+
+.camo-option-btn.is-active {
+  border: 2px solid var(--felt-terracotta);
+  background: #FFF9EE;
+  box-shadow: 0 5px 12px rgba(217, 110, 71, 0.14);
+}
+
+.camo-mini-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.camo-mini-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.camo-option-btn strong {
+  display: block;
+  font-size: 12.5px;
+}
+
+.camo-option-btn small {
+  display: block;
+  font-size: 10.5px;
+  color: var(--felt-espresso-muted);
+}
+
+.privacy-reset-row {
+  text-align: center;
+  padding-top: 2px;
+}
+
+.text-reset-btn {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--felt-espresso-muted);
+  font-size: 11.5px;
+  text-decoration: underline;
+  text-decoration-style: dashed;
+  cursor: pointer;
+}
+
+/* Stamp Feedback Floating Pill (Elastic Wool-Toy Toast) */
+.stamp-feedback {
+  position: absolute;
+  top: 46%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 40;
+  background: rgba(62, 45, 32, 0.93);
+  color: #FAF3E4;
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 1.5px dashed rgba(250, 243, 228, 0.45);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  box-shadow: 0 14px 30px rgba(40, 26, 14, 0.32);
+  pointer-events: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  max-width: 88%;
+  animation: stampPop 0.44s var(--spring-wool);
+}
+
+.stamp-feedback[hidden] {
+  display: none;
+}
+
+.stamp-feedback-img {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  object-fit: cover;
+  background: var(--felt-card-toy);
+  border: 1.5px solid rgba(250, 243, 228, 0.72);
+  flex-shrink: 0;
+  animation: woolToySquash 0.56s var(--spring-wool);
+}
+
+.stamp-feedback-img[hidden] {
+  display: none;
+}
+
+@keyframes stampPop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -40%) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* Home Stage Live Pop Animations */
+.mini-felt-thumb.is-spring-bounce {
+  animation: thumbSpringPop 0.62s var(--spring-wool);
+}
+
+@keyframes thumbSpringPop {
+  0% { transform: scale(0.75) rotate(-6deg); }
+  45% { transform: scale(1.22) rotate(5deg); }
+  75% { transform: scale(0.95) rotate(-2deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+.playbill-ticket.is-fresh-pop {
+  animation: playbillPop 0.52s var(--spring-wool);
+}
+
+@keyframes playbillPop {
+  0% { transform: scale(0.9); }
+  55% { transform: scale(1.07); }
+  100% { transform: scale(1); }
+}
+
+/* ==========================================================================
+   MVP Upgrade 1: Desktop-Only Director Quick Demo Rail (>= 920px)
+   ========================================================================== */
+.demo-stage-layout {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  max-width: 100vw;
+}
+
+.director-rail {
+  display: none;
+}
+
+@media (min-width: 920px) {
+  .director-rail {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 290px;
+    max-height: 92vh;
+    background: rgba(250, 243, 228, 0.94);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1.5px solid rgba(255, 250, 240, 0.92);
+    border-radius: 28px;
+    padding: 18px 16px 16px;
+    box-shadow:
+      0 20px 48px rgba(58, 40, 24, 0.14),
+      0 4px 12px rgba(58, 40, 24, 0.08),
+      inset 0 0 0 4px rgba(250, 243, 228, 0.72);
+    gap: 12px;
+    overflow-y: auto;
+  }
+
+  .director-rail::after {
+    content: "";
+    position: absolute;
+    inset: 7px;
+    border-radius: 22px;
+    border: 1.5px dashed rgba(138, 102, 68, 0.36);
+    pointer-events: none;
+  }
+}
+
+.director-rail-head,
+.director-rail-nav,
+.director-rail-foot {
+  position: relative;
+  z-index: 1;
+}
+
+.director-kicker {
+  display: inline-block;
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: var(--felt-terracotta-dark);
+  background: #FCEAE2;
+  border: 1px dashed rgba(217, 110, 71, 0.42);
+  border-radius: 999px;
+  padding: 2px 8px;
+  margin-bottom: 6px;
+}
+
+.director-rail-head h2 {
+  margin: 0;
+  font-family: var(--font-editorial);
+  font-size: 18px;
+  color: var(--felt-espresso);
+}
+
+.director-rail-head p {
+  margin: 4px 0 0;
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--felt-espresso-muted);
+}
+
+.director-rail-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.director-jump-btn {
+  appearance: none;
+  width: 100%;
+  border: 1.3px dashed rgba(138, 102, 68, 0.34);
+  background: #FBF4E4;
+  color: var(--felt-espresso);
+  border-radius: 14px;
+  padding: 9px 11px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-align: left;
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.22s var(--spring-wool), background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.director-jump-btn:hover {
+  background: #FFF9EE;
+  border-color: rgba(217, 110, 71, 0.56);
+  transform: translateX(2px);
+}
+
+.director-jump-btn:active {
+  transform: scale(0.97);
+}
+
+.director-jump-btn.is-active {
+  background: #FFF9EE;
+  border: 1.6px solid var(--felt-terracotta);
+  color: #9A3D1D;
+  box-shadow: 0 4px 12px rgba(217, 110, 71, 0.14);
+}
+
+.jump-num {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--felt-terracotta);
+  flex-shrink: 0;
+}
+
+.jump-label {
+  line-height: 1.25;
+}
+
+.director-rail-foot {
+  padding-top: 9px;
+  border-top: 1px dashed rgba(138, 102, 68, 0.26);
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.director-reset-btn {
+  appearance: none;
+  width: 100%;
+  border: 1.3px dashed rgba(138, 102, 68, 0.46);
+  background: #F2E7D3;
+  color: var(--felt-espresso);
+  border-radius: 13px;
+  padding: 8px 10px;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s var(--spring-wool), background-color 0.2s ease;
+}
+
+.director-reset-btn:hover {
+  background: #ECE0C7;
+}
+
+.director-reset-btn:active {
+  transform: scale(0.96);
+}
+
+.director-tip {
+  margin: 0;
+  font-size: 10.5px;
+  line-height: 1.42;
+  color: var(--felt-espresso-muted);
+}
+
+/* ==========================================================================
+   MVP Upgrade 2: Desktop-Friendly Bristol 1-7 Controls (Arrows + 1-7 Pills)
+   ========================================================================== */
+.block-label-between {
+  justify-content: space-between;
+}
+
+.block-label-left {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.rail-arrow-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.rail-arrow-btn {
+  appearance: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1.3px dashed rgba(138, 102, 68, 0.44);
+  background: #F5EAD6;
+  color: var(--felt-espresso);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s var(--spring-wool), background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.rail-arrow-btn:hover {
+  background: #FDF7EA;
+  border-color: var(--felt-terracotta);
+}
+
+.rail-arrow-btn:active {
+  transform: scale(0.9);
+}
+
+.bristol-dot-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: -2px;
+}
+
+.bristol-dot-btn {
+  appearance: none;
+  border: 1.2px dashed rgba(138, 102, 68, 0.35);
+  background: #F5EBD8;
+  color: var(--felt-espresso-muted);
+  min-width: 26px;
+  height: 22px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: transform 0.22s var(--spring-wool), background-color 0.2s ease, color 0.2s ease, min-width 0.22s ease;
+}
+
+.bristol-dot-btn:hover {
+  border-color: var(--felt-terracotta);
+}
+
+.bristol-dot-btn.is-active {
+  background: var(--felt-terracotta);
+  border-color: var(--felt-terracotta);
+  color: #FFFDF8;
+  min-width: 38px;
+}
+
+/* ==========================================================================
+   MVP Upgrade 4: Clickable 14-Day History List & Inspector Card in Insights
+   ========================================================================== */
+.trend-detail-card {
+  margin-top: 10px;
+  padding: 10px 11px;
+  border-radius: 14px;
+  background: #FAF3E4;
+  border: 1.3px dashed rgba(138, 102, 68, 0.34);
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.trend-detail-card .trend-detail-thumb {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--felt-card-toy);
+  border: 1px dashed rgba(138, 102, 68, 0.3);
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.trend-detail-body {
+  min-width: 0;
+  flex: 1;
+}
+
+.trend-detail-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  font-size: 11.5px;
+  color: var(--felt-espresso);
+}
+
+.trend-detail-sub {
+  margin: 2px 0 5px;
+  font-size: 10.5px;
+  color: var(--felt-espresso-muted);
+}
+
+.trend-detail-quote {
+  margin: 0;
+  font-family: var(--font-editorial);
+  font-size: 12.5px;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--felt-espresso);
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  max-height: 220px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.history-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.history-list::-webkit-scrollbar-thumb {
+  background: rgba(138, 102, 68, 0.22);
+  border-radius: 99px;
+}
+
+.history-row {
+  appearance: none;
+  width: 100%;
+  text-align: left;
+  background: #FAF3E4;
+  border: 1.2px dashed rgba(138, 102, 68, 0.3);
+  border-radius: 14px;
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  color: var(--felt-espresso);
+  transition: transform 0.2s var(--spring-wool), border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.history-row:active {
+  transform: scale(0.98);
+}
+
+.history-row.is-selected {
+  background: #FFF9EE;
+  border: 1.6px solid var(--felt-terracotta);
+  box-shadow: 0 4px 10px rgba(217, 110, 71, 0.12);
+}
+
+.history-row-thumb {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  object-fit: cover;
+  background: var(--felt-card-toy);
+  flex-shrink: 0;
+}
+
+.history-row-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.history-row-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.history-row-top strong {
+  color: var(--felt-espresso);
+}
+
+.history-row-time {
+  font-size: 10.5px;
+  color: var(--felt-espresso-muted);
+  white-space: nowrap;
+}
+
+.history-row-sub {
+  margin-top: 2px;
+  font-size: 11px;
+  color: var(--felt-espresso-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.postcard-cta-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: linear-gradient(135deg, #FBF4E4 0%, #F5E7CE 100%);
+}
+
+.postcard-cta-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.postcard-cta-copy strong {
+  font-size: 12.5px;
+  color: var(--felt-espresso);
+}
+
+.postcard-cta-copy span {
+  font-size: 11px;
+  color: var(--felt-espresso-muted);
+}
+
+.btn-compact-felt {
+  height: 36px;
+  padding: 0 11px;
+  font-size: 12px;
+  border-radius: 12px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   MVP Upgrade 3: Monthly Wool-Felt Postcard Sheet (Xiaohongshu Safe Share)
+   ========================================================================== */
+.postcard-canvas-card {
+  position: relative;
+  background:
+    radial-gradient(circle at 18% 12%, rgba(255, 252, 244, 0.85), transparent 52%),
+    #FBF4E4;
+  border: 1.5px solid rgba(255, 250, 240, 0.95);
+  border-radius: 26px;
+  padding: 18px 18px 16px;
+  box-shadow:
+    0 14px 32px rgba(68, 46, 26, 0.14),
+    inset 0 0 0 5px rgba(250, 243, 228, 0.7);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.postcard-canvas-card::after {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border-radius: 19px;
+  border: 1.5px dashed rgba(138, 102, 68, 0.36);
+  pointer-events: none;
+}
+
+.postcard-top-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.postcard-brand-col {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.postcard-kicker {
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: var(--felt-espresso-muted);
+}
+
+.postcard-month {
+  font-family: var(--font-editorial);
+  font-size: 16px;
+  color: var(--felt-espresso);
+}
+
+.postal-stamp-box {
+  width: 58px;
+  height: 58px;
+  border-radius: 12px;
+  border: 1.5px dashed rgba(217, 110, 71, 0.55);
+  background: #FCEAE1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transform: rotate(5deg);
+  flex-shrink: 0;
+}
+
+.postal-stamp-code {
+  font-size: 10px;
+  font-weight: 800;
+  color: #AE4522;
+  letter-spacing: 0.05em;
+}
+
+.postal-stamp-label {
+  font-family: var(--font-editorial);
+  font-size: 11px;
+  font-weight: 700;
+  color: #8E3719;
+  margin-top: 2px;
+}
+
+.postcard-centerpiece {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+  padding: 4px 4px 2px;
+}
+
+.postcard-medallion {
+  width: 124px;
+  height: 124px;
+  border-radius: 30px;
+  background: var(--felt-card-toy);
+  border: 2px dashed rgba(217, 160, 67, 0.65);
+  box-shadow: 0 10px 22px rgba(138, 102, 68, 0.14);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.postcard-medallion img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.06);
+}
+
+.postcard-award {
+  margin: 0;
+  font-family: var(--font-editorial);
+  font-size: 16.5px;
+  line-height: 1.42;
+  color: var(--felt-espresso);
+}
+
+.postcard-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.postcard-stat-cell {
+  background: #FAF3E4;
+  border: 1.2px dashed rgba(138, 102, 68, 0.34);
+  border-radius: 15px;
+  padding: 9px 6px;
+  text-align: center;
+}
+
+.postcard-stat-cell strong {
+  display: block;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--felt-espresso);
+}
+
+.postcard-stat-cell span {
+  display: block;
+  margin-top: 2px;
+  font-size: 10.5px;
+  color: var(--felt-espresso-muted);
+}
+
+.postcard-footer-note {
+  padding-top: 10px;
+  border-top: 1px dashed rgba(138, 102, 68, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.postcard-privacy-badge {
+  font-size: 10px;
+  font-weight: 700;
+  color: #4A6A46;
+  background: #E8F0E2;
+  border: 1px dashed rgba(74, 106, 70, 0.35);
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+
+.postcard-signature {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--felt-espresso-muted);
+}
+
+/* ==========================================================================
+   Viral Feature 1: Felt Detective Diet Deduction Strip (Home & Log Drawer)
+   ========================================================================== */
+.bulletin-card {
+  padding: 12px 15px 13px;
+}
+
+.bulletin-headline {
+  margin: 0 0 7px;
+  font-size: 16px;
+}
+
+.bulletin-stats {
+  margin: 0 0 9px;
+  padding-top: 6px;
+  font-size: 11.5px;
+}
+
+.detective-strip {
+  background: #F6ECD8;
+  border: 1.2px dashed rgba(138, 102, 68, 0.38);
+  border-radius: 13px;
+  padding: 6px 9px;
+  margin-bottom: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.detective-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.detective-guess-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  flex: 1;
+}
+
+.detective-badge {
+  flex-shrink: 0;
+  font-size: 9.5px;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: #FCE6DA;
+  color: #A43E1D;
+  border: 1px dashed rgba(186, 78, 42, 0.42);
+  white-space: nowrap;
+}
+
+.detective-badge.is-confirmed {
+  background: #E5F0DF;
+  color: #3E6037;
+  border-color: rgba(74, 106, 70, 0.42);
+}
+
+.detective-text {
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--felt-espresso);
+  white-space: normal;
+}
+
+.detective-btns {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.detective-chip {
+  appearance: none;
+  border: 1px dashed rgba(138, 102, 68, 0.42);
+  background: #FAF3E4;
+  color: var(--felt-espresso-muted);
+  border-radius: 999px;
+  padding: 3px 7px;
+  font-size: 10px;
+  font-weight: 700;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform 0.2s var(--spring-wool), background-color 0.2s ease, color 0.2s ease;
+}
+
+.detective-chip:active {
+  transform: scale(0.92);
+}
+
+.detective-chip-hit {
+  background: #FFF6E6;
+  color: #9A411F;
+  border-color: rgba(217, 110, 71, 0.55);
+}
+
+.detective-override-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-top: 5px;
+  border-top: 1px dashed rgba(138, 102, 68, 0.24);
+  flex-wrap: wrap;
+}
+
+.detective-override-row[hidden] {
+  display: none;
+}
+
+.override-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--felt-espresso-muted);
+}
+
+.override-chips {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.bulletin-actions-primary {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 8px;
+  margin-bottom: 7px;
+}
+
+.bulletin-actions-primary .btn-primary-felt,
+.bulletin-actions-primary .btn-secondary-felt {
+  height: 41px;
+  font-size: 13.5px;
+}
+
+.btn-pk-felt {
+  background: #FBF0D6;
+  border-color: rgba(173, 121, 24, 0.5);
+  color: #7D4E10;
+}
+
+.bulletin-actions-micro {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.micro-felt-btn {
+  appearance: none;
+  height: 30px;
+  border-radius: 11px;
+  border: 1.2px dashed rgba(138, 102, 68, 0.36);
+  background: #F5EBD7;
+  color: var(--felt-espresso);
+  font-size: 11.5px;
+  font-weight: 700;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: transform 0.2s var(--spring-wool), background-color 0.2s ease;
+}
+
+.micro-felt-btn:active {
+  transform: scale(0.95);
+}
+
+.micro-felt-warn {
+  background: #F8EAE1;
+  color: #8E472D;
+  border-color: rgba(168, 92, 62, 0.42);
+}
+
+/* Live Draft Detective Box inside 5s Log Drawer */
+.draft-detective-box {
+  background: #F6ECD9;
+  border: 1.3px dashed rgba(217, 110, 71, 0.45);
+  border-radius: 15px;
+  padding: 9px 11px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 9px;
+}
+
+.draft-detective-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  min-width: 0;
+}
+
+.draft-detective-text {
+  margin: 0;
+  font-size: 11.5px;
+  line-height: 1.4;
+  color: var(--felt-espresso);
+}
+
+.cta-mini-pair {
+  display: inline-flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   Viral Feature 2: Friend Wool-Felt Arena PK Sheet
+   ========================================================================== */
+.pk-rival-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 7px;
+}
+
+.pk-rival-tab {
+  appearance: none;
+  border: 1.3px dashed rgba(138, 102, 68, 0.36);
+  background: #F6ECDA;
+  color: var(--felt-espresso);
+  border-radius: 14px;
+  padding: 7px 6px;
+  text-align: center;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  transition: transform 0.2s var(--spring-wool), border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.pk-rival-tab strong {
+  display: block;
+  font-size: 12px;
+}
+
+.pk-rival-tab small {
+  display: block;
+  margin-top: 2px;
+  font-size: 10px;
+  color: var(--felt-espresso-muted);
+}
+
+.pk-rival-tab.is-active {
+  background: #FFF9EE;
+  border: 1.8px solid var(--felt-terracotta);
+  box-shadow: 0 5px 12px rgba(217, 110, 71, 0.14);
+}
+
+.pk-arena-card {
+  position: relative;
+  background: #FBF4E4;
+  border: 1.5px dashed rgba(138, 102, 68, 0.42);
+  border-radius: 22px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 10px 24px rgba(68, 46, 26, 0.09);
+}
+
+.pk-arena-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.pk-invite-code {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--felt-espresso-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.pk-versus-stage {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 8px;
+}
+
+.pk-fighter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+}
+
+.pk-avatar-frame {
+  width: 90px;
+  height: 90px;
+  border-radius: 22px;
+  background: var(--felt-card-toy);
+  border: 1.6px dashed rgba(138, 102, 68, 0.44);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pk-avatar-frame.is-mine {
+  border-color: rgba(217, 110, 71, 0.72);
+  box-shadow: 0 8px 16px rgba(217, 110, 71, 0.14);
+}
+
+.pk-avatar-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.06);
+}
+
+.pk-fighter-name {
+  font-size: 13.5px;
+  color: var(--felt-espresso);
+}
+
+.pk-fighter-toy {
+  font-size: 10.5px;
+  color: var(--felt-espresso-muted);
+}
+
+.pk-score-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  background: #FCE6DC;
+  color: #A43E1D;
+  border: 1px dashed rgba(217, 110, 71, 0.48);
+}
+
+.pk-score-badge.is-rival {
+  background: #EFE4CE;
+  color: var(--felt-espresso);
+  border-color: rgba(138, 102, 68, 0.42);
+}
+
+.pk-vs-medallion {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--felt-espresso);
+  color: #FAF3E4;
+  border: 2px dashed rgba(250, 243, 228, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  box-shadow: 0 6px 14px rgba(62, 45, 32, 0.24);
+}
+
+.pk-verdict-banner {
+  margin: 0;
+  padding: 9px 11px;
+  border-radius: 14px;
+  background: #FAF3E4;
+  border: 1.2px dashed rgba(173, 121, 24, 0.46);
+  font-family: var(--font-editorial);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.45;
+  color: var(--felt-espresso);
+  text-align: center;
+}
+
+.pk-bars-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.pk-bar-row {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.pk-bar-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--felt-espresso-muted);
+}
+
+.pk-dual-track {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  height: 7px;
+}
+
+.pk-track-half {
+  background: rgba(138, 102, 68, 0.14);
+  border-radius: 99px;
+  overflow: hidden;
+  display: flex;
+}
+
+.pk-track-half.is-mine {
+  justify-content: flex-end;
+}
+
+.pk-fill-mine {
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, var(--felt-terracotta), #E68F64);
+}
+
+.pk-fill-rival {
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, #9A846B, #7B654E);
+}
+
+.pk-banter-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 7px;
+}
+
+.pk-banter-btn {
+  appearance: none;
+  border: 1.3px dashed rgba(138, 102, 68, 0.44);
+  background: #FAF3E4;
+  color: var(--felt-espresso);
+  border-radius: 13px;
+  padding: 9px 6px;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: transform 0.2s var(--spring-wool), background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.pk-banter-btn:hover {
+  border-color: var(--felt-terracotta);
+  background: #FFF9EE;
+}
+
+.pk-banter-btn:active {
+  transform: scale(0.94);
+}
+
+/* ==========================================================================
+   Viral Feature 3: 3-in-1 Share Hub Tabs & Daily / PK Cards
+   ========================================================================== */
+.share-tabs-bar {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  padding: 10px 18px 2px;
+  flex-shrink: 0;
+}
+
+.share-tab-btn {
+  appearance: none;
+  border: 1.3px dashed rgba(138, 102, 68, 0.36);
+  background: #F4E9D4;
+  color: var(--felt-espresso-muted);
+  border-radius: 12px;
+  height: 34px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: transform 0.2s var(--spring-wool), background-color 0.2s ease, color 0.2s ease;
+}
+
+.share-tab-btn.is-active {
+  background: var(--felt-terracotta);
+  border: 1.3px solid var(--felt-terracotta);
+  color: #FFFDF8;
+  box-shadow: 0 4px 10px rgba(217, 110, 71, 0.22);
+}
+
+.postcard-canvas-card[hidden] {
+  display: none;
+}
+
+.share-detective-callout {
+  background: #FAF3E4;
+  border: 1.3px dashed rgba(217, 110, 71, 0.42);
+  border-radius: 15px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+}
+
+.share-deduction-copy {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--felt-espresso);
+}
+
+.share-pk-matchup {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 2px;
+}
+
+.share-pk-side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+}
+
+.share-pk-side img {
+  width: 92px;
+  height: 92px;
+  border-radius: 22px;
+  background: var(--felt-card-toy);
+  border: 1.6px dashed rgba(138, 102, 68, 0.44);
+  object-fit: cover;
+}
+
+.share-pk-side strong {
+  font-size: 13px;
+  color: var(--felt-espresso);
+}
+
+.share-pk-side small {
+  font-size: 10.5px;
+  color: var(--felt-espresso-muted);
+}
+
+.pk-vs-mini {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--felt-espresso);
+  color: #FAF3E4;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.share-pk-verdict {
+  text-align: center;
+  font-size: 15px;
+}
+
+/* ==========================================================================
+   Game-Level Settlement Mini-Theater & Dynamic Mood Themes (gold/desert/storm/care)
+   ========================================================================== */
+.share-tabs-4 {
+  grid-template-columns: repeat(4, 1fr);
+  gap: 5px;
+  padding: 10px 16px 2px;
+}
+
+.share-tabs-4 .share-tab-btn {
+  font-size: 11.5px;
+  padding: 0 4px;
+  white-space: nowrap;
+}
+
+.settlement-card {
+  position: relative;
+  border-radius: 26px;
+  padding: 16px 15px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  box-shadow:
+    0 14px 32px rgba(62, 42, 22, 0.14),
+    inset 0 0 0 4px rgba(255, 252, 245, 0.56);
+  border: 1.5px solid rgba(255, 252, 244, 0.88);
+  transition: background 0.4s var(--ease-silk), border-color 0.4s ease;
+}
+
+.settlement-card[hidden] {
+  display: none;
+}
+
+.settlement-card::after {
+  content: "";
+  position: absolute;
+  inset: 7px;
+  border-radius: 20px;
+  border: 1.5px dashed var(--mood-stitch, rgba(138, 102, 68, 0.36));
+  pointer-events: none;
+}
+
+/* Mood 1: Gold Victory Theater (Bristol 3 & 4) */
+.settlement-card[data-mood="gold"] {
+  background: linear-gradient(180deg, #FDF4DC 0%, #F7E3B5 100%);
+  --mood-curtain: #B5423A;
+  --mood-curtain-shade: #8C2D27;
+  --mood-stitch: rgba(168, 118, 28, 0.42);
+  --mood-stage-bg: radial-gradient(circle at 50% 34%, #FFF9E6 0%, #F6DFAA 78%, #EED091 100%);
+  --mood-stamp-bg: #FFF4CE;
+  --mood-stamp-ink: #8E580B;
+  --mood-stamp-border: rgba(181, 122, 22, 0.64);
+  --mood-accent: #C7821F;
+  --mood-ribbon-bg: #FFF7E0;
+  --mood-ribbon-ink: #7F4B0C;
+}
+
+/* Mood 2: Desert Endurance Theater (Bristol 1 & 2) */
+.settlement-card[data-mood="desert"] {
+  background: linear-gradient(180deg, #F8E6D3 0%, #ECCBA9 100%);
+  --mood-curtain: #B56B3A;
+  --mood-curtain-shade: #8C4D24;
+  --mood-stitch: rgba(154, 92, 48, 0.42);
+  --mood-stage-bg: radial-gradient(circle at 50% 25%, #FDF1E2 0%, #F0D2B2 72%, #E3BA92 100%);
+  --mood-stamp-bg: #FDE8D6;
+  --mood-stamp-ink: #8E441A;
+  --mood-stamp-border: rgba(174, 86, 38, 0.58);
+  --mood-accent: #B85C2B;
+  --mood-ribbon-bg: #FCF0E4;
+  --mood-ribbon-ink: #7D3C19;
+}
+
+/* Mood 3: Storm Express Theater (Bristol 5, 6, 7) */
+.settlement-card[data-mood="storm"] {
+  background: linear-gradient(180deg, #E4EDF1 0%, #C9DCE5 100%);
+  --mood-curtain: #3B5268;
+  --mood-curtain-shade: #283A4B;
+  --mood-stitch: rgba(66, 94, 118, 0.4);
+  --mood-stage-bg: radial-gradient(circle at 50% 28%, #F2F7FA 0%, #D4E4EC 72%, #BBD2DE 100%);
+  --mood-stamp-bg: #EBF1F6;
+  --mood-stamp-ink: #324C66;
+  --mood-stamp-border: rgba(65, 95, 125, 0.55);
+  --mood-accent: #3D5F7D;
+  --mood-ribbon-bg: #EEF4F8;
+  --mood-ribbon-ink: #2C465E;
+}
+
+/* Mood 4: Orange Tabby Cat Doctor Silent Care Clinic (Red-Flag) */
+.settlement-card[data-mood="care"] {
+  background: linear-gradient(180deg, #2D2520 0%, #3A312A 100%);
+  color: #FBF4E4;
+  --mood-stitch: rgba(236, 206, 158, 0.34);
+  border-color: rgba(236, 206, 158, 0.32);
+  box-shadow: 0 14px 30px rgba(24, 18, 13, 0.32);
+}
+
+.settlement-card[data-mood="care"] .settlement-kicker,
+.settlement-card[data-mood="care"] .postcard-signature {
+  color: rgba(251, 244, 228, 0.72);
+}
+
+.settlement-card[data-mood="care"] .settlement-mood-title {
+  color: #FBF4E4;
+}
+
+.settlement-card[data-mood="care"] .stage-motion-chip {
+  display: none;
+}
+
+.settlement-card-head {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.settlement-head-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.settlement-kicker {
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--felt-espresso-muted);
+}
+
+.settlement-mood-title {
+  font-family: var(--font-editorial);
+  font-size: 16px;
+  color: var(--felt-espresso);
+}
+
+.stage-motion-chip {
+  appearance: none;
+  border: 1.2px dashed rgba(138, 102, 68, 0.45);
+  background: rgba(255, 250, 240, 0.84);
+  color: var(--felt-espresso);
+  border-radius: 999px;
+  padding: 4px 9px;
+  font-size: 10.5px;
+  font-weight: 700;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: transform 0.2s var(--spring-wool), background-color 0.2s ease;
+}
+
+.stage-motion-chip:active {
+  transform: scale(0.94);
+}
+
+/* ==========================================================================
+   Animated Stop-Motion Wool Proscenium Mini-Stage
+   ========================================================================== */
+.mini-theater-stage {
+  position: relative;
+  z-index: 2;
+  height: 156px;
+  border-radius: 20px;
+  background: var(--mood-stage-bg);
+  border: 1.5px dashed var(--mood-stitch);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 6px 18px rgba(62, 42, 22, 0.09);
+}
+
+.mini-theater-compact {
+  height: 118px;
+}
+
+.felt-curtain {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 34px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--mood-curtain) 0px,
+    var(--mood-curtain) 9px,
+    var(--mood-curtain-shade) 9px,
+    var(--mood-curtain-shade) 13px
+  );
+  z-index: 4;
+  box-shadow: 0 0 12px rgba(40, 24, 14, 0.22);
+}
+
+.felt-curtain-left {
+  left: 0;
+  border-bottom-right-radius: 26px;
+  border-right: 1.5px dashed rgba(255, 248, 232, 0.48);
+  animation: curtainPartLeft 0.7s var(--ease-silk) forwards;
+}
+
+.felt-curtain-right {
+  right: 0;
+  border-bottom-left-radius: 26px;
+  border-left: 1.5px dashed rgba(255, 248, 232, 0.48);
+  animation: curtainPartRight 0.7s var(--ease-silk) forwards;
+}
+
+@keyframes curtainPartLeft {
+  from { transform: translateX(18px) scaleX(1.3); }
+  to { transform: translateX(0) scaleX(1); }
+}
+
+@keyframes curtainPartRight {
+  from { transform: translateX(-18px) scaleX(1.3); }
+  to { transform: translateX(0) scaleX(1); }
+}
+
+/* Prop Visibility Strictly Tied to data-mood */
+.stage-props {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  display: none;
+  z-index: 1;
+}
+
+.settlement-card[data-mood="gold"] .stage-props-gold {
+  display: block;
+}
+
+.settlement-card[data-mood="desert"] .stage-props-desert {
+  display: block;
+}
+
+.settlement-card[data-mood="storm"] .stage-props-storm {
+  display: block;
+}
+
+/* Gold Mood Props */
+.prop-star {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  animation: feltStarFloat 2.4s steps(6) infinite alternate;
+}
+
+.prop-star-1 { top: 14px; left: 48px; }
+.prop-star-2 { top: 24px; right: 54px; width: 18px; height: 18px; animation-delay: 0.45s; }
+.prop-star-3 { bottom: 26px; left: 62px; width: 16px; height: 16px; animation-delay: 0.9s; }
+
+.prop-sparkle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #FFF6CC;
+  box-shadow: 0 0 0 2px rgba(226, 174, 61, 0.35);
+  animation: feltTwinkle 1.8s steps(4) infinite alternate;
+}
+
+.prop-sparkle-1 { top: 52px; left: 82px; }
+.prop-sparkle-2 { bottom: 38px; right: 86px; animation-delay: 0.6s; }
+
+@keyframes feltStarFloat {
+  0% { transform: translateY(0px) rotate(-10deg) scale(0.94); }
+  100% { transform: translateY(-7px) rotate(12deg) scale(1.08); }
+}
+
+@keyframes feltTwinkle {
+  0% { opacity: 0.45; transform: scale(0.8); }
+  100% { opacity: 1; transform: scale(1.25); }
+}
+
+/* Desert Mood Props */
+.prop-dune {
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  border-top: 1.5px dashed rgba(162, 102, 54, 0.35);
+  border-radius: 50% 50% 0 0;
+}
+
+.prop-dune-back {
+  bottom: -24px;
+  height: 62px;
+  background: rgba(217, 166, 118, 0.42);
+}
+
+.prop-dune-front {
+  bottom: -30px;
+  height: 52px;
+  background: rgba(203, 144, 92, 0.46);
+}
+
+.prop-wind {
+  position: absolute;
+  width: 78px;
+  top: 22px;
+  left: 44px;
+  opacity: 0.85;
+  animation: desertWindDrift 2.6s steps(6) infinite;
+}
+
+.prop-sweat {
+  position: absolute;
+  width: 14px;
+  height: 19px;
+  animation: desertSweatDrop 1.6s steps(5) infinite;
+}
+
+.prop-sweat-1 { top: 28px; left: 98px; }
+.prop-sweat-2 { top: 44px; right: 92px; width: 12px; animation-delay: 0.7s; }
+
+@keyframes desertWindDrift {
+  0% { transform: translateX(-8px); opacity: 0.35; }
+  50% { transform: translateX(8px); opacity: 0.95; }
+  100% { transform: translateX(18px); opacity: 0.25; }
+}
+
+@keyframes desertSweatDrop {
+  0% { transform: translateY(-4px) scale(0.9); opacity: 0.9; }
+  70% { transform: translateY(10px) scale(1.05); opacity: 1; }
+  100% { transform: translateY(16px) scale(0.85); opacity: 0; }
+}
+
+/* Storm Mood Props */
+.prop-wave {
+  position: absolute;
+  left: -12%;
+  right: -12%;
+  border-top: 2px dashed rgba(61, 95, 125, 0.38);
+  border-radius: 42% 58% 0 0;
+}
+
+.prop-wave-back {
+  bottom: -20px;
+  height: 56px;
+  background: rgba(133, 173, 198, 0.42);
+  animation: stormWaveSway 2.4s steps(6) infinite alternate;
+}
+
+.prop-wave-front {
+  bottom: -26px;
+  height: 48px;
+  background: rgba(98, 143, 173, 0.45);
+  animation: stormWaveSway 1.9s steps(5) infinite alternate-reverse;
+}
+
+.prop-rain {
+  position: absolute;
+  width: 3px;
+  height: 14px;
+  border-radius: 99px;
+  background: rgba(74, 118, 152, 0.65);
+  transform: rotate(12deg);
+  animation: stormRainFall 1.3s steps(5) infinite;
+}
+
+.prop-rain-1 { top: 10px; left: 56px; }
+.prop-rain-2 { top: 18px; left: 96px; animation-delay: 0.35s; }
+.prop-rain-3 { top: 8px; right: 98px; animation-delay: 0.65s; }
+.prop-rain-4 { top: 20px; right: 58px; animation-delay: 0.95s; }
+
+@keyframes stormWaveSway {
+  0% { transform: translateX(-10px) translateY(0px); }
+  100% { transform: translateX(10px) translateY(-4px); }
+}
+
+@keyframes stormRainFall {
+  0% { transform: translateY(-6px) rotate(12deg); opacity: 0.2; }
+  50% { transform: translateY(14px) rotate(12deg); opacity: 0.9; }
+  100% { transform: translateY(34px) rotate(12deg); opacity: 0; }
+}
+
+/* Center Plush Actor + Pedestal */
+.stage-center-actor {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stage-plush-frame {
+  width: 88px;
+  height: 88px;
+  border-radius: 22px;
+  background: var(--felt-card-toy);
+  border: 2px dashed rgba(138, 102, 68, 0.42);
+  box-shadow: 0 10px 20px rgba(62, 42, 22, 0.16);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stage-plush-sm {
+  width: 70px;
+  height: 70px;
+  border-radius: 18px;
+}
+
+.stage-plush-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.06);
+}
+
+.stage-pedestal {
+  width: 78px;
+  height: 12px;
+  margin-top: -4px;
+  border-radius: 50%;
+  background: rgba(114, 86, 58, 0.18);
+  border: 1px dashed rgba(114, 86, 58, 0.28);
+}
+
+.settlement-card[data-mood="gold"] .stage-plush-frame {
+  animation: plushVictoryBounce 1.55s steps(6) infinite;
+}
+
+.settlement-card[data-mood="desert"] .stage-plush-frame {
+  animation: plushDesertStrain 1.35s steps(4) infinite;
+}
+
+.settlement-card[data-mood="storm"] .stage-plush-frame {
+  animation: plushStormBob 1.15s steps(5) infinite;
+}
+
+@keyframes plushVictoryBounce {
+  0%, 100% { transform: translateY(0px) scale(1, 1); }
+  30% { transform: translateY(-9px) scale(0.97, 1.05); }
+  65% { transform: translateY(1px) scale(1.04, 0.95); }
+}
+
+@keyframes plushDesertStrain {
+  0%, 100% { transform: translateX(0px) rotate(0deg); }
+  25% { transform: translateX(-3px) rotate(-3.5deg); }
+  55% { transform: translateX(3px) rotate(3.5deg); }
+  80% { transform: translateX(-2px) rotate(-2deg); }
+}
+
+@keyframes plushStormBob {
+  0%, 100% { transform: translateY(0px) rotate(-4deg); }
+  50% { transform: translateY(-6px) rotate(5deg); }
+}
+
+/* Static Poster Toggle Freezes All Stop-Motion Keyframes Cleanly */
+.settlement-sheet.is-static-stage .mini-theater-stage *,
+.settlement-sheet.is-static-stage .mini-theater-stage *::before,
+.settlement-sheet.is-static-stage .mini-theater-stage *::after {
+  animation-play-state: paused !important;
+}
+
+/* Angled Stitched Rank Stamp */
+.settlement-rank-stamp {
+  position: absolute;
+  right: 40px;
+  top: 14px;
+  z-index: 5;
+  background: var(--mood-stamp-bg);
+  color: var(--mood-stamp-ink);
+  border: 2px dashed var(--mood-stamp-border);
+  border-radius: 15px;
+  padding: 6px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.12;
+  transform: rotate(7deg);
+  box-shadow: 0 6px 14px rgba(58, 40, 22, 0.14);
+}
+
+.settlement-rank-stamp strong {
+  font-family: var(--font-editorial);
+  font-size: 21px;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+}
+
+.settlement-rank-stamp span {
+  font-size: 9.5px;
+  font-weight: 800;
+  margin-top: 1px;
+}
+
+.settlement-rank-stamp em {
+  font-style: normal;
+  font-size: 10px;
+  font-weight: 700;
+  opacity: 0.85;
+  margin-top: 1px;
+}
+
+.settlement-rank-stamp.stamp-sm {
+  right: 38px;
+  top: 10px;
+  padding: 5px 9px;
+}
+
+.settlement-rank-stamp.stamp-sm strong {
+  font-size: 17px;
+}
+
+.settlement-rank-stamp.is-stamp-slam {
+  animation: rankStampSlam 0.56s var(--spring-wool);
+}
+
+@keyframes rankStampSlam {
+  0% { opacity: 0; transform: scale(2.1) rotate(-12deg); }
+  65% { opacity: 1; transform: scale(0.92) rotate(9deg); }
+  100% { opacity: 1; transform: scale(1) rotate(7deg); }
+}
+
+/* Serious Calm Care Clinic Stage (Red-Flag ONLY) */
+.care-clinic-stage {
+  position: relative;
+  z-index: 2;
+  background: #FBF4E4;
+  color: var(--care-ink);
+  border-radius: 20px;
+  padding: 13px;
+  border: 1.5px dashed rgba(180, 123, 52, 0.45);
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+
+.care-clinic-stage[hidden] {
+  display: none;
+}
+
+.care-clinic-visual {
+  height: 146px;
+  border-radius: 15px;
+  overflow: hidden;
+  border: 1.5px solid rgba(180, 123, 52, 0.32);
+}
+
+.care-clinic-visual img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 48%;
+}
+
+.care-clinic-body {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.care-clinic-body h3 {
+  margin: 0;
+  font-family: var(--font-editorial);
+  font-size: 15.5px;
+  color: var(--care-ink);
+}
+
+.care-clinic-body p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--care-ink-muted);
+}
+
+/* Settlement Body Stack, 3-Col HUD, Analysis & PK Ribbon */
+.settlement-body-stack {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.settlement-body-stack[hidden] {
+  display: none;
+}
+
+.settlement-headline {
+  margin: 0;
+  font-family: var(--font-editorial);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--felt-espresso);
+  text-align: center;
+}
+
+.settlement-hud-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 7px;
+}
+
+.hud-cell {
+  background: rgba(255, 251, 242, 0.85);
+  border: 1.2px dashed var(--mood-stitch);
+  border-radius: 14px;
+  padding: 8px 6px;
+  text-align: center;
+}
+
+.hud-cell span {
+  display: block;
+  font-size: 10px;
+  color: var(--felt-espresso-muted);
+}
+
+.hud-cell strong {
+  display: block;
+  margin-top: 3px;
+  font-size: 11.5px;
+  font-weight: 800;
+  color: var(--felt-espresso);
+  line-height: 1.25;
+}
+
+.settlement-analysis-box {
+  position: relative;
+  z-index: 2;
+  background: rgba(255, 251, 242, 0.84);
+  border: 1.2px dashed var(--mood-stitch);
+  border-radius: 15px;
+  padding: 9px 11px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.analysis-line {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+}
+
+.analysis-tag {
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: #FCE6DA;
+  color: #9D3B1B;
+  border: 1px dashed rgba(186, 78, 42, 0.36);
+}
+
+.analysis-tag.tag-supply {
+  background: #E7F0E0;
+  color: #3E6037;
+  border-color: rgba(74, 106, 70, 0.36);
+}
+
+.analysis-line p {
+  margin: 0;
+  font-size: 11.5px;
+  line-height: 1.42;
+  color: var(--felt-espresso);
+}
+
+.pk-challenge-ribbon {
+  position: relative;
+  z-index: 2;
+  background: var(--mood-ribbon-bg, #FFF7E0);
+  color: var(--mood-ribbon-ink, #7F4B0C);
+  border: 1.4px dashed var(--mood-stamp-border, rgba(173, 121, 24, 0.55));
+  border-radius: 13px;
+  padding: 8px 10px;
+  font-size: 11.5px;
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.38;
+}
+
+.pk-challenge-ribbon[hidden] {
+  display: none;
+}
+
+/* Weekly 7-Day Attendance Track & 4 Score Pills */
+.weekly-track-box,
+.monthly-chart-box {
+  position: relative;
+  z-index: 2;
+  background: rgba(255, 251, 242, 0.84);
+  border: 1.2px dashed var(--mood-stitch);
+  border-radius: 15px;
+  padding: 10px 11px;
+}
+
+.weekly-track-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--felt-espresso);
+}
+
+.weekly-track-head small {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--felt-espresso-muted);
+}
+
+.seven-day-track {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+}
+
+.day-token-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.day-token-circle {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10.5px;
+  font-weight: 800;
+  border: 1.5px dashed;
+}
+
+.day-token-gold {
+  background: #FCEEC3;
+  color: #88540A;
+  border-color: rgba(181, 122, 22, 0.6);
+}
+
+.day-token-desert {
+  background: #F6DAC0;
+  color: #8B431B;
+  border-color: rgba(174, 86, 38, 0.55);
+}
+
+.day-token-storm {
+  background: #D4E6F0;
+  color: #2E4B63;
+  border-color: rgba(65, 95, 125, 0.52);
+}
+
+.day-token-empty {
+  background: rgba(250, 243, 228, 0.55);
+  color: rgba(114, 91, 71, 0.5);
+  border-color: rgba(138, 102, 68, 0.28);
+}
+
+.day-token-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--felt-espresso-muted);
+}
+
+.weekly-pills-grid {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.weekly-score-pill {
+  background: rgba(255, 251, 242, 0.85);
+  border: 1.2px dashed var(--mood-stitch);
+  border-radius: 12px;
+  padding: 6px 4px;
+  text-align: center;
+}
+
+.weekly-score-pill strong {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 800;
+  color: var(--felt-espresso);
+}
+
+.weekly-score-pill span {
+  display: block;
+  margin-top: 1px;
+  font-size: 9.5px;
+  color: var(--felt-espresso-muted);
+}
+
+/* Monthly Bristol 1-7 Wool Distribution Bar Chart */
+.bristol-wool-bars {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  align-items: end;
+  height: 92px;
+  padding-top: 12px;
+}
+
+.wool-bar-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+  gap: 4px;
+}
+
+.wool-bar-count {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--felt-espresso);
+}
+
+.wool-bar-fill {
+  width: 100%;
+  max-width: 26px;
+  min-height: 6px;
+  border-radius: 8px 8px 4px 4px;
+  border: 1.2px dashed rgba(255, 250, 240, 0.72);
+  transition: height 0.45s var(--ease-silk);
+}
+
+.wool-bar-fill.bar-desert { background: linear-gradient(180deg, #D98958, #B86032); }
+.wool-bar-fill.bar-gold { background: linear-gradient(180deg, #EAB64E, #C98A1F); }
+.wool-bar-fill.bar-storm { background: linear-gradient(180deg, #749FB9, #49718E); }
+
+.wool-bar-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--felt-espresso-muted);
+}
+
+/* Settlement Footer with PK Ribbon Toggle */
+.settlement-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding-top: 10px;
+}
+
+.pk-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: #F4EAD6;
+  border: 1.2px dashed rgba(138, 102, 68, 0.36);
+  border-radius: 13px;
+  padding: 6px 11px;
+}
+
+.pk-toggle-row[hidden] {
+  display: none;
+}
+
+.pk-toggle-label {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--felt-espresso);
+}
+
+.felt-switch-sm {
+  width: 42px;
+  height: 24px;
+  padding: 2px;
+}
+
+.felt-switch-sm .felt-switch-knob {
+  width: 17px;
+  height: 17px;
+}
+
+.felt-switch-sm[aria-checked="true"] .felt-switch-knob {
+  transform: translateX(17px);
+}
+
+/* Clean Print View for 30-Day Clinical Doctor Report */
+@media print {
+  body {
+    background: #FFFFFF !important;
+    overflow: visible !important;
+  }
+  .workbench-backdrop,
+  .director-rail,
+  .stage-viewport,
+  .top-safe-zone,
+  .bottom-safe-zone,
+  .sheet-scrim,
+  .sheet-handle,
+  .sheet-close-btn,
+  .sheet-footer {
+    display: none !important;
+  }
+  .phone-shell {
+    width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+  .doctor-sheet {
+    position: static !important;
+    max-height: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    display: block !important;
+  }
+  .sheet-scroll-body {
+    overflow: visible !important;
+  }
+}
