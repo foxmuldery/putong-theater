@@ -3040,6 +3040,56 @@
   // Event Bindings
   // =========================================================================
   function bindEvents() {
+    // V6 Minimalist Top More Menu & Collapsible Desktop Demo Drawer
+    const moreMenuBtn = document.getElementById('moreMenuBtn');
+    const moreMenuPopover = document.getElementById('moreMenuPopover');
+    const closeMoreMenu = () => {
+      if (!moreMenuPopover || moreMenuPopover.hidden) return;
+      moreMenuPopover.hidden = true;
+      if (moreMenuBtn) moreMenuBtn.setAttribute('aria-expanded', 'false');
+    };
+    if (moreMenuBtn && moreMenuPopover) {
+      moreMenuBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        FeltAudio.softTap();
+        const willOpen = moreMenuPopover.hidden;
+        moreMenuPopover.hidden = !willOpen;
+        moreMenuBtn.setAttribute('aria-expanded', String(willOpen));
+      });
+      moreMenuPopover.addEventListener('click', (e) => {
+        if (e.target.closest('button')) closeMoreMenu();
+      });
+      document.addEventListener('click', (e) => {
+        if (!moreMenuPopover.hidden && !e.target.closest('.more-menu-wrap')) {
+          closeMoreMenu();
+        }
+      });
+    }
+
+    const directorToggleBtn = document.getElementById('directorToggleBtn');
+    const directorCloseBtn = document.getElementById('directorCloseBtn');
+    const directorRail = document.getElementById('directorRail');
+    const setDirectorDrawer = (open) => {
+      if (!directorRail) return;
+      directorRail.classList.toggle('is-collapsed', !open);
+      if (directorToggleBtn) {
+        directorToggleBtn.setAttribute('aria-expanded', String(open));
+        directorToggleBtn.hidden = open;
+      }
+    };
+    if (directorToggleBtn && directorRail) {
+      directorToggleBtn.addEventListener('click', () => {
+        FeltAudio.softTap();
+        setDirectorDrawer(true);
+      });
+    }
+    if (directorCloseBtn && directorRail) {
+      directorCloseBtn.addEventListener('click', () => {
+        FeltAudio.softTap();
+        setDirectorDrawer(false);
+      });
+    }
+
     el.soundToggleBtn.addEventListener('click', () => {
       state.settings.soundEnabled = !state.settings.soundEnabled;
       saveState();

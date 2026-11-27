@@ -34,46 +34,19 @@
       <div class="stage-bottom-veil"></div>
     </div>
 
-    <!-- TOP 14% SAFE ZONE: Stitched Bar + Playbill Ticket -->
+    <!-- TOP SAFE ZONE: Serene Minimal Title + 2 Quiet Icons -->
     <header class="top-safe-zone">
       <div class="top-stitched-bar">
         <button id="brandButton" class="brand-patch" type="button" title="噗通剧场">
           <span class="brand-dot" aria-hidden="true"></span>
           <span class="brand-text">
             <strong id="brandTitle">噗通剧场</strong>
-            <small id="brandSubtitle">毛毡肠道公报</small>
+            <small id="brandSubtitle" class="v6-sr-hidden">毛毡肠道公报</small>
           </span>
         </button>
 
         <div class="top-controls">
-          <button
-            id="soundToggleBtn"
-            class="felt-icon-pill"
-            type="button"
-            aria-label="切换音效"
-            title="轻触音效"
-            aria-pressed="true"
-          >
-            <svg class="icon-svg icon-sound-on" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-              <path d="M3.5 8.2H6.5L10.5 4.8V15.2L6.5 11.8H3.5V8.2Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" />
-              <path d="M13.2 7.4C14.3 8.5 14.3 11.5 13.2 12.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
-              <path d="M15.4 5.6C17.2 7.8 17.2 12.2 15.4 14.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
-            </svg>
-            <svg class="icon-svg icon-sound-off" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-              <path d="M3.5 8.2H6.5L10.5 4.8V15.2L6.5 11.8H3.5V8.2Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" />
-              <path d="M13.4 7.8L16.8 12.2M16.8 7.8L13.4 12.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
-            </svg>
-          </button>
-
-          <button id="privacyBtn" class="felt-pill" type="button" aria-label="打开隐私与伪装设置">
-            <svg class="icon-svg" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-              <rect x="4.5" y="9" width="11" height="7.5" rx="2.2" stroke="currentColor" stroke-width="1.6" />
-              <path d="M7 9V6.8C7 5.1 8.3 3.8 10 3.8C11.7 3.8 13 5.1 13 6.8V9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
-            </svg>
-            <span id="privacyPillLabel">伪装</span>
-          </button>
-
-          <button id="timerPillBtn" class="felt-pill timer-pill" type="button" aria-label="蹲坑计时器">
+          <button id="timerPillBtn" class="felt-pill timer-pill" type="button" aria-label="蹲坑计时器" title="开始计时">
             <svg class="icon-svg" viewBox="0 0 20 20" fill="none" aria-hidden="true">
               <circle cx="10" cy="11" r="6" stroke="currentColor" stroke-width="1.6" />
               <path d="M10 8V11.2L12.2 12.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
@@ -81,20 +54,73 @@
             </svg>
             <span id="timerDisplay">00:00</span>
           </button>
+
+          <div class="more-menu-wrap">
+            <button
+              id="moreMenuBtn"
+              class="felt-icon-pill more-menu-btn"
+              type="button"
+              aria-label="更多设置与演示"
+              aria-expanded="false"
+              aria-controls="moreMenuPopover"
+            >
+              <svg class="icon-svg" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                <circle cx="4.5" cy="10" r="1.4" fill="currentColor" />
+                <circle cx="10" cy="10" r="1.4" fill="currentColor" />
+                <circle cx="15.5" cy="10" r="1.4" fill="currentColor" />
+              </svg>
+            </button>
+
+            <div id="moreMenuPopover" class="more-menu-popover" role="menu" hidden>
+              <button
+                id="soundToggleBtn"
+                class="more-menu-item"
+                type="button"
+                role="menuitem"
+                aria-pressed="true"
+              >
+                <span class="more-menu-icon">
+                  <svg class="icon-svg icon-sound-on" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                    <path d="M3.5 8.2H6.5L10.5 4.8V15.2L6.5 11.8H3.5V8.2Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" />
+                    <path d="M13.2 7.4C14.3 8.5 14.3 11.5 13.2 12.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                  </svg>
+                  <svg class="icon-svg icon-sound-off" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                    <path d="M3.5 8.2H6.5L10.5 4.8V15.2L6.5 11.8H3.5V8.2Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" />
+                    <path d="M13.4 7.8L16.8 12.2M16.8 7.8L13.4 12.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                  </svg>
+                </span>
+                <span>轻触音效</span>
+              </button>
+
+              <button id="privacyBtn" class="more-menu-item" type="button" role="menuitem">
+                <span class="more-menu-icon">
+                  <svg class="icon-svg" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                    <rect x="4.5" y="9" width="11" height="7.5" rx="2.2" stroke="currentColor" stroke-width="1.6" />
+                    <path d="M7 9V6.8C7 5.1 8.3 3.8 10 3.8C11.7 3.8 13 5.1 13 6.8V9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                  </svg>
+                </span>
+                <span id="privacyPillLabel">伪装外观</span>
+              </button>
+
+              <div class="more-menu-divider" aria-hidden="true"></div>
+
+              <button id="demoEightMinBtn" class="more-menu-item" type="button" role="menuitem">
+                <span class="more-menu-icon">⏱</span>
+                <span>预览 8 分钟提醒</span>
+              </button>
+
+              <button id="openRedFlagDemoBtn" class="more-menu-item is-warn" type="button" role="menuitem">
+                <span class="more-menu-icon">🩺</span>
+                <span>预览红灯关护</span>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- Floating Playbill Row (Sits cleanly above the wooden theater roof) -->
-      <div class="playbill-row">
-        <div id="playbillBadge" class="playbill-ticket">
-          <span class="ticket-notch ticket-notch-left" aria-hidden="true"></span>
-          <span class="ticket-notch ticket-notch-right" aria-hidden="true"></span>
-          <span id="playbillText">第 42 场 · 丝滑金冠团</span>
-        </div>
-
-        <button id="demoEightMinBtn" class="mini-stitched-chip" type="button" title="演示 8 分钟久蹲提醒">
-          演示 8 分提醒
-        </button>
+      <!-- Hidden metadata node preserved cleanly for state sync -->
+      <div id="playbillBadge" class="v6-sr-hidden" aria-hidden="true">
+        <span id="playbillText">第 42 场 · 丝滑金冠团</span>
       </div>
     </header>
 
@@ -115,58 +141,62 @@
 
     <!-- BOTTOM 28% SAFE ZONE: Theater Bulletin OR Calm Medical Red-Flag Card -->
     <section class="bottom-safe-zone">
-      <!-- 1. Normal Theater Bulletin Card -->
-      <article id="theaterCard" class="bulletin-card" aria-label="今日剧报">
-        <div class="bulletin-meta-row">
-          <div class="bulletin-left-meta">
-            <img id="latestToyThumb" class="mini-felt-thumb" src="assets/felt/bristol_4.jpg" alt="最新布里斯托毛毡团子" />
-            <div>
-              <span id="latestTimeLabel" class="meta-kicker">今日剧报 · 08:42</span>
-              <span id="latestBristolTag" class="meta-sub">4型 · 丝滑金冠团</span>
-            </div>
-          </div>
-          <span id="stageStampBadge" class="stage-stamp" data-tone="gold">五星金绒</span>
+      <!-- 1. Serene Minimal Theater Home Dock -->
+      <article id="theaterCard" class="bulletin-card v6-home-dock" aria-label="今日剧报">
+        <div class="v6-dock-meta">
+          <span id="latestBristolTag" class="v6-meta-main">4型 · 丝滑金冠团</span>
+          <span class="v6-meta-sep" aria-hidden="true">·</span>
+          <span id="latestTimeLabel" class="v6-meta-time">今日剧报 · 08:42</span>
         </div>
 
-        <h1 id="comedyHeadline" class="bulletin-headline">
+        <h1 id="comedyHeadline" class="bulletin-headline v6-dock-headline">
           “昨夜重辣火锅企图搞事，被四号金冠团优雅镇压！”
         </h1>
 
-        <!-- Feature 1: Felt Detective Diet Deduction Strip -->
-        <div id="detectiveStrip" class="detective-strip">
-          <div class="detective-top-row">
-            <span id="detectiveConfBadge" class="detective-badge">侦探反推 89%</span>
-            <div id="detectiveFeedbackBtns" class="detective-btns">
-              <button id="detectiveHitBtn" class="detective-chip detective-chip-hit" type="button">猜中了！</button>
-              <button id="detectiveMissBtn" class="detective-chip" type="button">其实吃了别的</button>
+        <!-- Legacy sync nodes cleanly hidden from Home stage (live inside Settlement & Insights) -->
+        <div class="v6-sr-hidden" aria-hidden="true">
+          <img id="latestToyThumb" src="assets/felt/bristol_4.jpg" alt="" />
+          <span id="stageStampBadge" data-tone="gold">五星金绒</span>
+          <p id="bulletinStats">耗时 4 分 18 秒 · 顺畅 · 连续 6 日安泰</p>
+          <div id="detectiveStrip">
+            <span id="detectiveConfBadge">侦探反推 89%</span>
+            <span id="detectiveGuessText"></span>
+            <div id="detectiveFeedbackBtns">
+              <button id="detectiveHitBtn" type="button">猜中了！</button>
+              <button id="detectiveMissBtn" type="button">其实吃了别的</button>
+            </div>
+            <div id="detectiveOverrideRow" hidden>
+              <div id="detectiveOverrideChips"></div>
             </div>
           </div>
-          <span id="detectiveGuessText" class="detective-text">猜你吃了：重辣火锅 + 温水补救到位</span>
-          <div id="detectiveOverrideRow" class="detective-override-row" hidden>
-            <span class="override-label">点选真实线索：</span>
-            <div id="detectiveOverrideChips" class="override-chips"></div>
-          </div>
         </div>
 
-        <p id="bulletinStats" class="bulletin-stats">
-          耗时 4 分 18 秒 · 顺畅 · 连续 6 日安泰
-        </p>
+        <button id="openLogBtn" class="btn-primary-felt v6-primary-cta" type="button">
+          记一笔
+        </button>
 
-        <div class="bulletin-actions-primary">
-          <button id="openLogBtn" class="btn-primary-felt" type="button">
-            <span class="btn-plus" aria-hidden="true">+</span>
-            <span>5 秒记一笔</span>
+        <nav class="v6-dock-nav" aria-label="核心入口">
+          <button id="openShareDailyBtn" class="v6-nav-link" type="button">
+            <svg class="v6-nav-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <rect x="3.5" y="4" width="13" height="12" rx="2.5" stroke="currentColor" stroke-width="1.5" />
+              <path d="M7 9H13M7 12.2H10.8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+            </svg>
+            <span>结算</span>
           </button>
-          <button id="openPkBtn" class="btn-secondary-felt btn-pk-felt" type="button">
-            好友毛毡 PK
+          <button id="openPkBtn" class="v6-nav-link" type="button">
+            <svg class="v6-nav-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M6.5 6.5L13.5 13.5M13.5 6.5L6.5 13.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+              <circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.5" />
+            </svg>
+            <span>好友 PK</span>
           </button>
-        </div>
-
-        <div class="bulletin-actions-micro">
-          <button id="openInsightsBtn" class="micro-felt-btn" type="button">雷区档案</button>
-          <button id="openShareDailyBtn" class="micro-felt-btn" type="button">通关结算</button>
-          <button id="openRedFlagDemoBtn" class="micro-felt-btn micro-felt-warn" type="button">红灯演示</button>
-        </div>
+          <button id="openInsightsBtn" class="v6-nav-link" type="button">
+            <svg class="v6-nav-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M4.5 14.5V10.5M10 14.5V6M15.5 14.5V8.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+            </svg>
+            <span>档案</span>
+          </button>
+        </nav>
       </article>
 
       <!-- 2. Calm Medical Red-Flag Care Card (Crossfades in with Orange Tabby Cat Doctor) -->
@@ -635,8 +665,7 @@
       <div class="sheet-handle" aria-hidden="true"></div>
       <div class="sheet-header">
         <div>
-          <h2 id="postcardTitle" class="sheet-title">通关结算剧场</h2>
-          <p class="sheet-subtitle">根据团子状态切换毛毡小剧场 · 一键导出好友 PK 分享图</p>
+          <h2 id="postcardTitle" class="sheet-title">通关结算</h2>
         </div>
         <button class="sheet-close-btn" type="button" data-close-sheet aria-label="关闭">×</button>
       </div>
@@ -998,12 +1027,24 @@
     </div>
   </main>
 
-  <!-- DESKTOP-ONLY (>= 920px) Director Quick Demo Rail -->
-  <aside id="directorRail" class="director-rail" aria-label="导演快捷体验台">
+  <!-- DESKTOP-ONLY (>= 920px) Collapsible Quick Demo Drawer (Hidden by Default for Pure Minimalism) -->
+  <button
+    id="directorToggleBtn"
+    class="director-fab"
+    type="button"
+    aria-expanded="false"
+    aria-controls="directorRail"
+  >
+    体验台
+  </button>
+
+  <aside id="directorRail" class="director-rail is-collapsed" aria-label="快捷体验台">
     <div class="director-rail-head">
-      <span class="director-kicker">DIRECTOR DEMO CONSOLE</span>
-      <h2>导演快捷体验台</h2>
-      <p>一键预览 3 种动态小剧场结算（金绒/荒漠/暴风）、周月赛季、PK 与红灯诊室。</p>
+      <div class="director-rail-head-top">
+        <h2>快捷体验台</h2>
+        <button id="directorCloseBtn" class="director-close-btn" type="button" aria-label="收起体验台">×</button>
+      </div>
+      <p>一键预览不同画风结算、周月赛季与红灯诊室。</p>
     </div>
 
     <nav class="director-rail-nav" aria-label="演示节点导航">

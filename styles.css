@@ -4151,3 +4151,632 @@ body {
     overflow: visible !important;
   }
 }
+
+
+/* ==========================================================================
+   V6: Gallery Minimalism & Serene Breathing Space (Zero Clutter)
+   Replaces busy dashed-box stacks with Apple / Muji / Wes-Anderson restraint.
+   ========================================================================== */
+.v6-sr-hidden {
+  display: none !important;
+}
+
+/* 1. Pure Serene Workbench & Centered Showcase on Desktop */
+.workbench-backdrop {
+  background: radial-gradient(circle at 50% 24%, #FAF4E8 0%, #EFE5D3 60%, #E5D8C2 100%) !important;
+}
+
+@media (min-width: 920px) {
+  .demo-stage-layout {
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .phone-shell {
+    box-shadow:
+      0 28px 72px rgba(74, 52, 34, 0.14),
+      0 4px 16px rgba(74, 52, 34, 0.06),
+      0 0 0 1px rgba(112, 83, 56, 0.10) !important;
+  }
+
+  .director-fab {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 60;
+    height: 36px;
+    padding: 0 16px;
+    border-radius: 999px;
+    border: 1px solid rgba(112, 83, 56, 0.16);
+    background: rgba(252, 248, 240, 0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    color: var(--felt-espresso-muted);
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    box-shadow: 0 8px 24px rgba(74, 52, 34, 0.08);
+    cursor: pointer;
+    transition: transform 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .director-fab:hover {
+    color: var(--felt-espresso);
+    transform: translateY(-1px);
+    box-shadow: 0 10px 28px rgba(74, 52, 34, 0.12);
+  }
+
+  .director-fab[hidden] {
+    display: none !important;
+  }
+
+  .director-rail {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 65;
+    width: 248px;
+    max-height: calc(100vh - 48px);
+    overflow-y: auto;
+    border-radius: 22px;
+    border: 1px solid rgba(112, 83, 56, 0.14) !important;
+    background: rgba(252, 248, 240, 0.96) !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 20px 50px rgba(74, 52, 34, 0.14) !important;
+    padding: 16px !important;
+    transition: opacity 0.22s ease, transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .director-rail.is-collapsed {
+    display: none !important;
+  }
+
+  .director-rail-head-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+
+  .director-rail-head h2 {
+    font-size: 14px !important;
+    margin: 0 !important;
+  }
+
+  .director-rail-head p {
+    font-size: 11.5px !important;
+    line-height: 1.45 !important;
+    margin: 0 0 10px !important;
+  }
+
+  .director-close-btn {
+    width: 26px;
+    height: 26px;
+    border-radius: 999px;
+    border: none;
+    background: rgba(112, 83, 56, 0.08);
+    color: var(--felt-espresso-muted);
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .director-jump-btn {
+    border: 1px solid transparent !important;
+    background: transparent !important;
+    padding: 7px 9px !important;
+    border-radius: 11px !important;
+  }
+
+  .director-jump-btn:hover,
+  .director-jump-btn.is-active {
+    background: rgba(217, 110, 71, 0.10) !important;
+    border-color: rgba(217, 110, 71, 0.22) !important;
+  }
+}
+
+@media (max-width: 919px) {
+  .director-fab {
+    display: none !important;
+  }
+}
+
+/* 2. Top Safe Zone: Whisper-Quiet Editorial Title + 2 Minimal Circular Icons */
+.top-safe-zone {
+  padding: max(14px, env(safe-area-inset-top)) 18px 0 !important;
+  gap: 0 !important;
+}
+
+.top-stitched-bar {
+  align-items: center !important;
+}
+
+.brand-patch {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 4px 2px !important;
+  gap: 7px !important;
+}
+
+.brand-patch::after {
+  display: none !important;
+}
+
+.brand-dot {
+  width: 7px !important;
+  height: 7px !important;
+  box-shadow: none !important;
+  opacity: 0.9;
+}
+
+.brand-text strong {
+  font-family: var(--font-editorial);
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.06em;
+  color: var(--felt-espresso);
+}
+
+.phone-shell[data-mode="redflag"] .brand-text strong {
+  color: #F7EFE2;
+}
+
+.top-controls {
+  gap: 8px !important;
+}
+
+.felt-pill.timer-pill,
+.more-menu-btn {
+  height: 36px !important;
+  min-width: 36px !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(112, 83, 56, 0.12) !important;
+  background: rgba(252, 248, 240, 0.72) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 4px 12px rgba(74, 52, 34, 0.05) !important;
+  color: var(--felt-espresso) !important;
+  padding: 0 10px !important;
+}
+
+.felt-pill.timer-pill::after,
+.more-menu-btn::after {
+  display: none !important;
+}
+
+/* Hide 00:00 at rest so the icon stays ultra-clean; reveal cleanly when timing */
+.felt-pill.timer-pill:not(.is-running) {
+  width: 36px !important;
+  padding: 0 !important;
+  justify-content: center;
+}
+
+.felt-pill.timer-pill:not(.is-running) #timerDisplay {
+  display: none !important;
+}
+
+.felt-pill.timer-pill.is-running {
+  padding: 0 12px !important;
+  background: rgba(217, 110, 71, 0.14) !important;
+  border-color: rgba(217, 110, 71, 0.32) !important;
+  color: #B44B27 !important;
+}
+
+.more-menu-btn {
+  width: 36px !important;
+  padding: 0 !important;
+}
+
+.phone-shell[data-mode="redflag"] .felt-pill.timer-pill,
+.phone-shell[data-mode="redflag"] .more-menu-btn {
+  background: rgba(45, 37, 32, 0.65) !important;
+  border-color: rgba(250, 243, 228, 0.16) !important;
+  color: #F7EFE2 !important;
+}
+
+/* Clean Floating More Menu Popover */
+.more-menu-wrap {
+  position: relative;
+}
+
+.more-menu-popover {
+  position: absolute;
+  top: 44px;
+  right: 0;
+  width: 176px;
+  padding: 6px;
+  border-radius: 16px;
+  background: rgba(253, 249, 242, 0.98);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(112, 83, 56, 0.13);
+  box-shadow: 0 16px 36px rgba(74, 52, 34, 0.14);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  z-index: 40;
+}
+
+.more-menu-popover[hidden] {
+  display: none !important;
+}
+
+.more-menu-item {
+  appearance: none;
+  border: none;
+  background: transparent;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 11px;
+  border-radius: 11px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--felt-espresso);
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.16s ease;
+}
+
+.more-menu-item:hover {
+  background: rgba(138, 102, 68, 0.09);
+}
+
+.more-menu-item.is-warn {
+  color: #A44122;
+}
+
+.more-menu-icon {
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: var(--felt-espresso-muted);
+  flex-shrink: 0;
+}
+
+.more-menu-item[aria-pressed="true"] .icon-sound-off {
+  display: none;
+}
+
+.more-menu-item[aria-pressed="false"] .icon-sound-on {
+  display: none;
+}
+
+.more-menu-divider {
+  height: 1px;
+  background: rgba(112, 83, 56, 0.10);
+  margin: 4px 8px;
+}
+
+/* 3. Bottom Home Dock: 1 Quiet Line + 1 Headline + 1 Full-Width CTA + 3 Clean Links */
+.bottom-safe-zone {
+  padding: 0 16px max(16px, env(safe-area-inset-bottom)) !important;
+}
+
+.bulletin-card.v6-home-dock {
+  background: rgba(253, 249, 241, 0.94) !important;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(112, 83, 56, 0.11) !important;
+  border-radius: 26px !important;
+  padding: 18px 20px 12px !important;
+  box-shadow: 0 14px 36px rgba(74, 52, 34, 0.10) !important;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.bulletin-card.v6-home-dock::after {
+  display: none !important;
+}
+
+.v6-dock-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--felt-espresso-muted);
+  margin-bottom: 8px;
+}
+
+.v6-meta-main {
+  font-weight: 700;
+  color: #9C6937;
+}
+
+.v6-meta-sep {
+  opacity: 0.45;
+}
+
+.v6-meta-time {
+  opacity: 0.78;
+}
+
+.bulletin-headline.v6-dock-headline {
+  font-family: var(--font-editorial);
+  font-size: 17.5px !important;
+  line-height: 1.52 !important;
+  font-weight: 700 !important;
+  color: var(--felt-espresso) !important;
+  margin: 0 0 16px !important;
+  letter-spacing: 0.01em;
+}
+
+.btn-primary-felt.v6-primary-cta {
+  width: 100%;
+  height: 48px !important;
+  border-radius: 15px !important;
+  font-size: 15.5px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.06em;
+  box-shadow: 0 8px 18px rgba(217, 110, 71, 0.24) !important;
+  margin-bottom: 10px;
+}
+
+.btn-primary-felt.v6-primary-cta::after {
+  display: none !important;
+}
+
+.v6-dock-nav {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-top: 1px solid rgba(112, 83, 56, 0.09);
+  padding-top: 8px;
+  margin-top: 2px;
+}
+
+.v6-nav-link {
+  appearance: none;
+  border: none;
+  background: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 34px;
+  border-radius: 10px;
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--felt-espresso-muted);
+  cursor: pointer;
+  transition: color 0.18s ease, background-color 0.18s ease;
+}
+
+.v6-nav-link:hover {
+  color: var(--felt-espresso);
+  background: rgba(138, 102, 68, 0.07);
+}
+
+.v6-nav-icon {
+  width: 15px;
+  height: 15px;
+  opacity: 0.8;
+}
+
+/* 4. Bottom Sheets & Settlement Theater: Editorial Gallery Poster (Zero Nested Dashed Clutter) */
+.felt-sheet {
+  border-top: 1px solid rgba(112, 83, 56, 0.12) !important;
+  border-radius: 28px 28px 0 0 !important;
+  background: #FCF7ED !important;
+}
+
+.sheet-header {
+  border-bottom: 1px solid rgba(112, 83, 56, 0.08) !important;
+  padding: 12px 20px 12px !important;
+}
+
+.sheet-title {
+  font-size: 18px !important;
+  letter-spacing: 0.02em;
+}
+
+.sheet-close-btn {
+  border: none !important;
+  background: rgba(112, 83, 56, 0.08) !important;
+}
+
+.sheet-footer {
+  border-top: 1px solid rgba(112, 83, 56, 0.08) !important;
+  background: #FCF7ED !important;
+}
+
+/* Clean Segmented Switcher (Apple-style pill track instead of 4 dashed boxes) */
+.share-tabs-bar {
+  background: rgba(138, 102, 68, 0.08);
+  padding: 3px !important;
+  margin: 10px 20px 2px !important;
+  border-radius: 13px;
+  gap: 2px !important;
+}
+
+.share-tab-btn {
+  border: none !important;
+  background: transparent !important;
+  border-radius: 10px !important;
+  height: 32px !important;
+  font-size: 12.5px !important;
+  font-weight: 600 !important;
+  color: var(--felt-espresso-muted) !important;
+  box-shadow: none !important;
+}
+
+.share-tab-btn.is-active {
+  background: #FFFDF8 !important;
+  color: var(--felt-espresso) !important;
+  font-weight: 700 !important;
+  box-shadow: 0 2px 8px rgba(74, 52, 34, 0.08) !important;
+}
+
+/* Gallery Poster Settlement Card — Clean Surfaces & Whisper Hairlines */
+.settlement-card,
+.postcard-canvas-card {
+  border: 1px solid rgba(112, 83, 56, 0.12) !important;
+  border-radius: 24px !important;
+  padding: 18px !important;
+  box-shadow: 0 10px 30px rgba(74, 52, 34, 0.06) !important;
+}
+
+.settlement-card::after,
+.postcard-canvas-card::after {
+  display: none !important;
+}
+
+.stage-motion-chip {
+  border: 1px solid rgba(112, 83, 56, 0.14) !important;
+  background: rgba(255, 253, 248, 0.78) !important;
+  font-size: 11px !important;
+  padding: 4px 10px !important;
+}
+
+.mini-theater-stage {
+  border: 1px solid rgba(112, 83, 56, 0.10) !important;
+  border-radius: 18px !important;
+}
+
+.stage-plush-frame {
+  border: 2px solid rgba(255, 253, 248, 0.92) !important;
+  box-shadow: 0 8px 20px rgba(74, 52, 34, 0.12) !important;
+}
+
+/* Unified 3-Metric Hairline Bar (Replaces 3 separate dashed boxes!) */
+.settlement-hud-grid,
+.postcard-stats-grid {
+  background: rgba(255, 253, 248, 0.72);
+  border: 1px solid rgba(112, 83, 56, 0.08);
+  border-radius: 15px;
+  gap: 0 !important;
+  padding: 10px 4px;
+}
+
+.hud-cell,
+.postcard-stat-cell {
+  border: none !important;
+  background: transparent !important;
+  border-radius: 0 !important;
+  padding: 2px 6px !important;
+  position: relative;
+}
+
+.hud-cell + .hud-cell::before,
+.postcard-stat-cell + .postcard-stat-cell::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 18%;
+  bottom: 18%;
+  width: 1px;
+  background: rgba(112, 83, 56, 0.12);
+}
+
+/* Calm Editorial Analysis Block (Replaces nested pill-tag boxes!) */
+.settlement-analysis-box,
+.weekly-track-box,
+.monthly-chart-box {
+  border: 1px solid rgba(112, 83, 56, 0.08) !important;
+  background: rgba(255, 253, 248, 0.66) !important;
+  border-radius: 15px !important;
+  padding: 12px 14px !important;
+}
+
+.analysis-tag {
+  border: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+  font-size: 11px !important;
+  color: #A44B27 !important;
+  letter-spacing: 0.02em;
+}
+
+.analysis-tag.tag-supply {
+  color: #4A6A46 !important;
+}
+
+.weekly-pills-grid {
+  background: rgba(255, 253, 248, 0.72);
+  border: 1px solid rgba(112, 83, 56, 0.08);
+  border-radius: 15px;
+  gap: 0 !important;
+  padding: 9px 2px;
+}
+
+.weekly-score-pill {
+  border: none !important;
+  background: transparent !important;
+  border-radius: 0 !important;
+  position: relative;
+}
+
+.weekly-score-pill + .weekly-score-pill::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 20%;
+  bottom: 20%;
+  width: 1px;
+  background: rgba(112, 83, 56, 0.10);
+}
+
+.pk-challenge-ribbon {
+  border: 1px solid rgba(186, 78, 42, 0.18) !important;
+  background: rgba(252, 236, 224, 0.65) !important;
+  border-radius: 12px !important;
+  padding: 9px 12px !important;
+}
+
+.postcard-footer-note {
+  padding-top: 2px;
+  opacity: 0.72;
+}
+
+.postcard-privacy-badge {
+  border: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+  font-size: 10.5px !important;
+}
+
+.pk-toggle-row {
+  border: none !important;
+  background: transparent !important;
+  padding: 2px 2px 6px !important;
+}
+
+.btn-secondary-felt {
+  border: 1px solid rgba(112, 83, 56, 0.16) !important;
+  background: rgba(255, 253, 248, 0.85) !important;
+}
+
+/* Also declutter PK Arena & Logger secondary boxes softly */
+.pk-rival-card,
+.pk-arena-card,
+.pk-banter-box,
+.pk-roast-box,
+.pk-banter-btn {
+  border-style: solid !important;
+  border-color: rgba(112, 83, 56, 0.11) !important;
+}
+
+.pk-rival-card.is-active {
+  border-color: var(--felt-terracotta) !important;
+}
+
+.pk-avatar-frame {
+  border: 2px solid rgba(255, 253, 248, 0.92) !important;
+  box-shadow: 0 6px 16px rgba(74, 52, 34, 0.10) !important;
+}
+
+.seven-day-dot {
+  border-style: solid !important;
+  border-width: 1.5px !important;
+}
