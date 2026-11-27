@@ -1267,6 +1267,15 @@
     FeltAudio.setEnabled(state.settings.soundEnabled);
   }
 
+  let activeHeroPose = 'default';
+
+  function setHeroStagePose(pose) {
+    const layers = document.querySelectorAll('.stage-image-hero[data-hero-pose]');
+    layers.forEach((img) => {
+      img.classList.toggle('is-visible', Boolean(pose) && img.dataset.heroPose === pose);
+    });
+  }
+
   function renderHomeStage(animatePop = false) {
     const latest = state.logs[0];
     const toy = getToy(latest.bristol);
@@ -1275,14 +1284,14 @@
     el.appShell.dataset.mode = currentMode;
 
     if (currentMode === 'redflag') {
-      el.stageHeroImg.classList.remove('is-visible');
+      setHeroStagePose(null);
       el.theaterCard.hidden = true;
       el.redFlagCard.hidden = false;
       el.playbillText.textContent = '大橘猫猫医生 · 安心问诊中';
       renderCareTriageView();
     } else {
       setDoctorPose(null);
-      el.stageHeroImg.classList.add('is-visible');
+      setHeroStagePose(activeHeroPose || 'default');
       el.redFlagCard.hidden = true;
       el.theaterCard.hidden = false;
 
@@ -1621,13 +1630,20 @@
 
   function showEightMinToast(playAudio = true) {
     if (currentMode === 'redflag') return;
+    activeHeroPose = 'overtime';
+    setHeroStagePose('overtime');
     el.eightMinToast.hidden = false;
     if (playAudio) FeltAudio.alertToast();
     syncDirectorRailActive();
   }
 
   function hideEightMinToast() {
+    if (el.eightMinToast.hidden) return;
     el.eightMinToast.hidden = true;
+    if (currentMode !== 'redflag') {
+      activeHeroPose = sessionActive ? 'sitting' : 'default';
+      setHeroStagePose(activeHeroPose);
+    }
     syncDirectorRailActive();
   }
 
@@ -1989,6 +2005,7 @@
     }
 
     currentMode = 'theater';
+    activeHeroPose = draft.bristol === 3 || draft.bristol === 4 ? 'victory' : 'effort';
     settlementPreviewEntry = null;
     directorActiveHint = '';
     closeAllSheets();
@@ -3628,9 +3645,10 @@
     ensureToilets();
     if (currentMode === 'redflag') {
       currentMode = 'theater';
-      renderHomeStage(false);
     }
     sessionActive = true;
+    activeHeroPose = 'sitting';
+    renderHomeStage(false);
     resetSquatTimer();
     timer.running = true;
     timer.intervalId = setInterval(() => {
@@ -3663,8 +3681,10 @@
 
   function resetPoopSessionUI() {
     sessionActive = false;
+    activeHeroPose = 'default';
     resetSquatTimer();
     syncHomeSessionView();
+    if (currentMode !== 'redflag') setHeroStagePose('default');
   }
 
   // =========================================================================
@@ -4432,6 +4452,11 @@
       closeAllSheets();
       playFeltArchiveCutscene(sample, null);
       return { persona: getCutscenePersona(sample).persona };
+    },
+    setHeroStagePose(pose) {
+      activeHeroPose = pose;
+      setHeroStagePose(pose);
+      return { activeHeroPose };
     }
   };
 

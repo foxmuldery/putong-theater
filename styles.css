@@ -6057,3 +6057,12 @@ body {
 .sheet-subtitle {
   display: none !important;
 }
+
+/* V8.1 Stop-Motion 5-Pose Hero Stage Crossfade */
+.stage-image-hero {
+  transition: opacity 0.24s cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+
+.stage-image-hero.is-visible {
+  opacity: 1 !important;
+}
