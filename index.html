@@ -6,9 +6,9 @@
   <meta name="theme-color" content="#FAF3E4" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <meta property="og:title" content="噗通剧场 · 手工毛毡肠道公报" />
-  <meta property="og:description" content="5 秒毛毡记录 · 动态通关结算小剧场 · 饮食侦探反推 · 好友毛毡擂台 PK" />
-  <title>噗通剧场 · 毛毡肠道公报</title>
+  <meta property="og:title" content="便便日记 · 手工毛毡肠道手账" />
+  <meta property="og:description" content="开始大便计时 · 毛毡定格过场动画 · 每日大便档案 · 厕所必拉榜 · 拉屎联盟 PK" />
+  <title>便便日记 · 手工毛毡肠道手账</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -59,19 +59,19 @@
       <div class="stage-bottom-veil"></div>
     </div>
 
-    <!-- TOP SAFE ZONE: Serene Minimal Title + 2 Quiet Icons -->
+    <!-- TOP SAFE ZONE: Ultra-Clean Brand Title + 1 Quiet More Icon -->
     <header class="top-safe-zone">
       <div class="top-stitched-bar">
-        <button id="brandButton" class="brand-patch" type="button" title="噗通剧场">
+        <button id="brandButton" class="brand-patch" type="button" title="便便日记">
           <span class="brand-dot" aria-hidden="true"></span>
           <span class="brand-text">
-            <strong id="brandTitle">噗通剧场</strong>
-            <small id="brandSubtitle" class="v6-sr-hidden">毛毡肠道公报</small>
+            <strong id="brandTitle">便便日记</strong>
+            <small id="brandSubtitle" class="v6-sr-hidden">手工毛毡肠道手账</small>
           </span>
         </button>
 
         <div class="top-controls">
-          <button id="timerPillBtn" class="felt-pill timer-pill" type="button" aria-label="蹲坑计时器" title="开始计时">
+          <button id="timerPillBtn" class="felt-pill timer-pill v7-top-timer" type="button" aria-label="蹲坑计时器" title="进行中计时">
             <svg class="icon-svg" viewBox="0 0 20 20" fill="none" aria-hidden="true">
               <circle cx="10" cy="11" r="6" stroke="currentColor" stroke-width="1.6" />
               <path d="M10 8V11.2L12.2 12.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
@@ -114,7 +114,7 @@
                     <path d="M13.4 7.8L16.8 12.2M16.8 7.8L13.4 12.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
                   </svg>
                 </span>
-                <span>轻触音效</span>
+                <span>轻触与过场音效</span>
               </button>
 
               <button id="privacyBtn" class="more-menu-item" type="button" role="menuitem">
@@ -127,6 +127,11 @@
                 <span id="privacyPillLabel">伪装外观</span>
               </button>
 
+              <button id="openInsightsBtn" class="more-menu-item" type="button" role="menuitem">
+                <span class="more-menu-icon">📊</span>
+                <span>14 日背刺榜与病历</span>
+              </button>
+
               <div class="more-menu-divider" aria-hidden="true"></div>
 
               <button id="demoEightMinBtn" class="more-menu-item" type="button" role="menuitem">
@@ -136,7 +141,7 @@
 
               <button id="openRedFlagDemoBtn" class="more-menu-item is-warn" type="button" role="menuitem">
                 <span class="more-menu-icon">🩺</span>
-                <span>预览红灯关护</span>
+                <span>预览大橘猫问诊</span>
               </button>
             </div>
           </div>
@@ -166,19 +171,78 @@
 
     <!-- BOTTOM 28% SAFE ZONE: Theater Bulletin OR Calm Medical Red-Flag Card -->
     <section class="bottom-safe-zone">
-      <!-- 1. Serene Minimal Theater Home Dock -->
-      <article id="theaterCard" class="bulletin-card v6-home-dock" aria-label="今日剧报">
-        <div class="v6-dock-meta">
-          <span id="latestBristolTag" class="v6-meta-main">4型 · 丝滑金冠团</span>
-          <span class="v6-meta-sep" aria-hidden="true">·</span>
-          <span id="latestTimeLabel" class="v6-meta-time">今日剧报 · 08:42</span>
+      <!-- 1. Serene Minimal Theater Home Dock (Idle: 开始大便 | Active: 正在大便 00:00 -> 结束大便) -->
+      <article id="theaterCard" class="bulletin-card v6-home-dock" aria-label="今日便便日记">
+        <!-- State A: Idle Ready to Start -->
+        <div id="homeIdleView" class="v7-home-view">
+          <div class="v6-dock-meta">
+            <span id="latestBristolTag" class="v6-meta-main">4型 · 丝滑金冠团</span>
+            <span class="v6-meta-sep" aria-hidden="true">·</span>
+            <span id="latestTimeLabel" class="v6-meta-time">今日档案 · 08:42</span>
+          </div>
+
+          <h1 id="comedyHeadline" class="bulletin-headline v6-dock-headline">
+            “昨夜重辣火锅企图搞事，被四号金冠团优雅镇压！”
+          </h1>
+
+          <button id="openLogBtn" class="btn-primary-felt v6-primary-cta v7-start-cta" type="button">
+            开始大便
+          </button>
+
+          <nav class="v6-dock-nav" aria-label="核心入口">
+            <button id="openShareDailyBtn" class="v6-nav-link" type="button">
+              <svg class="v6-nav-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                <rect x="3.5" y="4" width="13" height="12" rx="2.5" stroke="currentColor" stroke-width="1.5" />
+                <path d="M7 9H13M7 12.2H10.8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+              </svg>
+              <span>便便报告</span>
+            </button>
+            <button id="openToiletBtn" class="v6-nav-link" type="button">
+              <svg class="v6-nav-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                <path d="M10 17C10 17 15 12.8 15 8.5C15 5.7 12.8 3.5 10 3.5C7.2 3.5 5 5.7 5 8.5C5 12.8 10 17 10 17Z" stroke="currentColor" stroke-width="1.5" />
+                <circle cx="10" cy="8.5" r="1.8" stroke="currentColor" stroke-width="1.5" />
+              </svg>
+              <span>必拉榜</span>
+            </button>
+            <button id="openPkBtn" class="v6-nav-link" type="button">
+              <svg class="v6-nav-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                <path d="M6.5 6.5L13.5 13.5M13.5 6.5L6.5 13.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                <circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.5" />
+              </svg>
+              <span>拉屎联盟</span>
+            </button>
+          </nav>
         </div>
 
-        <h1 id="comedyHeadline" class="bulletin-headline v6-dock-headline">
-          “昨夜重辣火锅企图搞事，被四号金冠团优雅镇压！”
-        </h1>
+        <!-- State B: Active Live Poop Session (Timing -> 结束大便) -->
+        <div id="homeSessionView" class="v7-session-view" hidden>
+          <div class="v7-session-top">
+            <span class="v7-live-pill">
+              <span class="v7-live-dot" aria-hidden="true"></span>
+              正在大便 · 计时中
+            </span>
+            <button id="sessionToiletChip" class="v7-spot-chip" type="button" title="切换或打卡当前厕所">
+              📍 <span id="sessionToiletName">家里主卫</span>
+            </button>
+          </div>
 
-        <!-- Legacy sync nodes cleanly hidden from Home stage (live inside Settlement & Insights) -->
+          <div class="v7-timer-stage">
+            <strong id="sessionTimerBig" class="v7-timer-big">00:00</strong>
+            <span id="sessionTimerHint" class="v7-timer-hint">8 分钟内最护痔 · 放轻松慢慢来</span>
+          </div>
+
+          <button id="finishPoopBtn" class="btn-primary-felt v6-primary-cta v7-finish-cta" type="button">
+            结束大便
+          </button>
+
+          <div class="v7-session-foot">
+            <button id="sessionDirectLogBtn" class="v7-foot-link" type="button">补录历史</button>
+            <span class="v7-foot-sep" aria-hidden="true">·</span>
+            <button id="cancelPoopBtn" class="v7-foot-link" type="button">取消本次计时</button>
+          </div>
+        </div>
+
+        <!-- Legacy sync nodes cleanly hidden from Home stage -->
         <div class="v6-sr-hidden" aria-hidden="true">
           <img id="latestToyThumb" src="assets/felt/bristol_4.jpg" alt="" />
           <span id="stageStampBadge" data-tone="gold">五星金绒</span>
@@ -195,33 +259,6 @@
             </div>
           </div>
         </div>
-
-        <button id="openLogBtn" class="btn-primary-felt v6-primary-cta" type="button">
-          记一笔
-        </button>
-
-        <nav class="v6-dock-nav" aria-label="核心入口">
-          <button id="openShareDailyBtn" class="v6-nav-link" type="button">
-            <svg class="v6-nav-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-              <rect x="3.5" y="4" width="13" height="12" rx="2.5" stroke="currentColor" stroke-width="1.5" />
-              <path d="M7 9H13M7 12.2H10.8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-            </svg>
-            <span>结算</span>
-          </button>
-          <button id="openPkBtn" class="v6-nav-link" type="button">
-            <svg class="v6-nav-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-              <path d="M6.5 6.5L13.5 13.5M13.5 6.5L6.5 13.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-              <circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.5" />
-            </svg>
-            <span>好友 PK</span>
-          </button>
-          <button id="openInsightsBtn" class="v6-nav-link" type="button">
-            <svg class="v6-nav-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-              <path d="M4.5 14.5V10.5M10 14.5V6M15.5 14.5V8.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
-            </svg>
-            <span>档案</span>
-          </button>
-        </nav>
       </article>
 
       <!-- 2. Calm Medical Red-Flag Sequential Triage Card (Sits cleanly below Orange Tabby Cat Doctor) -->
@@ -291,8 +328,8 @@
 
       <div class="sheet-header">
         <div>
-          <h2 id="logDrawerTitle" class="sheet-title">5 秒记一笔</h2>
-          <p class="sheet-subtitle">单手三步收工，毛毡剧场即刻发报</p>
+          <h2 id="logDrawerTitle" class="sheet-title">记录本次细节</h2>
+          <p class="sheet-subtitle">选完团子与体感，生成今日毛毡大便档案</p>
         </div>
         <div class="sheet-header-right">
           <button id="cycleDurationBtn" class="duration-chip" type="button" title="点击切换耗时">
@@ -369,11 +406,23 @@
             <div id="easeGroup" class="ease-pills" role="radiogroup" aria-label="排便顺畅度"></div>
           </div>
         </div>
+
+        <!-- Step 4: Quick Toilet Spot Check-In (Optional) -->
+        <div class="form-block">
+          <div class="block-label-row block-label-between">
+            <div class="block-label-left">
+              <span class="step-index">04</span>
+              <span class="block-label">本次厕所打卡（可选 · 计入必拉榜）</span>
+            </div>
+            <button id="logOpenToiletBtn" class="care-text-link" type="button">+ 新厕所</button>
+          </div>
+          <div id="logToiletChips" class="trigger-chips-wrap"></div>
+        </div>
       </div>
 
       <div class="sheet-footer">
         <button id="publishLogBtn" class="btn-primary-felt btn-full" type="button">
-          收工 · 盖章入档
+          完成录入
         </button>
       </div>
     </section>
@@ -632,7 +681,7 @@
       <div class="sheet-handle" aria-hidden="true"></div>
       <div class="sheet-header">
         <div>
-          <h2 id="pkTitle" class="sheet-title">好友毛毡擂台 PK</h2>
+          <h2 id="pkTitle" class="sheet-title">拉屎联盟 · 好友 PK</h2>
           <p class="sheet-subtitle">只比健康分与毛毡团子，零隐私细节泄露</p>
         </div>
         <button class="sheet-close-btn" type="button" data-close-sheet aria-label="关闭">×</button>
@@ -715,24 +764,29 @@
       <div class="sheet-handle" aria-hidden="true"></div>
       <div class="sheet-header">
         <div>
-          <h2 id="postcardTitle" class="sheet-title">通关结算</h2>
+          <h2 id="postcardTitle" class="sheet-title">便便报告</h2>
         </div>
-        <button class="sheet-close-btn" type="button" data-close-sheet aria-label="关闭">×</button>
+        <div class="sheet-header-right">
+          <button id="replayCutsceneBtn" class="stage-motion-chip" type="button" title="重看本次毛毡定格过场动画">
+            🎬 重看动画
+          </button>
+          <button class="sheet-close-btn" type="button" data-close-sheet aria-label="关闭">×</button>
+        </div>
       </div>
 
       <!-- 4-Tab Segmented Switcher -->
-      <div class="share-tabs-bar share-tabs-4" role="tablist" aria-label="结算周期与PK类型">
+      <div class="share-tabs-bar share-tabs-4" role="tablist" aria-label="便便报告周期与联盟PK">
         <button class="share-tab-btn is-active" type="button" role="tab" data-share-tab="single" aria-selected="true">
-          单次关卡
+          日报
         </button>
         <button class="share-tab-btn" type="button" role="tab" data-share-tab="weekly" aria-selected="false">
-          每周结算
+          周报
         </button>
         <button class="share-tab-btn" type="button" role="tab" data-share-tab="monthly" aria-selected="false">
-          每月结算
+          月报
         </button>
         <button class="share-tab-btn" type="button" role="tab" data-share-tab="pk" aria-selected="false">
-          PK 对决
+          联盟 PK
         </button>
       </div>
 
@@ -1070,6 +1124,135 @@
         </div>
       </div>
     </section>
+
+    <!-- SHEET 7: Toilet Check-In & Must-Go Ranking (`必拉榜`) -->
+    <section
+      id="toiletSheet"
+      class="felt-sheet toilet-sheet"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="toiletSheetTitle"
+      hidden
+    >
+      <div class="sheet-handle" aria-hidden="true"></div>
+      <div class="sheet-header">
+        <div>
+          <h2 id="toiletSheetTitle" class="sheet-title">厕所打卡 · 必拉榜</h2>
+          <p class="sheet-subtitle">按位置、空气质量与清洁度实时计算口碑榜</p>
+        </div>
+        <button class="sheet-close-btn" type="button" data-close-sheet aria-label="关闭">×</button>
+      </div>
+
+      <div class="share-tabs-bar toilet-tabs-bar" role="tablist" aria-label="必拉榜与打卡切换">
+        <button id="toiletTabRankBtn" class="share-tab-btn is-active" type="button" role="tab" data-toilet-tab="rank" aria-selected="true">
+          必拉榜
+        </button>
+        <button id="toiletTabAddBtn" class="share-tab-btn" type="button" role="tab" data-toilet-tab="add" aria-selected="false">
+          打卡新厕所
+        </button>
+      </div>
+
+      <div class="sheet-scroll-body">
+        <!-- Tab 1: Must-Go Leaderboard -->
+        <div id="toiletRankPane" class="toilet-pane">
+          <div id="toiletMustGoList" class="toilet-list"></div>
+        </div>
+
+        <!-- Tab 2: New Toilet Check-In Form -->
+        <form id="toiletCheckinForm" class="toilet-form" hidden>
+          <div class="toilet-field">
+            <label for="toiletNameInput">厕所位置名称</label>
+            <input id="toiletNameInput" class="toilet-input" type="text" placeholder="例如：国贸三期 B2 东侧 / 公司 12F 隐秘单间" maxlength="26" required />
+          </div>
+
+          <div class="toilet-field">
+            <label for="toiletAreaInput">所在区域 / 楼层（可选）</label>
+            <input id="toiletAreaInput" class="toilet-input" type="text" placeholder="例如：朝阳区 · 写字楼西侧走廊尽头" maxlength="30" />
+          </div>
+
+          <div class="toilet-rate-row">
+            <div class="toilet-rate-block">
+              <span>空气质量</span>
+              <div id="toiletAirStars" class="star-picker" role="radiogroup" aria-label="空气质量评分"></div>
+              <small id="toiletAirLabel">清风无味</small>
+            </div>
+            <div class="toilet-rate-block">
+              <span>清洁度</span>
+              <div id="toiletCleanStars" class="star-picker" role="radiogroup" aria-label="清洁度评分"></div>
+              <small id="toiletCleanLabel">一尘不染</small>
+            </div>
+          </div>
+
+          <div class="toilet-field">
+            <label>口碑加分标签</label>
+            <div id="toiletTagPicker" class="trigger-chips-wrap"></div>
+          </div>
+
+          <div class="toilet-field">
+            <label for="toiletNoteInput">一句话坑位测评（可选）</label>
+            <input id="toiletNoteInput" class="toilet-input" type="text" placeholder="例如：音乐轻柔、纸巾厚实、信号满格" maxlength="40" />
+          </div>
+
+          <button id="toiletSubmitBtn" class="btn-primary-felt btn-full" type="submit">
+            提交打卡 · 计入必拉榜
+          </button>
+        </form>
+      </div>
+
+      <div class="sheet-footer">
+        <button id="toiletQuickAddFooterBtn" class="btn-secondary-felt btn-full" type="button">
+          + 打卡记录一个新厕所
+        </button>
+      </div>
+    </section>
+
+    <!-- STOP-MOTION FELT CUTSCENE OVERLAY (Plays after 完成录入 -> Freezes into Today's Archive!) -->
+    <div id="feltCutsceneOverlay" class="cutscene-overlay" data-persona="champion" role="dialog" aria-modal="true" aria-label="毛毡过场小动画" hidden>
+      <div class="cutscene-theater">
+        <div class="cutscene-curtain cutscene-curtain-left" aria-hidden="true"></div>
+        <div class="cutscene-curtain cutscene-curtain-right" aria-hidden="true"></div>
+
+        <button id="cutsceneSkipBtn" class="cutscene-skip-btn" type="button">跳过 ›</button>
+
+        <div class="cutscene-stage-inner">
+          <span id="cutsceneEpisodeTag" class="cutscene-kicker">第 43 场 · 毛毡定格小剧场</span>
+
+          <!-- Persona Props Layer -->
+          <div class="cutscene-props cutscene-props-champion" aria-hidden="true">
+            <span class="cs-star cs-star-1">★</span>
+            <span class="cs-star cs-star-2">✦</span>
+            <span class="cs-star cs-star-3">★</span>
+            <span class="cs-confetti cs-confetti-1"></span>
+            <span class="cs-confetti cs-confetti-2"></span>
+          </div>
+          <div class="cutscene-props cutscene-props-desert" aria-hidden="true">
+            <span class="cs-wind cs-wind-1"></span>
+            <span class="cs-wind cs-wind-2"></span>
+            <span class="cs-sweat">💧</span>
+          </div>
+          <div class="cutscene-props cutscene-props-storm" aria-hidden="true">
+            <span class="cs-rain cs-rain-1"></span>
+            <span class="cs-rain cs-rain-2"></span>
+            <span class="cs-rain cs-rain-3"></span>
+            <div class="cs-wave"></div>
+          </div>
+
+          <div id="cutsceneActorWrap" class="cutscene-actor-wrap">
+            <img id="cutsceneMascotImg" class="cutscene-mascot-img" src="assets/felt/bristol_4.jpg" alt="今日登场毛毡团子" />
+          </div>
+
+          <div class="cutscene-copy">
+            <strong id="cutscenePersonaTitle" class="cutscene-title">丝滑金冠团 · 优雅登场！</strong>
+            <p id="cutscenePersonaSub" class="cutscene-sub">“丝滑收工，今日肠道状态满分。”</p>
+          </div>
+
+          <div id="cutsceneSeal" class="cutscene-seal">
+            <span id="cutsceneSealGrade">SSS</span>
+            <small>大便档案已定格</small>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- Elastic Wool-Toy & Stamp Confirmation Toast -->
     <div id="stampFeedback" class="stamp-feedback" aria-live="polite" hidden>

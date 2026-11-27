@@ -148,9 +148,9 @@
   const CAMOUFLAGE_SKINS = [
     {
       id: 'default',
-      name: '噗通剧场',
-      subtitle: '毛毡肠道公报',
-      pillLabel: '伪装',
+      name: '便便日记',
+      subtitle: '手工毛毡肠道手账',
+      pillLabel: '伪装外观',
       desc: '原始手工毛毡剧场外观（可在下方一键换皮）',
       bg: 'linear-gradient(145deg, #F3DEAF, #E2B76A)',
       svg: `<svg viewBox="0 0 36 36" fill="none"><path d="M10 23C10 17.5 13.5 13 18 13C22.5 13 26 17.5 26 23C26 25.5 23 27 18 27C13 27 10 25.5 10 23Z" fill="#FFF8E8" stroke="#6E4D2B" stroke-width="1.8"/><path d="M13 12L15.2 8.5L18 11.2L20.8 8.5L23 12H13Z" fill="#D99B38" stroke="#6E4D2B" stroke-width="1.5" stroke-linejoin="round"/><circle cx="15.4" cy="20" r="1.4" fill="#3E2D20"/><circle cx="20.6" cy="20" r="1.4" fill="#3E2D20"/><path d="M16.5 22.8C17.4 23.7 18.6 23.7 19.5 22.8" stroke="#3E2D20" stroke-width="1.5" stroke-linecap="round"/></svg>`
@@ -1597,9 +1597,26 @@
   // Live Squat Timer & 8-Minute Hemorrhoid-Guard Toast
   // =========================================================================
   function updateTimerUI() {
-    el.timerDisplay.textContent = formatMMSS(timer.seconds);
+    const formatted = formatMMSS(timer.seconds);
+    el.timerDisplay.textContent = formatted;
     el.timerPillBtn.classList.toggle('is-running', timer.running);
     el.timerPillBtn.classList.toggle('is-overtime', timer.seconds >= 480);
+
+    const bigEl = document.getElementById('sessionTimerBig');
+    const hintEl = document.getElementById('sessionTimerHint');
+    if (bigEl) {
+      bigEl.textContent = formatted;
+      bigEl.classList.toggle('is-overtime', timer.seconds >= 480);
+    }
+    if (hintEl) {
+      if (timer.seconds >= 480) {
+        hintEl.textContent = '已满 8 分钟护痔防线，建议准备收工啦';
+      } else if (timer.seconds >= 180) {
+        hintEl.textContent = '节奏正好，别刷手机太久哦';
+      } else {
+        hintEl.textContent = '8 分钟内最护痔 · 放轻松慢慢来';
+      }
+    }
   }
 
   function showEightMinToast(playAudio = true) {
@@ -1675,6 +1692,8 @@
     el.privacySheet.hidden = true;
     if (el.pkSheet) el.pkSheet.hidden = true;
     if (el.postcardSheet) el.postcardSheet.hidden = true;
+    const toiletSheet = document.getElementById('toiletSheet');
+    if (toiletSheet) toiletSheet.hidden = true;
     syncDirectorRailActive();
   }
 
@@ -1689,6 +1708,8 @@
     if (name === 'privacy') el.privacySheet.hidden = false;
     if (name === 'pk' && el.pkSheet) el.pkSheet.hidden = false;
     if (name === 'postcard' && el.postcardSheet) el.postcardSheet.hidden = false;
+    const toiletSheet = document.getElementById('toiletSheet');
+    if (name === 'toilet' && toiletSheet) toiletSheet.hidden = false;
     syncDirectorRailActive();
   }
 
@@ -1888,10 +1909,10 @@
       draft.bristol === 7 && state.logs[0] && state.logs[0].bristol === 7;
     el.colorRedFlagHint.hidden = !(selectedColor.redFlag || willBeConsecutive7);
     el.publishLogBtn.textContent =
-      selectedColor.redFlag || willBeConsecutive7 ? '保存并查看猫猫医生提示' : '收工 · 盖章入档';
+      selectedColor.redFlag || willBeConsecutive7 ? '完成录入 · 进入大橘猫问诊' : '完成录入';
   }
 
-  function openLogDrawer(preselectBristol) {
+  function openLogDrawer(preselectBristol, explicitDurationSec) {
     if (typeof preselectBristol === 'number' && preselectBristol >= 1 && preselectBristol <= 7) {
       draft.bristol = preselectBristol;
     } else {
@@ -1900,7 +1921,9 @@
     draft.color = 'golden';
     draft.triggers = [];
     draft.ease = '顺畅';
-    if (timer.seconds >= 15) {
+    if (typeof explicitDurationSec === 'number' && explicitDurationSec > 0) {
+      draft.durationSec = explicitDurationSec;
+    } else if (timer.seconds >= 1) {
       draft.durationSec = timer.seconds;
     } else {
       draft.durationSec = DURATION_PRESETS[draft.durationPresetIdx];
@@ -1912,6 +1935,7 @@
     renderColorRadar();
     renderTriggerChips();
     renderEaseGroup();
+    renderLogToiletChips();
     renderDraftDetective();
     renderPublishButtonLabel();
     openSheet('log');
@@ -1930,6 +1954,7 @@
       color: draft.color
     });
 
+    const activeSpot = getSelectedToiletSpot();
     const newEntry = {
       id: `log-${Date.now()}`,
       timestamp: new Date().toISOString(),
@@ -1938,30 +1963,41 @@
       triggers: [...draft.triggers],
       durationSec: draft.durationSec,
       ease: draft.ease,
+      toiletId: activeSpot ? activeSpot.id : null,
+      toiletName: activeSpot ? activeSpot.name : '',
       headline: comedy.headline,
       stamp: comedy.stamp,
       stampTone: comedy.stampTone
     };
 
+    if (activeSpot) {
+      activeSpot.visits = (activeSpot.visits || 0) + 1;
+    }
+
     state.logs.unshift(newEntry);
     state.episode += 1;
     saveState();
-    resetSquatTimer();
+    resetPoopSessionUI();
 
     if (selectedColor.redFlag) {
       enterRedFlagMode(selectedColor.id, false);
       return;
     }
     if (isConsecutive7) {
-      enterRedFlagMode('bristol7_streak', false);
+      enterRedFlagMode('alarm', false);
       return;
     }
 
     currentMode = 'theater';
     settlementPreviewEntry = null;
     directorActiveHint = '';
+    closeAllSheets();
     renderHomeStage(true);
-    openSettlement('single', { autoLaunch: true });
+
+    // Play persona-matched Stop-Motion Felt Cutscene with sound -> freeze into Today's Archive!
+    playFeltArchiveCutscene(newEntry, () => {
+      openSettlement('single', { autoLaunch: false });
+    });
   }
 
   // =========================================================================
@@ -3299,6 +3335,444 @@
   }
 
   // =========================================================================
+  // V7: Toilet Check-In & Must-Go Ranking (`必拉榜`)
+  // =========================================================================
+  const SEED_TOILETS = [
+    {
+      id: 'spot-office-18f',
+      name: '公司 18F 西侧礼宾间',
+      area: '写字楼西翼走廊尽头',
+      air: 5,
+      clean: 5,
+      tags: ['智能马桶', '信号满格', '纸巾充足'],
+      note: '清风香氛 + 独立隔间，摸鱼护痔圣地',
+      visits: 16
+    },
+    {
+      id: 'spot-home-main',
+      name: '家里主卫 · 专属宝座',
+      area: '居家私密主场',
+      air: 5,
+      clean: 5,
+      tags: ['隔音极佳', '恒温座圈', '无异味'],
+      note: '熟悉的光线与温度，4 型金冠团高发地',
+      visits: 24
+    },
+    {
+      id: 'spot-mall-b1',
+      name: '国贸商城 B1 东南角',
+      area: '高端商场礼宾区',
+      air: 4,
+      clean: 5,
+      tags: ['无异味', '纸巾充足', '有挂钩'],
+      note: '保洁阿姨每小时巡检，逛街救急首选',
+      visits: 7
+    },
+    {
+      id: 'spot-cafe-downstairs',
+      name: '楼下精品咖啡馆单间',
+      area: '一层后院拐角',
+      air: 4,
+      clean: 4,
+      tags: ['隔音极佳', '有挂钩'],
+      note: '自带爵士背景音，冰美式发作 30 秒直达',
+      visits: 5
+    },
+    {
+      id: 'spot-subway-exit2',
+      name: '地铁换乘站 2 号口',
+      area: '站厅 B1 层',
+      air: 2,
+      clean: 2,
+      tags: ['仅限应急'],
+      note: '空气略闷且排队偏长，非紧急情况建议绕道',
+      visits: 2
+    }
+  ];
+
+  const TOILET_TAG_POOL = ['智能马桶', '信号满格', '纸巾充足', '隔音极佳', '无异味', '有挂钩'];
+  const AIR_LABELS = ['', '毒气预警', '略闷有味', '中规中矩', '清新舒适', '清风如林'];
+  const CLEAN_LABELS = ['', '劝退避雷', '勉强救急', '基本干净', '清爽整洁', '一尘不染'];
+
+  const toiletDraft = {
+    air: 5,
+    clean: 5,
+    tags: ['无异味', '纸巾充足']
+  };
+
+  function ensureToilets() {
+    if (!Array.isArray(state.toilets) || state.toilets.length === 0) {
+      state.toilets = SEED_TOILETS.map((t) => ({ ...t, tags: [...t.tags] }));
+    }
+    if (!state.selectedToiletId || !state.toilets.some((t) => t.id === state.selectedToiletId)) {
+      state.selectedToiletId = state.toilets[0].id;
+    }
+  }
+
+  function getSelectedToiletSpot() {
+    ensureToilets();
+    return state.toilets.find((t) => t.id === state.selectedToiletId) || state.toilets[0];
+  }
+
+  function computeToiletScore(spot) {
+    const airScore = (Number(spot.air) || 3) * 0.9;
+    const cleanScore = (Number(spot.clean) || 3) * 0.9;
+    const bonus = Math.min(1.0, (spot.tags ? spot.tags.length : 0) * 0.34);
+    return Math.min(10, Number((airScore + cleanScore + bonus).toFixed(1)));
+  }
+
+  function getToiletVerdict(score) {
+    if (score >= 9.2) return '必拉殿堂';
+    if (score >= 8.2) return '强烈推荐';
+    if (score >= 6.8) return '稳妥可用';
+    return '慎入避雷';
+  }
+
+  function syncSessionToiletBadge() {
+    const spot = getSelectedToiletSpot();
+    const elName = document.getElementById('sessionToiletName');
+    if (elName && spot) elName.textContent = spot.name.split('·')[0].trim();
+  }
+
+  function renderLogToiletChips() {
+    const wrap = document.getElementById('logToiletChips');
+    if (!wrap) return;
+    ensureToilets();
+    wrap.innerHTML = '';
+    const ranked = [...state.toilets]
+      .sort((a, b) => computeToiletScore(b) - computeToiletScore(a))
+      .slice(0, 4);
+    ranked.forEach((spot) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'trigger-chip';
+      if (spot.id === state.selectedToiletId) btn.classList.add('is-active');
+      btn.textContent = `📍 ${spot.name.split('·')[0].trim()}`;
+      btn.addEventListener('click', () => {
+        FeltAudio.softTap();
+        state.selectedToiletId = spot.id;
+        saveState();
+        syncSessionToiletBadge();
+        renderLogToiletChips();
+      });
+      wrap.appendChild(btn);
+    });
+  }
+
+  function renderToiletMustGoList() {
+    const listEl = document.getElementById('toiletMustGoList');
+    if (!listEl) return;
+    ensureToilets();
+    const ranked = [...state.toilets].sort((a, b) => computeToiletScore(b) - computeToiletScore(a));
+    listEl.innerHTML = '';
+    ranked.forEach((spot, idx) => {
+      const score = computeToiletScore(spot);
+      const isSelected = spot.id === state.selectedToiletId;
+      const card = document.createElement('article');
+      card.className = `toilet-card${isSelected ? ' is-selected' : ''}`;
+      const rankClass = idx === 0 ? 'is-top1' : idx === 1 ? 'is-top2' : idx === 2 ? 'is-top3' : '';
+      const rankText = idx === 0 ? '🏆' : `#${idx + 1}`;
+      card.innerHTML = `
+        <div class="toilet-card-top">
+          <div class="toilet-rank-wrap">
+            <span class="toilet-rank-badge ${rankClass}">${rankText}</span>
+            <div class="toilet-title-col">
+              <strong class="toilet-name">${spot.name}</strong>
+              <span class="toilet-area">${spot.area || '日常常去点位'} · 已打卡 ${spot.visits || 1} 次</span>
+            </div>
+          </div>
+          <div class="toilet-score-box">
+            <span class="toilet-score-num">${score.toFixed(1)}</span>
+            <span class="toilet-score-verdict">${getToiletVerdict(score)}</span>
+          </div>
+        </div>
+        <div class="toilet-metrics-row">
+          <span>空气质量 <strong>${'★'.repeat(spot.air)}${'☆'.repeat(5 - spot.air)}</strong></span>
+          <span>清洁度 <strong>${'★'.repeat(spot.clean)}${'☆'.repeat(5 - spot.clean)}</strong></span>
+        </div>
+        <div class="toilet-tags-row">
+          ${(spot.tags || []).map((t) => `<span class="toilet-tag">${t}</span>`).join('')}
+        </div>
+        <div class="toilet-card-foot">
+          <span class="toilet-note">${spot.note || '用户实地打卡验证'}</span>
+          <button class="toilet-use-btn" type="button">${isSelected ? '当前坑位 ✓' : '设为当前坑位'}</button>
+        </div>
+      `;
+      const useBtn = card.querySelector('.toilet-use-btn');
+      useBtn.addEventListener('click', () => {
+        FeltAudio.toyBounce();
+        state.selectedToiletId = spot.id;
+        saveState();
+        syncSessionToiletBadge();
+        renderToiletMustGoList();
+        renderLogToiletChips();
+        showStampFeedback(`已定位当前厕所：${spot.name.split('·')[0].trim()}`);
+      });
+      listEl.appendChild(card);
+    });
+  }
+
+  function renderToiletFormControls() {
+    const airEl = document.getElementById('toiletAirStars');
+    const cleanEl = document.getElementById('toiletCleanStars');
+    const airLabel = document.getElementById('toiletAirLabel');
+    const cleanLabel = document.getElementById('toiletCleanLabel');
+    const tagWrap = document.getElementById('toiletTagPicker');
+
+    if (airEl) {
+      airEl.innerHTML = '';
+      for (let i = 1; i <= 5; i += 1) {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = `star-btn${i <= toiletDraft.air ? ' is-on' : ''}`;
+        b.textContent = '★';
+        b.addEventListener('click', () => {
+          toiletDraft.air = i;
+          FeltAudio.softTap();
+          renderToiletFormControls();
+        });
+        airEl.appendChild(b);
+      }
+      if (airLabel) airLabel.textContent = AIR_LABELS[toiletDraft.air] || '';
+    }
+
+    if (cleanEl) {
+      cleanEl.innerHTML = '';
+      for (let i = 1; i <= 5; i += 1) {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = `star-btn${i <= toiletDraft.clean ? ' is-on' : ''}`;
+        b.textContent = '★';
+        b.addEventListener('click', () => {
+          toiletDraft.clean = i;
+          FeltAudio.softTap();
+          renderToiletFormControls();
+        });
+        cleanEl.appendChild(b);
+      }
+      if (cleanLabel) cleanLabel.textContent = CLEAN_LABELS[toiletDraft.clean] || '';
+    }
+
+    if (tagWrap) {
+      tagWrap.innerHTML = '';
+      TOILET_TAG_POOL.forEach((tag) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = `trigger-chip${toiletDraft.tags.includes(tag) ? ' is-active' : ''}`;
+        b.textContent = tag;
+        b.addEventListener('click', () => {
+          FeltAudio.softTap();
+          if (toiletDraft.tags.includes(tag)) {
+            toiletDraft.tags = toiletDraft.tags.filter((x) => x !== tag);
+          } else if (toiletDraft.tags.length < 4) {
+            toiletDraft.tags.push(tag);
+          }
+          renderToiletFormControls();
+        });
+        tagWrap.appendChild(b);
+      });
+    }
+  }
+
+  function switchToiletTab(tab = 'rank') {
+    const rankBtn = document.getElementById('toiletTabRankBtn');
+    const addBtn = document.getElementById('toiletTabAddBtn');
+    const rankPane = document.getElementById('toiletRankPane');
+    const form = document.getElementById('toiletCheckinForm');
+    const footBtn = document.getElementById('toiletQuickAddFooterBtn');
+    const isRank = tab !== 'add';
+
+    if (rankBtn) {
+      rankBtn.classList.toggle('is-active', isRank);
+      rankBtn.setAttribute('aria-selected', String(isRank));
+    }
+    if (addBtn) {
+      addBtn.classList.toggle('is-active', !isRank);
+      addBtn.setAttribute('aria-selected', String(!isRank));
+    }
+    if (rankPane) rankPane.hidden = !isRank;
+    if (form) form.hidden = isRank;
+    if (footBtn) footBtn.hidden = !isRank;
+
+    if (isRank) renderToiletMustGoList();
+    else renderToiletFormControls();
+  }
+
+  function openToiletSheet(tab = 'rank') {
+    ensureToilets();
+    switchToiletTab(tab);
+    openSheet('toilet');
+  }
+
+  // =========================================================================
+  // V7: Live Poop Session State Machine (`开始大便` -> Timing -> `结束大便`)
+  // =========================================================================
+  let sessionActive = false;
+
+  function syncHomeSessionView() {
+    const idleView = document.getElementById('homeIdleView');
+    const sessView = document.getElementById('homeSessionView');
+    if (idleView) idleView.hidden = sessionActive;
+    if (sessView) sessView.hidden = !sessionActive;
+    syncSessionToiletBadge();
+  }
+
+  function startPoopSession() {
+    ensureToilets();
+    if (currentMode === 'redflag') {
+      currentMode = 'theater';
+      renderHomeStage(false);
+    }
+    sessionActive = true;
+    resetSquatTimer();
+    timer.running = true;
+    timer.intervalId = setInterval(() => {
+      timer.seconds += 1;
+      updateTimerUI();
+      if (timer.seconds === 480 && !timer.alertShown) {
+        timer.alertShown = true;
+        showEightMinToast(true);
+      }
+    }, 1000);
+    FeltAudio.toyBounce();
+    updateTimerUI();
+    syncHomeSessionView();
+  }
+
+  function finishPoopSession() {
+    const elapsed = timer.seconds;
+    if (timer.intervalId) {
+      clearInterval(timer.intervalId);
+      timer.intervalId = null;
+    }
+    timer.running = false;
+    sessionActive = false;
+    syncHomeSessionView();
+    updateTimerUI();
+    FeltAudio.softTap();
+    // Pass exact elapsed seconds if >= 5s; otherwise give a clean 2m15s default for rapid demo clicking
+    openLogDrawer(4, elapsed >= 5 ? elapsed : 135);
+  }
+
+  function resetPoopSessionUI() {
+    sessionActive = false;
+    resetSquatTimer();
+    syncHomeSessionView();
+  }
+
+  // =========================================================================
+  // V7: Stop-Motion Felt Archive Cutscene (`完成录入` -> 过场动画+音效 -> 定格档案)
+  // =========================================================================
+  let cutsceneTimers = [];
+  let cutsceneFinishCb = null;
+
+  function getCutscenePersona(entry) {
+    const toy = getToy(entry ? entry.bristol : 4);
+    const single = computeSingleSettlement(entry || state.logs[0]);
+    if (toy.type === 4) {
+      return {
+        persona: 'champion',
+        title: '丝滑金冠团 · 优雅滑行登场！',
+        sub: entry?.headline || '“丝滑收工，今日肠道状态满分。”',
+        grade: single.grade,
+        img: toy.img,
+        sound: 'gold'
+      };
+    }
+    if (toy.type === 3) {
+      return {
+        persona: 'steady',
+        title: '缝线稳重团 · 准时稳健打卡！',
+        sub: entry?.headline || '“踏实靠谱，今天肠道运转顺滑。”',
+        grade: single.grade,
+        img: toy.img,
+        sound: 'gold'
+      };
+    }
+    if (toy.type <= 2) {
+      return {
+        persona: 'desert',
+        title: '硬核憋劲团 · 顶风突围成功！',
+        sub: entry?.headline || '“顶着荒漠逆风完成任务，快补杯温水！”',
+        grade: single.grade,
+        img: toy.img,
+        sound: 'desert'
+      };
+    }
+    return {
+      persona: 'storm',
+      title: `${toy.name} · 踏浪急行抢滩！`,
+      sub: entry?.headline || '“暴风急行完赛，今天让肠胃好好歇歇！”',
+      grade: single.grade,
+      img: toy.img,
+      sound: 'storm'
+    };
+  }
+
+  function stopFeltCutscene(runCallback = true) {
+    cutsceneTimers.forEach((t) => clearTimeout(t));
+    cutsceneTimers = [];
+    const overlay = document.getElementById('feltCutsceneOverlay');
+    if (overlay) {
+      overlay.hidden = true;
+      overlay.classList.remove('is-playing', 'is-sealed');
+    }
+    const cb = cutsceneFinishCb;
+    cutsceneFinishCb = null;
+    if (runCallback && typeof cb === 'function') cb();
+  }
+
+  function playFeltArchiveCutscene(entry, onDone) {
+    const overlay = document.getElementById('feltCutsceneOverlay');
+    if (!overlay) {
+      if (typeof onDone === 'function') onDone();
+      return;
+    }
+
+    stopFeltCutscene(false);
+    cutsceneFinishCb = onDone || null;
+
+    const info = getCutscenePersona(entry);
+    overlay.dataset.persona = info.persona;
+    const epEl = document.getElementById('cutsceneEpisodeTag');
+    const imgEl = document.getElementById('cutsceneMascotImg');
+    const titleEl = document.getElementById('cutscenePersonaTitle');
+    const subEl = document.getElementById('cutscenePersonaSub');
+    const gradeEl = document.getElementById('cutsceneSealGrade');
+
+    if (epEl) epEl.textContent = `第 ${state.episode} 场 · 毛毡定格过场小剧场`;
+    if (imgEl) imgEl.src = info.img;
+    if (titleEl) titleEl.textContent = info.title;
+    if (subEl) subEl.textContent = info.sub;
+    if (gradeEl) gradeEl.textContent = info.grade;
+
+    overlay.hidden = false;
+    overlay.classList.remove('is-playing', 'is-sealed');
+    void overlay.offsetWidth;
+    overlay.classList.add('is-playing');
+
+    // Synced Persona Soundscape
+    if (info.sound === 'gold') FeltAudio.victoryFanfare();
+    else if (info.sound === 'desert') FeltAudio.desertDrum();
+    else FeltAudio.stormPlop();
+
+    // Freeze-frame wax-stamp slam at 1.35s
+    cutsceneTimers.push(
+      setTimeout(() => {
+        overlay.classList.add('is-sealed');
+        FeltAudio.stampPublish();
+      }, 1350)
+    );
+
+    // Transition seamlessly into Today's Frozen Poop Archive at 2.65s
+    cutsceneTimers.push(
+      setTimeout(() => {
+        stopFeltCutscene(true);
+      }, 2650)
+    );
+  }
+
+  // =========================================================================
   // Event Bindings
   // =========================================================================
   function bindEvents() {
@@ -3474,9 +3948,128 @@
     }
 
     el.openLogBtn.addEventListener('click', () => {
-      FeltAudio.softTap();
-      openLogDrawer(4);
+      startPoopSession();
     });
+
+    const finishPoopBtn = document.getElementById('finishPoopBtn');
+    if (finishPoopBtn) finishPoopBtn.addEventListener('click', finishPoopSession);
+
+    const cancelPoopBtn = document.getElementById('cancelPoopBtn');
+    if (cancelPoopBtn) {
+      cancelPoopBtn.addEventListener('click', () => {
+        FeltAudio.softTap();
+        resetPoopSessionUI();
+      });
+    }
+
+    const sessionDirectLogBtn = document.getElementById('sessionDirectLogBtn');
+    if (sessionDirectLogBtn) {
+      sessionDirectLogBtn.addEventListener('click', () => {
+        FeltAudio.softTap();
+        resetPoopSessionUI();
+        openLogDrawer(4);
+      });
+    }
+
+    const openToiletBtn = document.getElementById('openToiletBtn');
+    if (openToiletBtn) {
+      openToiletBtn.addEventListener('click', () => {
+        FeltAudio.toyBounce();
+        openToiletSheet('rank');
+      });
+    }
+
+    const sessionToiletChip = document.getElementById('sessionToiletChip');
+    if (sessionToiletChip) {
+      sessionToiletChip.addEventListener('click', () => {
+        FeltAudio.softTap();
+        openToiletSheet('rank');
+      });
+    }
+
+    const logOpenToiletBtn = document.getElementById('logOpenToiletBtn');
+    if (logOpenToiletBtn) {
+      logOpenToiletBtn.addEventListener('click', () => {
+        FeltAudio.softTap();
+        openToiletSheet('add');
+      });
+    }
+
+    const toiletTabRankBtn = document.getElementById('toiletTabRankBtn');
+    if (toiletTabRankBtn) {
+      toiletTabRankBtn.addEventListener('click', () => {
+        FeltAudio.softTap();
+        switchToiletTab('rank');
+      });
+    }
+
+    const toiletTabAddBtn = document.getElementById('toiletTabAddBtn');
+    if (toiletTabAddBtn) {
+      toiletTabAddBtn.addEventListener('click', () => {
+        FeltAudio.softTap();
+        switchToiletTab('add');
+      });
+    }
+
+    const toiletQuickAddFooterBtn = document.getElementById('toiletQuickAddFooterBtn');
+    if (toiletQuickAddFooterBtn) {
+      toiletQuickAddFooterBtn.addEventListener('click', () => {
+        FeltAudio.softTap();
+        switchToiletTab('add');
+      });
+    }
+
+    const toiletForm = document.getElementById('toiletCheckinForm');
+    if (toiletForm) {
+      toiletForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const nameInput = document.getElementById('toiletNameInput');
+        const areaInput = document.getElementById('toiletAreaInput');
+        const noteInput = document.getElementById('toiletNoteInput');
+        const name = nameInput ? nameInput.value.trim() : '';
+        if (!name) return;
+        ensureToilets();
+        const newSpot = {
+          id: `spot-${Date.now()}`,
+          name,
+          area: areaInput ? areaInput.value.trim() || '自定义打卡点' : '自定义打卡点',
+          air: toiletDraft.air,
+          clean: toiletDraft.clean,
+          tags: [...toiletDraft.tags],
+          note: noteInput ? noteInput.value.trim() || '实地打卡收录' : '实地打卡收录',
+          visits: 1
+        };
+        state.toilets.unshift(newSpot);
+        state.selectedToiletId = newSpot.id;
+        saveState();
+        if (nameInput) nameInput.value = '';
+        if (areaInput) areaInput.value = '';
+        if (noteInput) noteInput.value = '';
+        FeltAudio.stampPublish();
+        syncSessionToiletBadge();
+        switchToiletTab('rank');
+        showStampFeedback(`已收录「${name}」进入必拉榜！`);
+      });
+    }
+
+    const cutsceneSkipBtn = document.getElementById('cutsceneSkipBtn');
+    if (cutsceneSkipBtn) {
+      cutsceneSkipBtn.addEventListener('click', () => {
+        FeltAudio.softTap();
+        stopFeltCutscene(true);
+      });
+    }
+
+    const replayCutsceneBtn = document.getElementById('replayCutsceneBtn');
+    if (replayCutsceneBtn) {
+      replayCutsceneBtn.addEventListener('click', () => {
+        const entry = settlementPreviewEntry || state.logs[0];
+        closeAllSheets();
+        playFeltArchiveCutscene(entry, () => {
+          openSettlement('single', { keepPreview: Boolean(settlementPreviewEntry) });
+        });
+      });
+    }
 
     if (el.openPkBtn) {
       el.openPkBtn.addEventListener('click', () => {
@@ -3814,14 +4407,34 @@
     },
     inferLikelyDiet(entry) {
       return inferLikelyDiet(entry || state.logs[0], state.logs);
+    },
+    startPoopSession() {
+      startPoopSession();
+      return { sessionActive, timerRunning: timer.running };
+    },
+    finishPoopSession() {
+      finishPoopSession();
+      return { sheet: activeSheet };
+    },
+    openToiletSheet(tab = 'rank') {
+      openToiletSheet(tab);
+      return { sheet: activeSheet, count: state.toilets.length };
+    },
+    playCutscenePreview(bristol = 4) {
+      const sample = makePreviewEntry(bristol);
+      closeAllSheets();
+      playFeltArchiveCutscene(sample, null);
+      return { persona: getCutscenePersona(sample).persona };
     }
   };
 
   // =========================================================================
   // Bootstrap
   // =========================================================================
+  ensureToilets();
   bindStageParallax();
   bindEvents();
+  syncHomeSessionView();
   updateTimerUI();
   renderHomeStage(false);
 })();
