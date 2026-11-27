@@ -1279,11 +1279,8 @@
       el.stageDoctorImg.classList.add('is-visible');
       el.theaterCard.hidden = true;
       el.redFlagCard.hidden = false;
-      el.playbillText.textContent = '大橘猫猫医生 · 安心关护值班中';
-
-      const guide = RED_FLAG_GUIDE[activeRedFlagReason] || RED_FLAG_GUIDE.black;
-      el.careDepartmentBadge.textContent = guide.dept;
-      el.careExplanation.textContent = guide.explanation;
+      el.playbillText.textContent = '大橘猫猫医生 · 安心问诊中';
+      renderCareTriageView();
     } else {
       el.stageDoctorImg.classList.remove('is-visible');
       el.stageHeroImg.classList.add('is-visible');
@@ -1316,8 +1313,264 @@
     syncDirectorRailActive();
   }
 
-  function enterRedFlagMode(reason = 'black', silent = false) {
-    activeRedFlagReason = RED_FLAG_GUIDE[reason] ? reason : 'black';
+  // =========================================================================
+  // Big Orange Cat 3-Step Sequential Triage Questionnaire
+  // =========================================================================
+  const careTriageState = {
+    reason: 'blood',
+    step: 0,
+    answers: {}
+  };
+
+  const CARE_TRIAGE_QUESTIONS = {
+    blood: [
+      {
+        key: 'dye',
+        question: '先别慌，大橘猫先排查饮食染色：近 24–48 小时吃过红心火龙果、甜菜根、大量番茄或辣椒吗？',
+        options: [
+          { label: '吃过红心火龙果 / 甜菜根等', value: 'yes' },
+          { label: '完全没吃过', value: 'no' },
+          { label: '不太确定', value: 'unsure' }
+        ]
+      },
+      {
+        key: 'pattern',
+        question: '这次见红具体是什么情况？最近持续多久了？',
+        options: [
+          { label: '仅厕纸擦拭见鲜红，或轻微刺痛', value: 'mild' },
+          { label: '混在大便里，或偏暗红色', value: 'moderate' },
+          { label: '已经连续出现 2 天以上', value: 'high' }
+        ]
+      },
+      {
+        key: 'systemic',
+        question: '最后问一下，最近身体整体感觉怎么样？',
+        options: [
+          { label: '没有任何不舒服，精神很好', value: 'none' },
+          { label: '轻微腹胀、隐痛或没胃口', value: 'mild' },
+          { label: '头晕乏力 / 发烧 / 剧烈腹痛 / 近期消瘦', value: 'severe' }
+        ]
+      }
+    ],
+    black: [
+      {
+        key: 'dye',
+        question: '先别慌，大橘猫先排查饮食和药物：近 24–48 小时吃过鸭血/猪血、黑芝麻，或铁剂/胃药铋剂吗？',
+        options: [
+          { label: '吃过动物血 / 铁剂 / 铋剂胃药', value: 'yes' },
+          { label: '完全没吃过', value: 'no' },
+          { label: '不太确定', value: 'unsure' }
+        ]
+      },
+      {
+        key: 'pattern',
+        question: '这次黑便的质地和持续时间怎么样？',
+        options: [
+          { label: '偶发一次，成形和气味和平时一样', value: 'mild' },
+          { label: '发亮粘稠像柏油，气味偏腥臭', value: 'high' },
+          { label: '已经连续出现 2 天以上', value: 'high' }
+        ]
+      },
+      {
+        key: 'systemic',
+        question: '最后问一下，最近身体整体感觉怎么样？',
+        options: [
+          { label: '没有任何不舒服，精神很好', value: 'none' },
+          { label: '轻微胃部隐痛、反酸或胀气', value: 'mild' },
+          { label: '头晕心慌 / 乏力 / 剧烈胃痛或黑便加重', value: 'severe' }
+        ]
+      }
+    ],
+    pale: [
+      {
+        key: 'dye',
+        question: '先别急，大橘猫先排查检查和药物：最近几天做过钡餐检查，或吃过含铝/铋的抗酸胃药吗？',
+        options: [
+          { label: '做过钡餐 / 吃过抗酸胃药', value: 'yes' },
+          { label: '都没有', value: 'no' },
+          { label: '不太确定', value: 'unsure' }
+        ]
+      },
+      {
+        key: 'pattern',
+        question: '除了大便偏白/灰白，最近还有这些变化吗？',
+        options: [
+          { label: '仅这一次，小便颜色正常', value: 'mild' },
+          { label: '小便明显变深黄 / 像浓茶色', value: 'high' },
+          { label: '已经连续出现 2 天以上', value: 'high' }
+        ]
+      },
+      {
+        key: 'systemic',
+        question: '最后问一下，最近身体整体感觉怎么样？',
+        options: [
+          { label: '没有任何不舒服，精神很好', value: 'none' },
+          { label: '右上腹轻微发闷、厌油腻或没胃口', value: 'mild' },
+          { label: '皮肤或眼白发黄 / 发烧 / 剧烈腹痛', value: 'severe' }
+        ]
+      }
+    ],
+    alarm: [
+      {
+        key: 'dye',
+        question: '大橘猫先了解一下诱因：近 24–48 小时吃过生冷外卖、隔夜食物，或者受凉了吗？',
+        options: [
+          { label: '吃过生冷 / 重口外卖或受凉', value: 'yes' },
+          { label: '饮食规律，没有明显诱因', value: 'no' },
+          { label: '不太确定', value: 'unsure' }
+        ]
+      },
+      {
+        key: 'pattern',
+        question: '这几天排便频率和持续时间怎么样？',
+        options: [
+          { label: '刚开始，每天 1–2 次偏稀', value: 'mild' },
+          { label: '一天跑 4 次以上，水样停不下来', value: 'high' },
+          { label: '已经持续 3 天以上还没缓解', value: 'high' }
+        ]
+      },
+      {
+        key: 'systemic',
+        question: '最后问一下，最近身体整体感觉怎么样？',
+        options: [
+          { label: '精神还不错，能正常喝水吃饭', value: 'none' },
+          { label: '轻微腹痛、乏力或口干', value: 'mild' },
+          { label: '高烧 / 明显脱水头晕 / 伴随剧烈腹痛', value: 'severe' }
+        ]
+      }
+    ]
+  };
+
+  function evaluateCareTriage(reason, ans) {
+    const guide = RED_FLAG_GUIDE[reason] || RED_FLAG_GUIDE.black;
+    const isUrgent =
+      ans.systemic === 'severe' ||
+      (ans.dye !== 'yes' && ans.pattern === 'high') ||
+      (reason === 'pale' && ans.pattern === 'high');
+
+    const isLikelyDiet =
+      ans.dye === 'yes' && ans.pattern === 'mild' && ans.systemic === 'none';
+
+    if (isLikelyDiet) {
+      const dyeMap = {
+        blood: '红心火龙果、甜菜根或红色蔬果',
+        black: '动物血制品、深色食物或铁剂/铋剂胃药',
+        pale: '近期钡餐或抗酸胃药',
+        alarm: '生冷外卖或受凉刺激'
+      };
+      return {
+        level: 'safe',
+        badge: '大概率饮食影响',
+        dept: '建议居家观察 24–48h',
+        title: '大概率是暂时性影响，先不用过度紧张',
+        explanation: `结合你的回答，这次变化很可能与「${dyeMap[reason] || '近期饮食'}」有关，且目前无明显不适。建议接下来 1–2 天清淡饮食、多喝温水观察；如果停吃后颜色或性状仍未恢复正常，再考虑挂号排查。`,
+        safeFirst: true
+      };
+    }
+
+    if (isUrgent) {
+      return {
+        level: 'urgent',
+        badge: '重点提醒 · 建议尽快面诊评估',
+        dept: guide.dept.replace('建议挂号：', '可优先考虑：'),
+        title: '综合你的情况，建议尽快去医院让医生看看',
+        explanation: `你的回答中出现了持续异常或伴随明显身体不适（且并非单纯饮食染色）。大橘猫建议不要硬扛，尽早携带近 30 天记录前往医院做针对性检查，早确认早安心。`,
+        safeFirst: false
+      };
+    }
+
+    const obsMap = {
+      blood: '排除饮食染色后，偶发擦拭见鲜红较常见于局部痔疮或肛裂；若混在便中或反复出现，建议预约肛肠科或消化内科做一次基础排查。',
+      black: '未明确食用动物血或铁剂/铋剂的情况下出现黑便，建议留意接下来 1–2 次排便颜色；若仍偏黑或伴胃部不适，建议预约消化内科检查。',
+      pale: '非药物引起的灰白便值得多留意 1–2 天，同时注意小便颜色与食欲；若持续发白，建议预约消化内科或肝胆科排查。',
+      alarm: '肠道目前仍在敏感期，建议少量多次补充温水或口服补液盐、暂避生冷油腻；若超过 48–72 小时未缓解，建议前往消化内科看看。'
+    };
+    return {
+      level: 'observe',
+      badge: '建议观察并酌情预约门诊',
+      dept: guide.dept.replace('建议挂号：', '可参考挂号：'),
+      title: '结合你的情况，建议留意变化并考虑门诊排查',
+      explanation: obsMap[reason] || guide.explanation,
+      safeFirst: false
+    };
+  }
+
+  function renderCareTriageView() {
+    const triageView = document.getElementById('careTriageView');
+    const resultView = document.getElementById('careResultView');
+    const stepBadge = document.getElementById('careStepBadge');
+    const qText = document.getElementById('careQuestionText');
+    const optList = document.getElementById('careOptionsList');
+    const resultBadge = document.getElementById('careResultBadge');
+    const resultTitle = document.getElementById('careResultTitle');
+    const actionsRow = document.getElementById('careActionsRow');
+    if (!triageView || !resultView) return;
+
+    const questions = CARE_TRIAGE_QUESTIONS[careTriageState.reason] || CARE_TRIAGE_QUESTIONS.blood;
+    const dots = document.querySelectorAll('[data-care-dot]');
+
+    if (careTriageState.step < questions.length) {
+      triageView.hidden = false;
+      resultView.hidden = true;
+      const cur = questions[careTriageState.step];
+      if (stepBadge) stepBadge.textContent = `大橘猫小问诊 · ${careTriageState.step + 1}/${questions.length}`;
+      if (qText) qText.textContent = cur.question;
+      dots.forEach((dot, idx) => {
+        dot.classList.toggle('is-active', idx === careTriageState.step);
+        dot.classList.toggle('is-done', idx < careTriageState.step);
+      });
+
+      if (optList) {
+        optList.innerHTML = '';
+        cur.options.forEach((opt) => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'care-option-btn';
+          btn.innerHTML = `<span>${opt.label}</span><span class="care-option-arrow" aria-hidden="true">›</span>`;
+          btn.addEventListener('click', () => {
+            FeltAudio.softTap();
+            careTriageState.answers[cur.key] = opt.value;
+            careTriageState.step += 1;
+            renderCareTriageView();
+          });
+          optList.appendChild(btn);
+        });
+      }
+      return;
+    }
+
+    // Completed all 3 steps -> render personalized conclusion
+    triageView.hidden = true;
+    resultView.hidden = false;
+    const verdict = evaluateCareTriage(careTriageState.reason, careTriageState.answers);
+    if (resultBadge) {
+      resultBadge.textContent = verdict.badge;
+      resultBadge.dataset.level = verdict.level;
+    }
+    if (el.careDepartmentBadge) el.careDepartmentBadge.textContent = verdict.dept;
+    if (resultTitle) resultTitle.textContent = verdict.title;
+    if (el.careExplanation) el.careExplanation.textContent = verdict.explanation;
+    if (actionsRow) actionsRow.classList.toggle('is-safe-first', Boolean(verdict.safeFirst));
+    if (el.careExitBtn && el.careOpenReportBtn) {
+      if (verdict.safeFirst) {
+        el.careExitBtn.textContent = '放心了，回剧场';
+        el.careOpenReportBtn.textContent = '导出 30 天记录';
+      } else {
+        el.careOpenReportBtn.textContent = '生成 30 天病历单';
+        el.careExitBtn.textContent = '回到剧场';
+      }
+    }
+  }
+
+  function startCareTriage(reason) {
+    careTriageState.reason = CARE_TRIAGE_QUESTIONS[reason] ? reason : 'blood';
+    careTriageState.step = 0;
+    careTriageState.answers = {};
+  }
+
+  function enterRedFlagMode(reason = 'blood', silent = false) {
+    activeRedFlagReason = RED_FLAG_GUIDE[reason] ? reason : 'blood';
+    startCareTriage(activeRedFlagReason);
     currentMode = 'redflag';
     closeAllSheets();
     hideEightMinToast();
@@ -3090,6 +3343,19 @@
       });
     }
 
+    const careSkipExitBtn = document.getElementById('careSkipExitBtn');
+    if (careSkipExitBtn) {
+      careSkipExitBtn.addEventListener('click', exitRedFlagMode);
+    }
+    const careRetakeBtn = document.getElementById('careRetakeBtn');
+    if (careRetakeBtn) {
+      careRetakeBtn.addEventListener('click', () => {
+        FeltAudio.softTap();
+        startCareTriage(activeRedFlagReason);
+        renderCareTriageView();
+      });
+    }
+
     el.soundToggleBtn.addEventListener('click', () => {
       state.settings.soundEnabled = !state.settings.soundEnabled;
       saveState();
@@ -3224,7 +3490,7 @@
     }
 
     el.openRedFlagDemoBtn.addEventListener('click', () => {
-      enterRedFlagMode('black', false);
+      enterRedFlagMode('blood', false);
     });
 
     el.careOpenReportBtn.addEventListener('click', () => {

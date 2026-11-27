@@ -4780,3 +4780,230 @@ body {
   border-style: solid !important;
   border-width: 1.5px !important;
 }
+
+
+/* ==========================================================================
+   V6.1: Unobstructed Orange Tabby Cat Doctor + 3-Step Sequential Triage Card
+   ========================================================================== */
+.bulletin-card.v6-home-dock[hidden],
+.care-card[hidden],
+.care-triage-view[hidden],
+.care-result-view[hidden] {
+  display: none !important;
+}
+
+/* Lift Orange Tabby Cat Doctor wooden box cleanly into the upper 62% safe zone */
+.stage-image-doctor {
+  object-fit: cover;
+  object-position: center 68% !important;
+  transform: translateY(-9%) scale(1.04);
+  transform-origin: center center;
+}
+
+.stage-image-doctor.is-visible {
+  transform: translateY(-9%) scale(1.04) !important;
+}
+
+.phone-shell[data-mode="redflag"] .stage-bottom-veil {
+  height: 34% !important;
+  background: linear-gradient(
+    180deg,
+    rgba(28, 22, 18, 0) 0%,
+    rgba(28, 22, 18, 0.32) 55%,
+    rgba(28, 22, 18, 0.72) 100%
+  ) !important;
+}
+
+.care-card.v6-care-card {
+  background: rgba(252, 248, 241, 0.96) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(112, 83, 56, 0.14) !important;
+  border-radius: 24px !important;
+  padding: 15px 17px 14px !important;
+  box-shadow: 0 16px 38px rgba(24, 18, 14, 0.24) !important;
+}
+
+.care-card.v6-care-card::after {
+  display: none !important;
+}
+
+.care-triage-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 9px;
+}
+
+.care-step-dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.care-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(94, 114, 96, 0.22);
+  transition: width 0.2s ease, background-color 0.2s ease;
+}
+
+.care-dot.is-active {
+  width: 16px;
+  background: #4E6A52;
+}
+
+.care-dot.is-done {
+  background: #7D9A81;
+}
+
+.care-text-link {
+  appearance: none;
+  border: none;
+  background: transparent;
+  padding: 2px 4px;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--felt-espresso-muted);
+  cursor: pointer;
+}
+
+.care-text-link:hover {
+  color: var(--felt-espresso);
+}
+
+.care-question-title {
+  margin: 0 0 11px;
+  font-family: var(--font-editorial);
+  font-size: 15px;
+  line-height: 1.48;
+  font-weight: 700;
+  color: var(--felt-espresso);
+}
+
+.care-options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.care-option-btn {
+  appearance: none;
+  width: 100%;
+  min-height: 38px;
+  padding: 8px 13px;
+  border-radius: 12px;
+  border: 1px solid rgba(94, 114, 96, 0.22);
+  background: rgba(255, 253, 248, 0.92);
+  color: var(--felt-espresso);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  cursor: pointer;
+  transition: background-color 0.16s ease, border-color 0.16s ease, transform 0.14s ease;
+}
+
+.care-option-btn:hover {
+  background: #EEF4EC;
+  border-color: #557259;
+}
+
+.care-option-btn:active {
+  transform: scale(0.985);
+}
+
+.care-option-arrow {
+  font-size: 14px;
+  color: rgba(78, 106, 82, 0.55);
+  flex-shrink: 0;
+}
+
+.v6-care-card .care-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.v6-care-card .care-badge {
+  border: none !important;
+  font-size: 11px !important;
+  padding: 3px 9px !important;
+  border-radius: 999px;
+  background: #E8F1E7;
+  color: #38583C;
+}
+
+.v6-care-card .care-badge[data-level="safe"] {
+  background: #E4F2E3;
+  color: #2E6234;
+}
+
+.v6-care-card .care-badge[data-level="observe"] {
+  background: #FAF0D7;
+  color: #8C5E14;
+}
+
+.v6-care-card .care-badge[data-level="urgent"] {
+  background: #FCE6E2;
+  color: #9E3422;
+}
+
+.v6-care-card .care-dept {
+  font-size: 11px;
+  color: var(--felt-espresso-muted);
+  margin-right: auto;
+}
+
+.v6-care-card .care-title {
+  font-size: 15.5px !important;
+  line-height: 1.4 !important;
+  margin: 0 0 7px !important;
+}
+
+.v6-care-card .care-desc {
+  font-size: 12.8px !important;
+  line-height: 1.52 !important;
+  margin: 0 0 8px !important;
+  color: #4D3F35 !important;
+}
+
+.v6-care-card .care-disclaimer {
+  font-size: 11px !important;
+  margin: 0 0 11px !important;
+  opacity: 0.72;
+}
+
+.care-actions.care-actions-row {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 8px;
+}
+
+.care-actions.care-actions-row.is-safe-first {
+  grid-template-columns: 1fr 1.35fr;
+}
+
+.v6-care-card .btn-care-primary,
+.v6-care-card .btn-care-secondary {
+  height: 40px !important;
+  border-radius: 12px !important;
+  font-size: 13px !important;
+  padding: 0 12px !important;
+  border-style: solid !important;
+}
+
+.v6-care-card .btn-care-secondary {
+  border: 1px solid rgba(112, 83, 56, 0.16) !important;
+  background: rgba(255, 253, 248, 0.9) !important;
+}

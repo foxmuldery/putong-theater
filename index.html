@@ -199,28 +199,53 @@
         </nav>
       </article>
 
-      <!-- 2. Calm Medical Red-Flag Care Card (Crossfades in with Orange Tabby Cat Doctor) -->
-      <article id="redFlagCard" class="care-card" aria-label="安心关护提示" hidden>
-        <div class="care-meta-row">
-          <span class="care-badge">大橘猫猫医生值班中</span>
-          <span id="careDepartmentBadge" class="care-dept">建议挂号：消化内科 / 肛肠科</span>
+      <!-- 2. Calm Medical Red-Flag Sequential Triage Card (Sits cleanly below Orange Tabby Cat Doctor) -->
+      <article id="redFlagCard" class="care-card v6-care-card" aria-label="大橘猫猫医生安心问诊" hidden>
+        <!-- Phase A: 3-Step Sequential Triage Questionnaire -->
+        <div id="careTriageView" class="care-triage-view">
+          <div class="care-triage-head">
+            <span id="careStepBadge" class="care-badge">大橘医生问诊 · 1/3</span>
+            <div class="care-step-dots" aria-hidden="true">
+              <span class="care-dot is-active" data-care-dot="0"></span>
+              <span class="care-dot" data-care-dot="1"></span>
+              <span class="care-dot" data-care-dot="2"></span>
+            </div>
+            <button id="careSkipExitBtn" class="care-text-link" type="button">返回剧场</button>
+          </div>
+
+          <h2 id="careQuestionText" class="care-question-title">
+            先别慌，大橘医生先排查饮食染色：近 24–48 小时吃过红心火龙果、甜菜根或大量番茄/辣椒吗？
+          </h2>
+
+          <div id="careOptionsList" class="care-options-list" role="group" aria-label="问诊选项"></div>
+
+          <p class="care-disclaimer">大橘猫仅提供日常参考建议，不构成医疗建议或临床诊断</p>
         </div>
 
-        <h2 class="care-title">先不开玩笑了，这个信号值得认真看看</h2>
+        <!-- Phase B: Personalized Conclusion (Shown ONLY after answering all 3 questions) -->
+        <div id="careResultView" class="care-result-view" hidden>
+          <div class="care-meta-row">
+            <span id="careResultBadge" class="care-badge" data-level="observe">大橘猫参考建议</span>
+            <span id="careDepartmentBadge" class="care-dept">可考虑挂号：消化内科 / 肛肠科</span>
+            <button id="careRetakeBtn" class="care-text-link" type="button">重新问诊</button>
+          </div>
 
-        <p id="careExplanation" class="care-desc">
-          检测到“柏油黑”记录。若近期未食用动物血制品或服用铁剂、铋剂，黑便可能提示上消化道出血，建议尽早前往消化内科做进一步排查。
-        </p>
+          <h2 id="careResultTitle" class="care-title">综合你的回答，大橘猫给你这些参考建议</h2>
 
-        <p class="care-disclaimer">本提示仅供参考，不替代专业医生诊断</p>
+          <p id="careExplanation" class="care-desc">
+            请先完成上方 3 步小问诊，大橘猫会结合饮食染色、排便表现与身体状态给出参考建议。
+          </p>
 
-        <div class="care-actions">
-          <button id="careOpenReportBtn" class="btn-care-primary" type="button">
-            一键生成 30 天医生病历单
-          </button>
-          <button id="careExitBtn" class="btn-care-secondary" type="button">
-            我已知晓，回到剧场
-          </button>
+          <p class="care-disclaimer">免责声明：大橘猫仅提供日常参考建议，不构成任何医疗建议或专业诊断</p>
+
+          <div id="careActionsRow" class="care-actions care-actions-row">
+            <button id="careOpenReportBtn" class="btn-care-primary" type="button">
+              生成 30 天病历单
+            </button>
+            <button id="careExitBtn" class="btn-care-secondary" type="button">
+              回到剧场
+            </button>
+          </div>
         </div>
       </article>
     </section>
@@ -756,8 +781,9 @@
               <span class="care-badge">大橘猫猫医生静音诊室 · 暂停通关计分</span>
               <h3>本次记录含需关注医学信号，已关闭游戏结算与 PK</h3>
               <p id="singleCareNote">
-                检测到异常颜色或持续水样记录，建议优先关注身体状态，必要时携带 30 天记录前往消化内科 / 肛肠科就诊。
+                检测到异常颜色或持续水样记录，已暂停游戏计分与 PK，建议先通过大橘猫 3 步问诊排查饮食染色后再决定是否就医。
               </p>
+              <p class="care-disclaimer">免责声明：大橘猫仅提供日常参考建议，不构成任何医疗建议或专业诊断</p>
               <button id="singleCareOpenDoctorBtn" class="btn-care-primary btn-full" type="button">
                 查看 30 天就医报告
               </button>
