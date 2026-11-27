@@ -12,6 +12,30 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <!-- V8 Serene Wool-Felt Access Gate (Password: Tiger) -->
+  <div id="accessGateOverlay" class="access-gate-overlay" role="dialog" aria-modal="true" aria-labelledby="accessGateTitle">
+    <form id="accessGateForm" class="access-gate-card" autocomplete="off">
+      <div class="access-gate-emblem">
+        <img src="assets/felt/bristol_4.jpg" alt="便便日记毛毡徽章" />
+      </div>
+      <h1 id="accessGateTitle" class="access-gate-title">便便日记</h1>
+      <p class="access-gate-sub">内部体验预览</p>
+      <div class="access-gate-field">
+        <input
+          id="gatePasswordInput"
+          class="access-gate-input"
+          type="password"
+          placeholder="输入体验口令"
+          aria-label="输入体验口令"
+          autocomplete="off"
+          required
+        />
+        <button id="gateSubmitBtn" class="access-gate-btn" type="submit">进入</button>
+      </div>
+      <p id="gateErrorText" class="access-gate-error" hidden>口令不对，请重试</p>
+    </form>
+  </div>
+
   <div class="workbench-backdrop" aria-hidden="true"></div>
 
   <div class="demo-stage-layout">
@@ -173,17 +197,27 @@
     <section class="bottom-safe-zone">
       <!-- 1. Serene Minimal Theater Home Dock (Idle: 开始大便 | Active: 正在大便 00:00 -> 结束大便) -->
       <article id="theaterCard" class="bulletin-card v6-home-dock" aria-label="今日便便日记">
-        <!-- State A: Idle Ready to Start -->
-        <div id="homeIdleView" class="v7-home-view">
-          <div class="v6-dock-meta">
-            <span id="latestBristolTag" class="v6-meta-main">4型 · 丝滑金冠团</span>
-            <span class="v6-meta-sep" aria-hidden="true">·</span>
-            <span id="latestTimeLabel" class="v6-meta-time">今日档案 · 08:42</span>
+        <!-- State A: Idle Ready to Start (V8 Ultra-Zen: Whisper Pill + Hover/Tap Quote + Bold CTA) -->
+        <div id="homeIdleView" class="v7-home-view v8-zen-home">
+          <div id="homeQuoteDisclosure" class="v8-quote-disclosure">
+            <button
+              id="homeQuoteToggleBtn"
+              class="v8-whisper-pill"
+              type="button"
+              aria-expanded="false"
+              aria-controls="homeQuotePopover"
+            >
+              <span id="latestBristolTag" class="v6-meta-main">4型 · 丝滑金冠团</span>
+              <span class="v6-meta-sep" aria-hidden="true">·</span>
+              <span id="latestTimeLabel" class="v6-meta-time">今日档案</span>
+              <span class="v8-whisper-chev" aria-hidden="true">▾</span>
+            </button>
+            <div id="homeQuotePopover" class="v8-quote-popover" role="region" aria-label="今日剧报详情">
+              <h1 id="comedyHeadline" class="bulletin-headline v8-popover-headline">
+                “昨夜重辣火锅企图搞事，被四号金冠团优雅镇压！”
+              </h1>
+            </div>
           </div>
-
-          <h1 id="comedyHeadline" class="bulletin-headline v6-dock-headline">
-            “昨夜重辣火锅企图搞事，被四号金冠团优雅镇压！”
-          </h1>
 
           <button id="openLogBtn" class="btn-primary-felt v6-primary-cta v7-start-cta" type="button">
             开始大便
@@ -195,7 +229,7 @@
                 <rect x="3.5" y="4" width="13" height="12" rx="2.5" stroke="currentColor" stroke-width="1.5" />
                 <path d="M7 9H13M7 12.2H10.8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
               </svg>
-              <span>便便报告</span>
+              <span>报告</span>
             </button>
             <button id="openToiletBtn" class="v6-nav-link" type="button">
               <svg class="v6-nav-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
@@ -209,7 +243,7 @@
                 <path d="M6.5 6.5L13.5 13.5M13.5 6.5L6.5 13.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
                 <circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.5" />
               </svg>
-              <span>拉屎联盟</span>
+              <span>联盟</span>
             </button>
           </nav>
         </div>
@@ -380,43 +414,46 @@
           </div>
         </div>
 
-        <!-- Step 3: Optional Felt Trigger Tags & Live Strategy Detective -->
+        <!-- Step 3: Optional Felt Trigger Tags (Collapsed by default for Zen flow) -->
         <div class="form-block">
-          <div class="block-label-row">
-            <span class="step-index">03</span>
-            <span class="block-label">策略侦探预判 &amp; 诱因标签（可选）</span>
-          </div>
-
-          <div id="draftDetectiveBox" class="draft-detective-box">
-            <div class="draft-detective-copy">
-              <span id="draftDetectiveConf" class="detective-badge">策略预判 91%</span>
-              <p id="draftDetectiveText" class="draft-detective-text">
-                反推近 12–24h：温热均衡正餐 + 蔬果纤维 + 饮水达标
-              </p>
-            </div>
-            <button id="adoptDetectiveTagsBtn" class="detective-chip detective-chip-hit" type="button">
-              一键采纳
-            </button>
-          </div>
-
-          <div id="triggerChips" class="trigger-chips-wrap"></div>
-
           <div class="ease-row">
             <span class="ease-label">体感节奏</span>
             <div id="easeGroup" class="ease-pills" role="radiogroup" aria-label="排便顺畅度"></div>
           </div>
-        </div>
 
-        <!-- Step 4: Quick Toilet Spot Check-In (Optional) -->
-        <div class="form-block">
-          <div class="block-label-row block-label-between">
-            <div class="block-label-left">
-              <span class="step-index">04</span>
-              <span class="block-label">本次厕所打卡（可选 · 计入必拉榜）</span>
+          <details class="v8-fold" style="margin-top: 10px;">
+            <summary class="v8-fold-summary">
+              <span>+ 饮食侦探与诱因线索（可选）</span>
+              <span class="v8-fold-chev" aria-hidden="true">▾</span>
+            </summary>
+            <div class="v8-fold-body">
+              <div id="draftDetectiveBox" class="draft-detective-box">
+                <div class="draft-detective-copy">
+                  <span id="draftDetectiveConf" class="detective-badge">策略预判 91%</span>
+                  <p id="draftDetectiveText" class="draft-detective-text">
+                    反推近 12–24h：温热均衡正餐 + 蔬果纤维 + 饮水达标
+                  </p>
+                </div>
+                <button id="adoptDetectiveTagsBtn" class="detective-chip detective-chip-hit" type="button">
+                  一键采纳
+                </button>
+              </div>
+              <div id="triggerChips" class="trigger-chips-wrap"></div>
             </div>
-            <button id="logOpenToiletBtn" class="care-text-link" type="button">+ 新厕所</button>
-          </div>
-          <div id="logToiletChips" class="trigger-chips-wrap"></div>
+          </details>
+
+          <details class="v8-fold" style="margin-top: 8px;">
+            <summary class="v8-fold-summary">
+              <span>+ 绑定本次厕所坑位（可选）</span>
+              <span class="v8-fold-chev" aria-hidden="true">▾</span>
+            </summary>
+            <div class="v8-fold-body">
+              <div style="display:flex;justify-content:flex-end;margin-bottom:6px;">
+                <button id="logOpenToiletBtn" class="care-text-link" type="button">+ 打卡新厕所</button>
+              </div>
+              <div id="logToiletChips" class="trigger-chips-wrap"></div>
+            </div>
+          </details>
         </div>
       </div>
 
@@ -720,12 +757,20 @@
             </div>
           </div>
 
-          <p id="pkVerdictBanner" class="pk-verdict-banner">
-            「本轮绝杀！你的四号丝滑金冠团丝滑碾压阿哲昨夜火锅召唤的六号摊软团！」
-          </p>
+          <details class="v8-fold v8-hover-fold">
+            <summary class="v8-fold-summary">
+              <span>查看四维对比与评语</span>
+              <span class="v8-fold-chev" aria-hidden="true">▾</span>
+            </summary>
+            <div class="v8-fold-body">
+              <p id="pkVerdictBanner" class="pk-verdict-banner">
+                「本轮绝杀！你的四号丝滑金冠团丝滑碾压阿哲昨夜火锅召唤的六号摊软团！」
+              </p>
 
-          <!-- 4-Dimension Privacy-Safe Health Score Bars -->
-          <div id="pkBarsGrid" class="pk-bars-grid"></div>
+              <!-- 4-Dimension Privacy-Safe Health Score Bars -->
+              <div id="pkBarsGrid" class="pk-bars-grid"></div>
+            </div>
+          </details>
         </div>
 
         <!-- Interactive Banter Actions -->
@@ -891,27 +936,35 @@
               </div>
             </div>
 
-            <!-- 2-Line Simple Analysis Card -->
-            <div class="settlement-analysis-box">
-              <div class="analysis-line">
-                <span id="shareDailyConf" class="analysis-tag">🔍 侦探归因 89%</span>
-                <p id="shareDailyDeduction">策略反推近 12–24h：虽有重辣挑战，但温水与蔬果打底稳住全场。</p>
-              </div>
-              <div class="analysis-line">
-                <span class="analysis-tag tag-supply">🧭 下关补给</span>
-                <p id="singleNextSupply">继续保持当前饮水节奏，明天稳稳冲刺四号金冠连胜！</p>
-              </div>
-            </div>
+            <!-- Collapsible / Hover-Expand Analysis & PK Ribbon (Keeps Report Visual-First!) -->
+            <details class="v8-fold v8-hover-fold">
+              <summary class="v8-fold-summary">
+                <span>侦探简析与下关建议</span>
+                <span class="v8-fold-chev" aria-hidden="true">▾</span>
+              </summary>
+              <div class="v8-fold-body">
+                <div class="settlement-analysis-box">
+                  <div class="analysis-line">
+                    <span id="shareDailyConf" class="analysis-tag">🔍 侦探归因 89%</span>
+                    <p id="shareDailyDeduction">策略反推近 12–24h：虽有重辣挑战，但温水与蔬果打底稳住全场。</p>
+                  </div>
+                  <div class="analysis-line">
+                    <span class="analysis-tag tag-supply">🧭 下关补给</span>
+                    <p id="singleNextSupply">继续保持当前饮水节奏，明天稳稳冲刺四号金冠连胜！</p>
+                  </div>
+                </div>
 
-            <!-- Toggleable PK Challenge Ribbon (Embedded inside Card & Exported PNG!) -->
-            <div id="singlePkRibbon" class="pk-challenge-ribbon">
-              <span id="singlePkRibbonText">⚔️ 本关战力 96 分 · 口令 PUTONG-PK-842 · 不服来毛毡擂台晒你的团子！</span>
-            </div>
+                <!-- Toggleable PK Challenge Ribbon (Embedded inside Card & Exported PNG!) -->
+                <div id="singlePkRibbon" class="pk-challenge-ribbon">
+                  <span id="singlePkRibbonText">⚔️ 本关战力 96 分 · 口令 PUTONG-PK-842 · 不服来毛毡擂台晒你的团子！</span>
+                </div>
+              </div>
+            </details>
           </div>
 
-          <div class="postcard-footer-note">
+          <div class="postcard-footer-note v6-sr-hidden">
             <span class="postcard-privacy-badge">隐私脱敏 · 隐藏具体时刻</span>
-            <span class="postcard-signature">噗通剧场 · 通关结算小剧场</span>
+            <span class="postcard-signature">便便日记 · 大便档案</span>
           </div>
         </article>
 
@@ -966,25 +1019,33 @@
           <!-- 4 Compact Weekly Score Pills -->
           <div id="weeklyScorePills" class="weekly-pills-grid"></div>
 
-          <!-- Weekly Analysis Strip -->
-          <div class="settlement-analysis-box">
-            <div class="analysis-line">
-              <span class="analysis-tag">⚠️ 本周头号背刺</span>
-              <p id="weeklyTopCulprit">重辣火锅 + 冰美式：触发 1 次偏软预警，其余 6 日稳态过关。</p>
-            </div>
-            <div class="analysis-line">
-              <span class="analysis-tag tag-supply">📈 趋势简评</span>
-              <p id="weeklyTrendVerdict">本周 3–4 型黄金率稳居高位，下周继续守住 5 分钟内不伤痔防线！</p>
-            </div>
-          </div>
+          <!-- Weekly Analysis Strip (Collapsed by default, expands on hover/tap) -->
+          <details class="v8-fold v8-hover-fold">
+            <summary class="v8-fold-summary">
+              <span>本周背刺与趋势简评</span>
+              <span class="v8-fold-chev" aria-hidden="true">▾</span>
+            </summary>
+            <div class="v8-fold-body">
+              <div class="settlement-analysis-box">
+                <div class="analysis-line">
+                  <span class="analysis-tag">⚠️ 本周头号背刺</span>
+                  <p id="weeklyTopCulprit">重辣火锅 + 冰美式：触发 1 次偏软预警，其余 6 日稳态过关。</p>
+                </div>
+                <div class="analysis-line">
+                  <span class="analysis-tag tag-supply">📈 趋势简评</span>
+                  <p id="weeklyTrendVerdict">本周 3–4 型黄金率稳居高位，下周继续守住 5 分钟内不伤痔防线！</p>
+                </div>
+              </div>
 
-          <div id="weeklyPkRibbon" class="pk-challenge-ribbon">
-            <span id="weeklyPkRibbonText">⚔️ 本周战力 84 分（领先阿哲 +26 分）· 口令 PUTONG-PK-842 接战！</span>
-          </div>
+              <div id="weeklyPkRibbon" class="pk-challenge-ribbon">
+                <span id="weeklyPkRibbonText">⚔️ 本周战力 84 分（领先阿哲 +26 分）· 口令 PUTONG-PK-842 接战！</span>
+              </div>
+            </div>
+          </details>
 
-          <div class="postcard-footer-note">
+          <div class="postcard-footer-note v6-sr-hidden">
             <span class="postcard-privacy-badge">周度脱敏战报 · 可直接发好友群 PK</span>
-            <span class="postcard-signature">噗通剧场 · 每周赛季</span>
+            <span class="postcard-signature">便便日记 · 周报</span>
           </div>
         </article>
 

@@ -3473,33 +3473,40 @@
       const rankClass = idx === 0 ? 'is-top1' : idx === 1 ? 'is-top2' : idx === 2 ? 'is-top3' : '';
       const rankText = idx === 0 ? '🏆' : `#${idx + 1}`;
       card.innerHTML = `
-        <div class="toilet-card-top">
+        <div class="toilet-card-top v8-toilet-summary" role="button" tabindex="0" aria-expanded="false">
           <div class="toilet-rank-wrap">
             <span class="toilet-rank-badge ${rankClass}">${rankText}</span>
             <div class="toilet-title-col">
               <strong class="toilet-name">${spot.name}</strong>
-              <span class="toilet-area">${spot.area || '日常常去点位'} · 已打卡 ${spot.visits || 1} 次</span>
+              <span class="toilet-area">空气 ${spot.air}★ · 清洁 ${spot.clean}★${isSelected ? ' · 当前坑位' : ''}</span>
             </div>
           </div>
           <div class="toilet-score-box">
             <span class="toilet-score-num">${score.toFixed(1)}</span>
-            <span class="toilet-score-verdict">${getToiletVerdict(score)}</span>
+            <span class="toilet-score-verdict">${getToiletVerdict(score)} ▾</span>
           </div>
         </div>
-        <div class="toilet-metrics-row">
-          <span>空气质量 <strong>${'★'.repeat(spot.air)}${'☆'.repeat(5 - spot.air)}</strong></span>
-          <span>清洁度 <strong>${'★'.repeat(spot.clean)}${'☆'.repeat(5 - spot.clean)}</strong></span>
-        </div>
-        <div class="toilet-tags-row">
-          ${(spot.tags || []).map((t) => `<span class="toilet-tag">${t}</span>`).join('')}
-        </div>
-        <div class="toilet-card-foot">
-          <span class="toilet-note">${spot.note || '用户实地打卡验证'}</span>
-          <button class="toilet-use-btn" type="button">${isSelected ? '当前坑位 ✓' : '设为当前坑位'}</button>
+        <div class="v8-toilet-details">
+          <div class="toilet-area" style="margin-bottom:6px;">${spot.area || '日常常去点位'} · 已打卡 ${spot.visits || 1} 次</div>
+          <div class="toilet-tags-row" style="margin-bottom:8px;">
+            ${(spot.tags || []).map((t) => `<span class="toilet-tag">${t}</span>`).join('')}
+          </div>
+          <div class="toilet-card-foot">
+            <span class="toilet-note">${spot.note || '用户实地打卡验证'}</span>
+            <button class="toilet-use-btn" type="button">${isSelected ? '当前坑位 ✓' : '设为当前坑位'}</button>
+          </div>
         </div>
       `;
+      const summaryEl = card.querySelector('.v8-toilet-summary');
+      summaryEl.addEventListener('click', () => {
+        FeltAudio.softTap();
+        const willOpen = !card.classList.contains('is-expanded');
+        card.classList.toggle('is-expanded', willOpen);
+        summaryEl.setAttribute('aria-expanded', String(willOpen));
+      });
       const useBtn = card.querySelector('.toilet-use-btn');
-      useBtn.addEventListener('click', () => {
+      useBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
         FeltAudio.toyBounce();
         state.selectedToiletId = spot.id;
         saveState();
@@ -4429,12 +4436,107 @@
   };
 
   // =========================================================================
+  // V8: Access Gate (`Tiger`) & Hover/Tap Progressive Disclosure
+  // =========================================================================
+  const GATE_SESSION_KEY = 'bb_diary_gate_unlocked_v8';
+  const GATE_EXPECTED_HASH = 0x95d40b46;
+
+  function fnv1aHash(str) {
+    let h = 2166136261;
+    for (let i = 0; i < str.length; i += 1) {
+      h ^= str.charCodeAt(i);
+      h = Math.imul(h, 16777619) >>> 0;
+    }
+    return h >>> 0;
+  }
+
+  function initAccessGate() {
+    const overlay = document.getElementById('accessGateOverlay');
+    const form = document.getElementById('accessGateForm');
+    const input = document.getElementById('gatePasswordInput');
+    const errEl = document.getElementById('gateErrorText');
+    if (!overlay || !form || !input) return;
+
+    try {
+      if (sessionStorage.getItem(GATE_SESSION_KEY) === '1') {
+        overlay.hidden = true;
+        return;
+      }
+    } catch (_) {}
+
+    overlay.hidden = false;
+    setTimeout(() => {
+      try { input.focus(); } catch (_) {}
+    }, 120);
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const val = input.value.trim();
+      if (fnv1aHash(`bb_diary::${val}::v8`) === GATE_EXPECTED_HASH) {
+        try { sessionStorage.setItem(GATE_SESSION_KEY, '1'); } catch (_) {}
+        if (errEl) errEl.hidden = true;
+        FeltAudio.toyBounce();
+        overlay.classList.add('is-unlocked');
+        setTimeout(() => {
+          overlay.hidden = true;
+        }, 280);
+      } else {
+        if (errEl) errEl.hidden = false;
+        FeltAudio.softTap();
+        form.classList.remove('is-shake');
+        void form.offsetWidth;
+        form.classList.add('is-shake');
+        input.select();
+      }
+    });
+  }
+
+  function initZenDisclosures() {
+    // 1. Home Whisper Quote Disclosure (tap on mobile + hover on desktop)
+    const wrap = document.getElementById('homeQuoteDisclosure');
+    const toggle = document.getElementById('homeQuoteToggleBtn');
+    if (wrap && toggle) {
+      toggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        FeltAudio.softTap();
+        const willOpen = !wrap.classList.contains('is-open');
+        wrap.classList.toggle('is-open', willOpen);
+        toggle.setAttribute('aria-expanded', String(willOpen));
+      });
+      document.addEventListener('click', (e) => {
+        if (wrap.classList.contains('is-open') && !e.target.closest('#homeQuoteDisclosure')) {
+          wrap.classList.remove('is-open');
+          toggle.setAttribute('aria-expanded', 'false');
+        }
+      });
+    }
+
+    // 2. Smooth hover-to-open on desktop pointers for .v8-hover-fold <details>
+    if (window.matchMedia && window.matchMedia('(hover: hover)').matches) {
+      document.querySelectorAll('details.v8-hover-fold').forEach((det) => {
+        let closeTimer = null;
+        det.addEventListener('mouseenter', () => {
+          if (closeTimer) clearTimeout(closeTimer);
+          det.open = true;
+        });
+        det.addEventListener('mouseleave', () => {
+          closeTimer = setTimeout(() => {
+            det.open = false;
+          }, 180);
+        });
+      });
+    }
+  }
+
+  // =========================================================================
   // Bootstrap
   // =========================================================================
   ensureToilets();
   bindStageParallax();
   bindEvents();
+  initZenDisclosures();
   syncHomeSessionView();
   updateTimerUI();
   renderHomeStage(false);
+  initAccessGate();
 })();
