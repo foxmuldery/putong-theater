@@ -6066,3 +6066,473 @@ body {
 .stage-image-hero.is-visible {
   opacity: 1 !important;
 }
+
+
+/* ==========================================================================
+   V8.2 Red-Team Upgrade: Trust, Safety, 44pt Touch Targets, Backfill,
+   Desensitive Aesthetic Poster & 1v1 Zero-Privacy Care Stickers
+   ========================================================================== */
+
+/* Global safety: never let display:flex/grid override HTML [hidden] */
+[hidden] {
+  display: none !important;
+}
+
+/* Lift stage framing slightly for breathing room + quick backfill */
+.stage-image-hero {
+  object-position: center 42%;
+}
+
+/* iOS 44x44pt minimum touch targets for core interactive controls */
+.v6-nav-link {
+  min-height: 44px !important;
+  padding: 6px 8px !important;
+}
+
+.rail-arrow-btn {
+  min-width: 44px !important;
+  min-height: 44px !important;
+  font-size: 20px !important;
+}
+
+.sheet-close-btn,
+.toast-close-btn,
+.felt-icon-pill {
+  min-width: 44px !important;
+  min-height: 44px !important;
+}
+
+/* Remove redundant tiny 26x22 jump dots; keep swipeable big cards + 44x44 arrows */
+.bristol-dot-nav {
+  display: none !important;
+}
+
+/* Home quick-backfill secondary action row */
+.v82-quick-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
+  margin-bottom: 4px;
+}
+
+.v82-quick-backfill-btn {
+  appearance: none;
+  flex: 1;
+  min-height: 44px;
+  padding: 8px 14px;
+  border-radius: 14px;
+  border: 1px dashed rgba(138, 102, 68, 0.34);
+  background: rgba(255, 251, 242, 0.86);
+  color: var(--felt-espresso);
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.16s ease, transform 0.14s ease, border-color 0.16s ease;
+}
+
+.v82-quick-backfill-btn:hover {
+  background: rgba(255, 248, 232, 0.98);
+  border-color: rgba(217, 110, 71, 0.45);
+}
+
+.v82-quick-backfill-btn:active {
+  transform: scale(0.98);
+}
+
+.v82-empty-day-btn {
+  appearance: none;
+  flex-shrink: 0;
+  min-height: 44px;
+  padding: 8px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(112, 83, 56, 0.16);
+  background: rgba(247, 240, 226, 0.72);
+  color: var(--felt-espresso-muted);
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.16s ease, color 0.16s ease;
+}
+
+.v82-empty-day-btn:hover {
+  background: rgba(244, 234, 214, 0.95);
+  color: var(--felt-espresso);
+}
+
+/* Demo vs Personal badges & scope switcher */
+.v82-demo-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 700;
+  background: rgba(138, 102, 68, 0.14);
+  color: var(--felt-espresso-muted);
+  letter-spacing: 0.02em;
+}
+
+.v82-demo-badge.is-alert {
+  background: rgba(158, 52, 46, 0.14);
+  color: #8F2C27;
+}
+
+.v82-scope-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 14px;
+  background: rgba(247, 240, 226, 0.78);
+  border: 1px solid rgba(112, 83, 56, 0.12);
+  margin-bottom: 10px;
+  font-size: 12px;
+  color: var(--felt-espresso-muted);
+}
+
+.v82-scope-bar strong {
+  color: var(--felt-espresso);
+}
+
+.v82-scope-toggle-btn {
+  appearance: none;
+  min-height: 36px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(138, 102, 68, 0.28);
+  background: #FFFDF8;
+  color: var(--felt-espresso);
+  font-family: var(--font-sans);
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* Immediate Emergency Strip inside Care Card & Care Clinic Stage */
+.v82-emergency-strip {
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(158, 52, 46, 0.09);
+  border: 1.5px solid rgba(158, 52, 46, 0.32);
+  color: #7D231E;
+  font-size: 12.5px;
+  line-height: 1.55;
+  margin-bottom: 10px;
+}
+
+.v82-emergency-strip strong {
+  display: block;
+  font-size: 12.5px;
+  margin-bottom: 2px;
+  color: #8F241E;
+}
+
+.care-badge[data-level="emergency"] {
+  background: #9E342E !important;
+  color: #FFFDF8 !important;
+}
+
+/* Log drawer backfill datetime & uncertain/optional controls */
+.v82-datetime-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 9px 12px;
+  border-radius: 14px;
+  background: rgba(255, 251, 242, 0.85);
+  border: 1px solid rgba(112, 83, 56, 0.14);
+  margin-bottom: 12px;
+}
+
+.v82-datetime-label {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--felt-espresso);
+  white-space: nowrap;
+}
+
+.v82-datetime-input {
+  flex: 1;
+  min-height: 38px;
+  padding: 4px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(112, 83, 56, 0.18);
+  background: #FFFDF8;
+  color: var(--felt-espresso);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.v82-bristol-desc {
+  display: block;
+  font-size: 10.5px;
+  line-height: 1.3;
+  color: var(--felt-espresso-muted);
+  margin-top: 2px;
+}
+
+.v82-optional-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.v82-uncertain-btn {
+  appearance: none;
+  min-height: 36px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px dashed rgba(112, 83, 56, 0.28);
+  background: rgba(255, 253, 248, 0.72);
+  color: var(--felt-espresso-muted);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.v82-uncertain-btn.is-active {
+  background: rgba(138, 102, 68, 0.16);
+  border-style: solid;
+  border-color: rgba(138, 102, 68, 0.45);
+  color: var(--felt-espresso);
+}
+
+.v82-note-input {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 44px;
+  padding: 9px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(112, 83, 56, 0.16);
+  background: #FFFDF8;
+  color: var(--felt-espresso);
+  font-family: var(--font-sans);
+  font-size: 13px;
+}
+
+/* Session reminder selector */
+.v82-reminder-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 6px;
+  font-size: 11.5px;
+  color: var(--felt-espresso-muted);
+}
+
+.v82-reminder-pill {
+  appearance: none;
+  min-height: 30px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid rgba(112, 83, 56, 0.18);
+  background: rgba(255, 253, 248, 0.8);
+  color: var(--felt-espresso-muted);
+  font-family: var(--font-sans);
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.v82-reminder-pill.is-active {
+  background: rgba(217, 110, 71, 0.14);
+  border-color: rgba(217, 110, 71, 0.42);
+  color: #9D3B1B;
+}
+
+/* Cutscene top-right controls (mute + skip) */
+.cutscene-top-actions {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cutscene-top-actions .cutscene-skip-btn {
+  position: static !important;
+  min-height: 40px;
+  padding: 0 12px;
+}
+
+/* Desensitive Aesthetic Poster Builder */
+.v82-actor-picker {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin: 10px 0;
+}
+
+.v82-actor-chip {
+  appearance: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 4px;
+  border-radius: 12px;
+  border: 1.5px solid rgba(112, 83, 56, 0.14);
+  background: rgba(255, 252, 245, 0.88);
+  color: var(--felt-espresso);
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 44px;
+}
+
+.v82-actor-chip img {
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
+  object-fit: cover;
+}
+
+.v82-actor-chip.is-selected {
+  border-color: var(--felt-terracotta);
+  background: rgba(217, 110, 71, 0.11);
+}
+
+.v82-caption-preview-box {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(255, 252, 245, 0.92);
+  border: 1px dashed rgba(112, 83, 56, 0.24);
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--felt-espresso);
+}
+
+.v82-caption-preview-box strong {
+  display: block;
+  font-size: 11px;
+  color: var(--felt-espresso-muted);
+  margin-bottom: 4px;
+}
+
+/* 1v1 Zero-Privacy Care Stickers Sheet */
+.v82-sticker-stage {
+  border-radius: 20px;
+  padding: 18px 16px;
+  background: linear-gradient(160deg, #FDF6E6 0%, #F4E6CA 100%);
+  border: 1.5px dashed rgba(138, 102, 68, 0.34);
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.v82-sticker-actor {
+  width: 112px;
+  height: 112px;
+  margin: 0 auto 10px;
+  border-radius: 22px;
+  overflow: hidden;
+  border: 3px solid #FFFDF8;
+  box-shadow: 0 10px 24px rgba(84, 58, 36, 0.14);
+}
+
+.v82-sticker-actor img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.v82-sticker-title {
+  margin: 0 0 6px;
+  font-family: var(--font-editorial);
+  font-size: 18px;
+  color: var(--felt-espresso);
+}
+
+.v82-sticker-body {
+  margin: 0 0 10px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--felt-espresso-muted);
+}
+
+.v82-sticker-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.v82-sticker-btn {
+  appearance: none;
+  min-height: 48px;
+  padding: 8px 6px;
+  border-radius: 14px;
+  border: 1.5px solid rgba(112, 83, 56, 0.16);
+  background: #FFFDF8;
+  color: var(--felt-espresso);
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.v82-sticker-btn.is-active {
+  border-color: var(--felt-terracotta);
+  background: rgba(217, 110, 71, 0.12);
+  color: #9D3B1B;
+}
+
+/* Private vs Public Spot Scope Tag */
+.v82-spot-scope-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 700;
+  margin-left: 6px;
+}
+
+.v82-spot-scope-tag.is-private {
+  background: rgba(112, 83, 56, 0.12);
+  color: var(--felt-espresso-muted);
+}
+
+.v82-spot-scope-tag.is-public {
+  background: rgba(74, 106, 70, 0.14);
+  color: #3E6037;
+}
+
+/* Weekly day tokens for empty / no-bm / abnormal */
+.day-token-nodata {
+  background: rgba(244, 237, 224, 0.65) !important;
+  border-style: dashed !important;
+  color: #9C8A76 !important;
+}
+
+.day-token-nobm {
+  background: #EDE8DF !important;
+  color: #6B5C4E !important;
+}
+
+.day-token-alert {
+  background: #F6DFDC !important;
+  border-color: #9E342E !important;
+  color: #8F241E !important;
+}
+
+/* History row alert highlight */
+.history-row.is-redflag-entry {
+  border-color: rgba(158, 52, 46, 0.34) !important;
+  background: rgba(252, 240, 238, 0.82) !important;
+}

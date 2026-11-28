@@ -6,9 +6,9 @@
   <meta name="theme-color" content="#FAF3E4" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <meta property="og:title" content="便便日记 · 手工毛毡肠道手账" />
-  <meta property="og:description" content="开始大便计时 · 毛毡定格过场动画 · 每日大便档案 · 厕所必拉榜 · 拉屎联盟 PK" />
-  <title>便便日记 · 手工毛毡肠道手账</title>
+  <meta property="og:title" content="便便日记 · 手工毛毡小剧场" />
+  <meta property="og:description" content="开始大便计时 · 一键补记 · 30 天个人排便记录摘要 · 脱敏毛毡海报 · 1v1 轻关心贴纸" />
+  <title>便便日记 · 手工毛毡小剧场</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -166,6 +166,17 @@
                 <span>轻触与过场音效</span>
               </button>
 
+              <button
+                id="cutscenePrefToggleBtn"
+                class="more-menu-item"
+                type="button"
+                role="menuitem"
+                aria-pressed="true"
+              >
+                <span class="more-menu-icon">🎬</span>
+                <span id="cutscenePrefLabel">入档播放过场动画：开</span>
+              </button>
+
               <button id="privacyBtn" class="more-menu-item" type="button" role="menuitem">
                 <span class="more-menu-icon">
                   <svg class="icon-svg" viewBox="0 0 20 20" fill="none" aria-hidden="true">
@@ -176,21 +187,26 @@
                 <span id="privacyPillLabel">伪装外观</span>
               </button>
 
+              <button id="openDoctorQuickBtn" class="more-menu-item" type="button" role="menuitem">
+                <span class="more-menu-icon">📋</span>
+                <span>30 天个人记录摘要</span>
+              </button>
+
               <button id="openInsightsBtn" class="more-menu-item" type="button" role="menuitem">
                 <span class="more-menu-icon">📊</span>
-                <span>14 日背刺榜与病历</span>
+                <span>14 日记录与趋势</span>
               </button>
 
               <div class="more-menu-divider" aria-hidden="true"></div>
 
               <button id="demoEightMinBtn" class="more-menu-item" type="button" role="menuitem">
                 <span class="more-menu-icon">⏱</span>
-                <span>预览 8 分钟提醒</span>
+                <span>预览久坐提醒</span>
               </button>
 
               <button id="openRedFlagDemoBtn" class="more-menu-item is-warn" type="button" role="menuitem">
                 <span class="more-menu-icon">🩺</span>
-                <span>预览大橘猫问诊</span>
+                <span>预览大橘猫安全提示</span>
               </button>
             </div>
           </div>
@@ -199,30 +215,30 @@
 
       <!-- Hidden metadata node preserved cleanly for state sync -->
       <div id="playbillBadge" class="v6-sr-hidden" aria-hidden="true">
-        <span id="playbillText">第 42 场 · 丝滑金冠团</span>
+        <span id="playbillText">便便日记 · 毛毡小剧场</span>
       </div>
     </header>
 
-    <!-- Hemorrhoid-Guard Toast (Triggered at >= 8:00 or Demo Button) -->
+    <!-- Neutral Sitting-Time Reminder Toast (User-Configurable, Snoozable Without Resetting Duration) -->
     <aside id="eightMinToast" class="guard-toast" role="alert" aria-live="polite" hidden>
       <div class="guard-toast-inner">
         <div class="guard-toast-header">
-          <span class="stitched-tag tag-warn">久蹲 8 分钟防线</span>
+          <span id="toastReminderTag" class="stitched-tag tag-warn">久坐时间提醒</span>
           <button id="closeToastBtn" class="toast-close-btn" type="button" aria-label="收起提醒">×</button>
         </div>
-        <p class="guard-toast-quote">“老板没发现，但你的肛周静脉已经开始写辞职信了，收工吧！”</p>
+        <p id="toastReminderQuote" class="guard-toast-quote">“已经坐了一会儿啦，可以先结束计时，稍后再补记详情。”</p>
         <div class="guard-toast-actions">
-          <button id="toastLogNowBtn" class="toast-action-primary" type="button">收工并记一笔</button>
-          <button id="toastResetTimerBtn" class="toast-action-secondary" type="button">重置计时</button>
+          <button id="toastLogNowBtn" class="toast-action-primary" type="button">结束并记一笔</button>
+          <button id="toastResetTimerBtn" class="toast-action-secondary" type="button">稍后再说（继续计时）</button>
         </div>
       </div>
     </aside>
 
-    <!-- BOTTOM 28% SAFE ZONE: Theater Bulletin OR Calm Medical Red-Flag Card -->
+    <!-- BOTTOM SAFE ZONE: Theater Home Dock OR Calm Safety Guidance Card -->
     <section class="bottom-safe-zone">
-      <!-- 1. Serene Minimal Theater Home Dock (Idle: 开始大便 | Active: 正在大便 00:00 -> 结束大便) -->
+      <!-- 1. Serene Minimal Theater Home Dock -->
       <article id="theaterCard" class="bulletin-card v6-home-dock" aria-label="今日便便日记">
-        <!-- State A: Idle Ready to Start (V8 Ultra-Zen: Whisper Pill + Hover/Tap Quote + Bold CTA) -->
+        <!-- State A: Idle Ready to Start or Quick Backfill -->
         <div id="homeIdleView" class="v7-home-view v8-zen-home">
           <div id="homeQuoteDisclosure" class="v8-quote-disclosure">
             <button
@@ -232,14 +248,15 @@
               aria-expanded="false"
               aria-controls="homeQuotePopover"
             >
+              <span id="homeDemoBadge" class="v82-demo-badge" hidden>示例</span>
               <span id="latestBristolTag" class="v6-meta-main">4型 · 丝滑金冠团</span>
               <span class="v6-meta-sep" aria-hidden="true">·</span>
-              <span id="latestTimeLabel" class="v6-meta-time">今日档案</span>
+              <span id="latestTimeLabel" class="v6-meta-time">今日记录</span>
               <span class="v8-whisper-chev" aria-hidden="true">▾</span>
             </button>
-            <div id="homeQuotePopover" class="v8-quote-popover" role="region" aria-label="今日剧报详情">
+            <div id="homeQuotePopover" class="v8-quote-popover" role="region" aria-label="最近一笔详情">
               <h1 id="comedyHeadline" class="bulletin-headline v8-popover-headline">
-                “昨夜重辣火锅企图搞事，被四号金冠团优雅镇压！”
+                “丝滑金冠团准时登台，今天也如实记下这一笔。”
               </h1>
             </div>
           </div>
@@ -248,46 +265,60 @@
             开始大便
           </button>
 
+          <div class="v82-quick-row">
+            <button id="quickBackfillBtn" class="v82-quick-backfill-btn" type="button">
+              刚拉完 · 补记一笔
+            </button>
+            <button id="markNoBmTodayBtn" class="v82-empty-day-btn" type="button">
+              今日未排便
+            </button>
+          </div>
+
           <nav class="v6-dock-nav" aria-label="核心入口">
             <button id="openShareDailyBtn" class="v6-nav-link" type="button">
               <svg class="v6-nav-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
                 <rect x="3.5" y="4" width="13" height="12" rx="2.5" stroke="currentColor" stroke-width="1.5" />
                 <path d="M7 9H13M7 12.2H10.8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
               </svg>
-              <span>报告</span>
+              <span>档案</span>
+            </button>
+            <button id="openPkBtn" class="v6-nav-link" type="button">
+              <svg class="v6-nav-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                <path d="M10 16.5C10 16.5 4 12.6 4 8.2C4 6.1 5.6 4.5 7.6 4.5C8.8 4.5 9.6 5.1 10 5.9C10.4 5.1 11.2 4.5 12.4 4.5C14.4 4.5 16 6.1 16 8.2C16 12.6 10 16.5 10 16.5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
+              </svg>
+              <span>轻关心</span>
             </button>
             <button id="openToiletBtn" class="v6-nav-link" type="button">
               <svg class="v6-nav-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
                 <path d="M10 17C10 17 15 12.8 15 8.5C15 5.7 12.8 3.5 10 3.5C7.2 3.5 5 5.7 5 8.5C5 12.8 10 17 10 17Z" stroke="currentColor" stroke-width="1.5" />
                 <circle cx="10" cy="8.5" r="1.8" stroke="currentColor" stroke-width="1.5" />
               </svg>
-              <span>必拉榜</span>
-            </button>
-            <button id="openPkBtn" class="v6-nav-link" type="button">
-              <svg class="v6-nav-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-                <path d="M6.5 6.5L13.5 13.5M13.5 6.5L6.5 13.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-                <circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.5" />
-              </svg>
-              <span>联盟</span>
+              <span>私人坑位</span>
             </button>
           </nav>
         </div>
 
-        <!-- State B: Active Live Poop Session (Timing -> 结束大便) -->
+        <!-- State B: Active Live Poop Session (Persisted Across Refresh -> 结束大便) -->
         <div id="homeSessionView" class="v7-session-view" hidden>
           <div class="v7-session-top">
             <span class="v7-live-pill">
               <span class="v7-live-dot" aria-hidden="true"></span>
-              正在大便 · 计时中
+              正在记录 · 计时中
             </span>
-            <button id="sessionToiletChip" class="v7-spot-chip" type="button" title="切换或打卡当前厕所">
+            <button id="sessionToiletChip" class="v7-spot-chip" type="button" title="切换私人坑位备忘">
               📍 <span id="sessionToiletName">家里主卫</span>
             </button>
           </div>
 
           <div class="v7-timer-stage">
             <strong id="sessionTimerBig" class="v7-timer-big">00:00</strong>
-            <span id="sessionTimerHint" class="v7-timer-hint">8 分钟内最护痔 · 放轻松慢慢来</span>
+            <span id="sessionTimerHint" class="v7-timer-hint">已设 8 分钟温和提醒 · 放轻松慢慢来</span>
+            <div class="v82-reminder-row" role="group" aria-label="久坐提醒时长">
+              <span>提醒：</span>
+              <button class="v82-reminder-pill" type="button" data-reminder-min="5">5 分钟</button>
+              <button class="v82-reminder-pill is-active" type="button" data-reminder-min="8">8 分钟</button>
+              <button class="v82-reminder-pill" type="button" data-reminder-min="10">10 分钟</button>
+            </div>
           </div>
 
           <button id="finishPoopBtn" class="btn-primary-felt v6-primary-cta v7-finish-cta" type="button">
@@ -295,7 +326,7 @@
           </button>
 
           <div class="v7-session-foot">
-            <button id="sessionDirectLogBtn" class="v7-foot-link" type="button">补录历史</button>
+            <button id="sessionDirectLogBtn" class="v7-foot-link" type="button">补记历史</button>
             <span class="v7-foot-sep" aria-hidden="true">·</span>
             <button id="cancelPoopBtn" class="v7-foot-link" type="button">取消本次计时</button>
           </div>
@@ -304,67 +335,63 @@
         <!-- Legacy sync nodes cleanly hidden from Home stage -->
         <div class="v6-sr-hidden" aria-hidden="true">
           <img id="latestToyThumb" src="assets/felt/bristol_4.jpg" alt="" />
-          <span id="stageStampBadge" data-tone="gold">五星金绒</span>
-          <p id="bulletinStats">耗时 4 分 18 秒 · 顺畅 · 连续 6 日安泰</p>
-          <div id="detectiveStrip">
-            <span id="detectiveConfBadge">侦探反推 89%</span>
-            <span id="detectiveGuessText"></span>
-            <div id="detectiveFeedbackBtns">
-              <button id="detectiveHitBtn" type="button">猜中了！</button>
-              <button id="detectiveMissBtn" type="button">其实吃了别的</button>
-            </div>
-            <div id="detectiveOverrideRow" hidden>
-              <div id="detectiveOverrideChips"></div>
-            </div>
-          </div>
+          <span id="stageStampBadge" data-tone="gold">已入档</span>
+          <p id="bulletinStats"></p>
         </div>
       </article>
 
-      <!-- 2. Calm Medical Red-Flag Sequential Triage Card (Sits cleanly below Orange Tabby Cat Doctor) -->
-      <article id="redFlagCard" class="care-card v6-care-card" aria-label="大橘猫猫医生安心问诊" hidden>
-        <!-- Phase A: 3-Step Sequential Triage Questionnaire -->
+      <!-- 2. Calm Safety Guidance Card (Immediate Emergency Signals Visible First + Optional 3-Step Self-Check) -->
+      <article id="redFlagCard" class="care-card v6-care-card" aria-label="大橘猫安全守护提示" hidden>
+        <div id="careEmergencyBanner" class="v82-emergency-strip" role="alert">
+          <strong>先看急症信号（无需完成下方自查）</strong>
+          <span id="careEmergencyText">如出现大量或持续出血、柏油样发亮粘稠黑便、头晕乏力、心慌晕厥、高热或剧烈腹痛，请立即前往急诊或尽快就医。</span>
+        </div>
+
+        <!-- Phase A: Optional 3-Step Self-Check -->
         <div id="careTriageView" class="care-triage-view">
           <div class="care-triage-head">
-            <span id="careStepBadge" class="care-badge">大橘医生问诊 · 1/3</span>
+            <span id="careStepBadge" class="care-badge">大橘猫安全自查 · 1/3</span>
             <div class="care-step-dots" aria-hidden="true">
               <span class="care-dot is-active" data-care-dot="0"></span>
               <span class="care-dot" data-care-dot="1"></span>
               <span class="care-dot" data-care-dot="2"></span>
             </div>
-            <button id="careSkipExitBtn" class="care-text-link" type="button">返回剧场</button>
+            <button id="careSkipExitBtn" class="care-text-link" type="button">返回首页</button>
           </div>
 
           <h2 id="careQuestionText" class="care-question-title">
-            先别慌，大橘医生先排查饮食染色：近 24–48 小时吃过红心火龙果、甜菜根或大量番茄/辣椒吗？
+            先帮你核对近期饮食与情况，便于就诊时准确描述：
           </h2>
 
-          <div id="careOptionsList" class="care-options-list" role="group" aria-label="问诊选项"></div>
+          <div id="careOptionsList" class="care-options-list" role="group" aria-label="自查选项"></div>
 
-          <p class="care-disclaimer">大橘猫仅提供日常参考建议，不构成医疗建议或临床诊断</p>
-        </div>
-
-        <!-- Phase B: Personalized Conclusion (Shown ONLY after answering all 3 questions) -->
-        <div id="careResultView" class="care-result-view" hidden>
-          <div class="care-meta-row">
-            <span id="careResultBadge" class="care-badge" data-level="observe">大橘猫参考建议</span>
-            <span id="careDepartmentBadge" class="care-dept">可考虑挂号：消化内科 / 肛肠科</span>
-            <button id="careRetakeBtn" class="care-text-link" type="button">重新问诊</button>
+          <div class="v82-optional-row">
+            <button id="careQuickSummaryBtn" class="care-text-link" type="button">直接查看 30 天个人记录摘要 ›</button>
           </div>
 
-          <h2 id="careResultTitle" class="care-title">综合你的回答，大橘猫给你这些参考建议</h2>
+          <p class="care-disclaimer">提示：以上信息仅作日常健康参考与就医整理，不构成医疗诊断或治疗建议。</p>
+        </div>
 
-          <p id="careExplanation" class="care-desc">
-            请先完成上方 3 步小问诊，大橘猫会结合饮食染色、排便表现与身体状态给出参考建议。
-          </p>
+        <!-- Phase B: Summary Guidance -->
+        <div id="careResultView" class="care-result-view" hidden>
+          <div class="care-meta-row">
+            <span id="careResultBadge" class="care-badge" data-level="observe">大橘猫安全提示</span>
+            <span id="careDepartmentBadge" class="care-dept">就医参考科室：消化内科</span>
+            <button id="careRetakeBtn" class="care-text-link" type="button">重新核对</button>
+          </div>
 
-          <p class="care-disclaimer">免责声明：大橘猫仅提供日常参考建议，不构成任何医疗建议或专业诊断</p>
+          <h2 id="careResultTitle" class="care-title">已为你整理本次重点关注提示</h2>
+
+          <p id="careExplanation" class="care-desc"></p>
+
+          <p class="care-disclaimer">免责声明：本提示仅作日常参考与就医前整理，不替代专业医生面诊或急救判断。</p>
 
           <div id="careActionsRow" class="care-actions care-actions-row">
             <button id="careOpenReportBtn" class="btn-care-primary" type="button">
-              生成 30 天病历单
+              查看 30 天个人记录摘要
             </button>
             <button id="careExitBtn" class="btn-care-secondary" type="button">
-              回到剧场
+              回到首页
             </button>
           </div>
         </div>
@@ -388,23 +415,29 @@
       <div class="sheet-header">
         <div>
           <h2 id="logDrawerTitle" class="sheet-title">记录本次细节</h2>
-          <p class="sheet-subtitle">选完团子与体感，生成今日毛毡大便档案</p>
+          <p class="sheet-subtitle">只选形态也能直接落档，其余项均可留空或选“不确定”</p>
         </div>
         <div class="sheet-header-right">
-          <button id="cycleDurationBtn" class="duration-chip" type="button" title="点击切换耗时">
-            耗时 <strong id="logDurationLabel">4 分 18 秒</strong>
+          <button id="cycleDurationBtn" class="duration-chip" type="button" title="点击切换耗时（可选）">
+            耗时 <strong id="logDurationLabel">未记录</strong>
           </button>
           <button class="sheet-close-btn" type="button" data-close-sheet aria-label="关闭">×</button>
         </div>
       </div>
 
       <div class="sheet-scroll-body">
-        <!-- Step 1: Bristol 1-7 Wool Felt Toys -->
+        <!-- Date & Time Picker for Backfill or Exact Logging -->
+        <div class="v82-datetime-row">
+          <label class="v82-datetime-label" for="logDateTimeInput">记录时间</label>
+          <input id="logDateTimeInput" class="v82-datetime-input" type="datetime-local" />
+        </div>
+
+        <!-- Step 1: Bristol 1-7 Wool Felt Toys (Swipeable Big Cards + 44x44 Arrows + Uncertain) -->
         <div class="form-block">
           <div class="block-label-row block-label-between">
             <div class="block-label-left">
               <span class="step-index">01</span>
-              <span class="block-label">选一位今日出场团子（Bristol 1–7）</span>
+              <span class="block-label">选一位出场团子（Bristol 1–7）</span>
             </div>
             <div class="rail-arrow-group" aria-label="切换布里斯托团子">
               <button id="bristolPrevBtn" class="rail-arrow-btn" type="button" aria-label="上一个形态">‹</button>
@@ -414,67 +447,74 @@
 
           <div id="bristolRail" class="bristol-rail" role="radiogroup" aria-label="布里斯托 1 到 7 型毛毡团子"></div>
 
-          <div id="bristolDotNav" class="bristol-dot-nav" aria-label="快速跳转 1 到 7 型"></div>
+          <div id="bristolDotNav" class="bristol-dot-nav" aria-hidden="true"></div>
 
           <div id="bristolCaptionCard" class="bristol-caption-card">
             <div class="caption-top">
-              <strong id="selectedBristolName">4型 · 丝滑金冠团</strong>
-              <span id="selectedBristolStatus" class="status-tag status-good">五星冠军</span>
+              <strong id="selectedBristolName">4型 · 丝滑金冠团（光滑柔软条状）</strong>
+              <span id="selectedBristolStatus" class="status-tag status-good">常见参考</span>
             </div>
-            <p id="selectedBristolAdvice" class="caption-advice">丝滑完美！佩戴金色小皇冠的五星冠军</p>
+            <p id="selectedBristolAdvice" class="caption-advice">光滑柔软条状，通常代表较顺畅的日常状态</p>
+          </div>
+
+          <div class="v82-optional-row">
+            <button id="bristolUncertainBtn" class="v82-uncertain-btn" type="button" aria-pressed="false">
+              不太确定（形态留空）
+            </button>
           </div>
         </div>
 
-        <!-- Step 2: 6-Color Health Radar -->
+        <!-- Step 2: 6-Color Health Radar (Default Unconfirmed -> Explicit Tap or Uncertain) -->
         <div class="form-block">
-          <div class="block-label-row">
-            <span class="step-index">02</span>
-            <span class="block-label">颜色雷达（6 色健康自检）</span>
+          <div class="block-label-row block-label-between">
+            <div class="block-label-left">
+              <span class="step-index">02</span>
+              <span class="block-label">颜色观察（可选，默认未选）</span>
+            </div>
+            <button id="colorUncertainBtn" class="v82-uncertain-btn is-active" type="button" aria-pressed="true">
+              未选 / 不确定
+            </button>
           </div>
 
-          <div id="colorGrid" class="color-radar-grid" role="radiogroup" aria-label="颜色健康雷达"></div>
+          <div id="colorGrid" class="color-radar-grid" role="radiogroup" aria-label="颜色观察"></div>
 
           <div id="colorRedFlagHint" class="inline-calm-notice" hidden>
-            该颜色触发医学红灯关注：保存后将自动切换至「大橘猫猫医生安心关护模式」，暂停一切玩笑。
+            该颜色或连续水样属于需关注信号：保存后将立即进入「大橘猫安全守护提示」，暂停娱乐动效与分享外发。
           </div>
         </div>
 
-        <!-- Step 3: Optional Felt Trigger Tags (Collapsed by default for Zen flow) -->
+        <!-- Step 3: Optional Ease, Diet Tags & Memo -->
         <div class="form-block">
           <div class="ease-row">
-            <span class="ease-label">体感节奏</span>
-            <div id="easeGroup" class="ease-pills" role="radiogroup" aria-label="排便顺畅度"></div>
+            <span class="ease-label">体感（可选）</span>
+            <div id="easeGroup" class="ease-pills" role="radiogroup" aria-label="排便体感"></div>
           </div>
 
           <details class="v8-fold" style="margin-top: 10px;">
             <summary class="v8-fold-summary">
-              <span>+ 饮食侦探与诱因线索（可选）</span>
+              <span>+ 饮食 / 作息标签与个人备注（可选）</span>
               <span class="v8-fold-chev" aria-hidden="true">▾</span>
             </summary>
             <div class="v8-fold-body">
-              <div id="draftDetectiveBox" class="draft-detective-box">
-                <div class="draft-detective-copy">
-                  <span id="draftDetectiveConf" class="detective-badge">策略预判 91%</span>
-                  <p id="draftDetectiveText" class="draft-detective-text">
-                    反推近 12–24h：温热均衡正餐 + 蔬果纤维 + 饮水达标
-                  </p>
-                </div>
-                <button id="adoptDetectiveTagsBtn" class="detective-chip detective-chip-hit" type="button">
-                  一键采纳
-                </button>
-              </div>
               <div id="triggerChips" class="trigger-chips-wrap"></div>
+              <input
+                id="logMemoInput"
+                class="v82-note-input"
+                type="text"
+                placeholder="例如：吃过红心火龙果、喝水偏少、出差路上（仅存本机）"
+                maxlength="60"
+              />
             </div>
           </details>
 
           <details class="v8-fold" style="margin-top: 8px;">
             <summary class="v8-fold-summary">
-              <span>+ 绑定本次厕所坑位（可选）</span>
+              <span>+ 关联私人坑位备忘（可选）</span>
               <span class="v8-fold-chev" aria-hidden="true">▾</span>
             </summary>
             <div class="v8-fold-body">
               <div style="display:flex;justify-content:flex-end;margin-bottom:6px;">
-                <button id="logOpenToiletBtn" class="care-text-link" type="button">+ 打卡新厕所</button>
+                <button id="logOpenToiletBtn" class="care-text-link" type="button">+ 记录新坑位</button>
               </div>
               <div id="logToiletChips" class="trigger-chips-wrap"></div>
             </div>
@@ -489,7 +529,7 @@
       </div>
     </section>
 
-    <!-- SHEET 2: 14-Day 肠道背刺榜 Insights -->
+    <!-- SHEET 2: 14-Day Personal Records & Factual Trend -->
     <section
       id="insightsSheet"
       class="felt-sheet insights-sheet"
@@ -501,98 +541,78 @@
       <div class="sheet-handle" aria-hidden="true"></div>
       <div class="sheet-header">
         <div>
-          <h2 id="insightsTitle" class="sheet-title">14 日肠道背刺榜</h2>
-          <p class="sheet-subtitle">用毛毡证据链，捉拿每一杯暗算你的冰美式</p>
+          <h2 id="insightsTitle" class="sheet-title">我的记录与事实趋势</h2>
+          <p class="sheet-subtitle">所有统计均按真实记录重算，演示示例与个人记录严格隔离</p>
         </div>
         <button class="sheet-close-btn" type="button" data-close-sheet aria-label="关闭">×</button>
       </div>
 
       <div class="sheet-scroll-body">
+        <div id="insightsScopeBar" class="v82-scope-bar">
+          <span id="insightsScopeText">当前范围：<strong>仅本人记录</strong></span>
+          <button id="insightsScopeToggleBtn" class="v82-scope-toggle-btn" type="button">查看演示示例</button>
+        </div>
+
         <div id="insightsKpiStrip" class="kpi-strip"></div>
 
-        <!-- 14-Day Bristol Trend -->
+        <!-- 14-Entry Bristol Trend -->
         <div class="stitched-panel">
           <div class="panel-head">
-            <h3>近 14 次布里斯托形态轨迹</h3>
-            <span class="panel-legend">浅蜜区 = 3–4型黄金带</span>
+            <h3>近期形态记录轨迹</h3>
+            <span class="panel-legend">浅蜜区 = 3–4型常见参考带</span>
           </div>
           <div id="trendChart" class="trend-chart"></div>
           <div id="trendSelectedDetail" class="trend-detail-card">
-            点按任意毛线节点或下方历史记录，查看当日团子与剧报头条
+            点按任意节点或下方记录，查看当次详情
           </div>
         </div>
 
-        <!-- Clickable 14-Day History List -->
+        <!-- Clickable History List -->
         <div class="stitched-panel">
           <div class="panel-head">
-            <h3>近 14 日剧报档案（点击回看）</h3>
+            <h3>近期记录明细（点击回看）</h3>
             <span class="panel-legend">按时间倒序</span>
           </div>
-          <div id="historyList" class="history-list" role="listbox" aria-label="近 14 日排便剧报记录"></div>
+          <div id="historyList" class="history-list" role="listbox" aria-label="近期排便记录明细"></div>
         </div>
 
-        <!-- Trigger Backstab Leaderboard -->
+        <!-- Factual Co-occurrence Summary (Zero Fabricated Percentages!) -->
         <div class="stitched-panel">
           <div class="panel-head">
-            <h3>高频诱因相关性（背刺榜）</h3>
-            <span class="panel-legend">本地统计算法</span>
+            <h3>个人标签共现事实</h3>
+            <span class="panel-legend">仅基于你手动标记的样本</span>
           </div>
           <div id="correlationList" class="correlation-list"></div>
         </div>
 
-        <!-- Monthly Postcard & Friend PK Entry Card -->
+        <!-- Quick Jump to Aesthetic Poster & 1v1 Care Stickers -->
         <div class="stitched-panel postcard-cta-panel">
           <div class="postcard-cta-copy">
-            <strong>3 合 1 分享中心 &amp; 好友擂台 PK</strong>
-            <span>隐私安全脱敏战报 · 支持高清图下载与微信/小红书文案</span>
+            <strong>脱敏剧团海报 &amp; 1v1 轻关心贴纸</strong>
+            <span>纯美学展示与零隐私关心 · 绝不外泄个人排便细节</span>
           </div>
           <div class="cta-mini-pair">
             <button id="insightsToPkBtn" class="btn-secondary-felt btn-compact-felt" type="button">
-              好友 PK
+              轻关心贴纸
             </button>
             <button id="insightsToPostcardBtn" class="btn-secondary-felt btn-compact-felt" type="button">
-              月度明信片
+              脱敏海报
             </button>
-          </div>
-        </div>
-
-        <!-- Subtle Collapsible Paid-Poop Easter Egg -->
-        <div class="stitched-panel easter-egg-panel">
-          <button
-            id="easterEggToggleBtn"
-            class="easter-egg-trigger"
-            type="button"
-            aria-expanded="false"
-          >
-            <span>隐藏彩蛋：本月“带薪蹲坑”战报</span>
-            <span id="easterEggChevron" class="chevron-text">展开</span>
-          </button>
-          <div id="easterEggBody" class="easter-egg-body" hidden>
-            <div class="egg-amount-row">
-              <div>
-                <span class="egg-label">本月带薪蹲坑折算</span>
-                <strong id="eggCurrencyValue" class="egg-value">¥ 318</strong>
-              </div>
-              <span class="stitched-tag tag-gold">摸鱼剧场</span>
-            </div>
-            <p id="eggSubNote" class="egg-note">
-              按本地估算均薪与近 30 日有效蹲坑时长折算。温馨提醒：单次超过 8 分钟会亏掉肛周静脉健康，千万别硬蹲！
-            </p>
           </div>
         </div>
       </div>
 
       <div class="sheet-footer sheet-footer-split">
         <button id="insightsToDoctorBtn" class="btn-secondary-felt btn-full" type="button">
-          查看 30 天医生病历单
+          30 天个人记录摘要
         </button>
         <button id="insightsToLogBtn" class="btn-primary-felt btn-full" type="button">
-          + 记一笔
+          + 补记一笔
         </button>
       </div>
     </section>
 
-    <!-- SHEET 3: Clean Printable 30-Day Clinical Doctor Report -->
+    <!-- SHEET 3: Clean Printable 30-Day Personal Log Summary (Personal Data ONLY, Zero Demo Leakage) -->
     <section
       id="doctorSheet"
       class="felt-sheet doctor-sheet"
@@ -604,9 +624,9 @@
       <div class="sheet-handle" aria-hidden="true"></div>
       <div class="sheet-header doctor-header">
         <div>
-          <span class="clinical-kicker">CLINICAL SUMMARY · 无玩笑就诊版</span>
-          <h2 id="doctorTitle" class="sheet-title">近 30 天排便医生病历单</h2>
-          <p id="doctorDateRange" class="sheet-subtitle">统计周期：近 30 日 · 本地原始记录</p>
+          <span class="clinical-kicker">PERSONAL LOG SUMMARY · 个人自记 · 仅供参考</span>
+          <h2 id="doctorTitle" class="sheet-title">近 30 天个人排便记录摘要</h2>
+          <p id="doctorDateRange" class="sheet-subtitle">仅统计本人记录（已自动排除演示示例）</p>
         </div>
         <button class="sheet-close-btn" type="button" data-close-sheet aria-label="关闭">×</button>
       </div>
@@ -618,17 +638,17 @@
 
         <div class="clinical-table-wrap">
           <div class="clinical-table-title">
-            <h3>排便明细表（按时间倒序）</h3>
-            <span>就诊时可直接向消化内科 / 肛肠科医生展示</span>
+            <h3>个人自记明细表（按时间倒序）</h3>
+            <span>就诊前可由本人决定是否向医生出示</span>
           </div>
           <table class="clinical-table">
             <thead>
               <tr>
                 <th>日期时间</th>
-                <th>Bristol 分型</th>
+                <th>形态记录</th>
                 <th>颜色</th>
-                <th>耗时 / 感受</th>
-                <th>诱因备注</th>
+                <th>时长 / 体感</th>
+                <th>标签与备注</th>
               </tr>
             </thead>
             <tbody id="doctorTableBody"></tbody>
@@ -636,7 +656,7 @@
         </div>
 
         <p class="clinical-footnote">
-          免责声明：本病历摘要由用户本人记录于设备本地，仅用于辅助医生了解近期排便规律与性状变化，不作为医疗诊断结论。
+          免责声明：本摘要由用户本人记录并保存于设备本地（已自动排除演示示例，未填项保持空白），仅用于梳理个人近期排便规律与性状变化，不构成医疗诊断或治疗建议。
         </p>
       </div>
 
@@ -709,7 +729,7 @@
           <div class="home-preview-dock">
             <div id="camouflagePreviewIcon" class="app-icon-tile" data-skin="default"></div>
             <div class="preview-meta">
-              <strong id="camouflagePreviewName">噗通剧场</strong>
+              <strong id="camouflagePreviewName">便便日记</strong>
               <span id="camouflagePreviewDesc">原始手工毛毡剧场外观（可在下方一键换皮）</span>
             </div>
           </div>
@@ -717,7 +737,10 @@
           <div id="camouflageGrid" class="camouflage-grid"></div>
         </div>
 
-        <div class="privacy-reset-row">
+        <div class="privacy-reset-row" style="display:flex;flex-direction:column;gap:8px;align-items:center;">
+          <button id="clearDemoOnlyBtn" class="text-reset-btn" type="button">
+            仅清空演示示例数据（保留我的个人记录）
+          </button>
           <button id="resetDemoDataBtn" class="text-reset-btn" type="button">
             恢复初始 14 天演示数据
           </button>
@@ -731,7 +754,7 @@
       </div>
     </section>
 
-    <!-- SHEET 5: Friend Wool-Felt Arena PK (`openPkSheet`) -->
+    <!-- SHEET 5: 1v1 Zero-Privacy Wool-Felt Care Stickers (`openPkSheet`) -->
     <section
       id="pkSheet"
       class="felt-sheet pk-sheet"
@@ -743,86 +766,63 @@
       <div class="sheet-handle" aria-hidden="true"></div>
       <div class="sheet-header">
         <div>
-          <h2 id="pkTitle" class="sheet-title">拉屎联盟 · 好友 PK</h2>
-          <p class="sheet-subtitle">只比健康分与毛毡团子，零隐私细节泄露</p>
+          <h2 id="pkTitle" class="sheet-title">1v1 轻关心贴纸</h2>
+          <p class="sheet-subtitle">只送毛毡暖心卡片，不含任何排便形态、颜色或分数</p>
         </div>
         <button class="sheet-close-btn" type="button" data-close-sheet aria-label="关闭">×</button>
       </div>
 
       <div class="sheet-scroll-body">
-        <!-- 3 Preset Fun Rivals -->
-        <div id="pkRivalTabs" class="pk-rival-tabs" role="tablist" aria-label="选择 PK 好友"></div>
-
-        <!-- Visual Felt Arena Card -->
-        <div class="pk-arena-card">
-          <div class="pk-arena-top">
-            <span class="stitched-tag tag-gold">本周肠道健康分对决</span>
-            <span id="pkInviteCodePill" class="pk-invite-code">口令：PUTONG-PK-842</span>
+        <div class="v82-sticker-stage">
+          <div class="v82-sticker-actor">
+            <img id="careStickerImg" src="assets/felt/bristol_4.jpg" alt="毛毡轻关心贴纸" />
           </div>
-
-          <div class="pk-versus-stage">
-            <div class="pk-fighter">
-              <div class="pk-avatar-frame is-mine">
-                <img id="pkMyImg" src="assets/felt/bristol_4.jpg" alt="我的毛毡团子" />
-              </div>
-              <strong class="pk-fighter-name">你</strong>
-              <span id="pkMyToyName" class="pk-fighter-toy">4型 丝滑金冠团</span>
-              <span id="pkMyScore" class="pk-score-badge">86 分</span>
-            </div>
-
-            <div class="pk-vs-medallion" aria-hidden="true">VS</div>
-
-            <div class="pk-fighter">
-              <div class="pk-avatar-frame">
-                <img id="pkRivalImg" src="assets/felt/bristol_6.jpg" alt="好友毛毡团子" />
-              </div>
-              <strong id="pkRivalName" class="pk-fighter-name">阿哲</strong>
-              <span id="pkRivalToyName" class="pk-fighter-toy">6型 炸毛摊软团</span>
-              <span id="pkRivalScore" class="pk-score-badge is-rival">58 分</span>
-            </div>
-          </div>
-
-          <details class="v8-fold v8-hover-fold">
-            <summary class="v8-fold-summary">
-              <span>查看四维对比与评语</span>
-              <span class="v8-fold-chev" aria-hidden="true">▾</span>
-            </summary>
-            <div class="v8-fold-body">
-              <p id="pkVerdictBanner" class="pk-verdict-banner">
-                「本轮绝杀！你的四号丝滑金冠团丝滑碾压阿哲昨夜火锅召唤的六号摊软团！」
-              </p>
-
-              <!-- 4-Dimension Privacy-Safe Health Score Bars -->
-              <div id="pkBarsGrid" class="pk-bars-grid"></div>
-            </div>
-          </details>
+          <h3 id="careStickerTitle" class="v82-sticker-title">递一张毛毡纸巾</h3>
+          <p id="careStickerBody" class="v82-sticker-body">
+            今天也辛苦啦，慢慢来别着急，照顾好自己的小肚子。
+          </p>
         </div>
 
-        <!-- Interactive Banter Actions -->
-        <div class="stitched-panel pk-banter-panel">
+        <div class="stitched-panel">
           <div class="panel-head">
-            <h3>隔空毛毡互动</h3>
-            <span id="pkBanterCounter" class="panel-legend">本局互动 0 次</span>
+            <h3>选择要送给亲友的贴纸</h3>
+            <span class="panel-legend">零隐私 · 无排行榜</span>
           </div>
-          <div class="pk-banter-row">
-            <button id="pkSendTissueBtn" class="pk-banter-btn" type="button">递一张毛毡纸巾</button>
-            <button id="pkSendWaterBtn" class="pk-banter-btn" type="button">投喂一杯温水</button>
-            <button id="pkCopyInviteBtn" class="pk-banter-btn" type="button">生成邀请码</button>
+          <div id="careStickerChoices" class="v82-sticker-grid">
+            <button class="v82-sticker-btn is-active" type="button" data-sticker="tissue">
+              🧻 递一张毛毡纸巾
+            </button>
+            <button class="v82-sticker-btn" type="button" data-sticker="water">
+              🍵 投喂一杯温水
+            </button>
+            <button class="v82-sticker-btn" type="button" data-sticker="hug">
+              🧶 抱抱暖心毛毡团
+            </button>
           </div>
+        </div>
+
+        <div class="stitched-panel">
+          <div class="panel-head">
+            <h3>将要复制的完整文案预览</h3>
+            <span class="panel-legend">发送前可见</span>
+          </div>
+          <p id="careStickerCaptionPreview" class="v82-caption-preview-box">
+            《便便日记》递给你一张软乎乎的毛毡纸巾：今天也辛苦啦，慢慢来，别忘了多喝温水照顾自己。
+          </p>
         </div>
       </div>
 
       <div class="sheet-footer sheet-footer-split">
-        <button id="pkToShareBtn" class="btn-primary-felt btn-full" type="button">
-          晒出 PK 战报图
+        <button id="copyCareStickerBtn" class="btn-primary-felt btn-full" type="button">
+          复制轻关心文案
         </button>
-        <button class="btn-secondary-felt btn-full" type="button" data-close-sheet>
-          返回剧场
+        <button id="openPosterFromStickerBtn" class="btn-secondary-felt btn-full" type="button">
+          制作脱敏海报
         </button>
       </div>
     </section>
 
-    <!-- SHEET 6: Stage-Clear Settlement & PK Share Hub (`openSettlement` / `openShareHub`) -->
+    <!-- SHEET 6: Archive, Factual 7D/30D Trends & Desensitive Aesthetic Poster Hub -->
     <section
       id="postcardSheet"
       class="felt-sheet postcard-sheet settlement-sheet"
@@ -834,384 +834,291 @@
       <div class="sheet-handle" aria-hidden="true"></div>
       <div class="sheet-header">
         <div>
-          <h2 id="postcardTitle" class="sheet-title">便便报告</h2>
+          <h2 id="postcardTitle" class="sheet-title">档案与趋势</h2>
         </div>
         <div class="sheet-header-right">
-          <button id="replayCutsceneBtn" class="stage-motion-chip" type="button" title="重看本次毛毡定格过场动画">
-            🎬 重看动画
+          <button id="replayCutsceneBtn" class="stage-motion-chip" type="button" title="重看本次毛毡过场小剧场">
+            🎬 回放过场
           </button>
           <button class="sheet-close-btn" type="button" data-close-sheet aria-label="关闭">×</button>
         </div>
       </div>
 
       <!-- 4-Tab Segmented Switcher -->
-      <div class="share-tabs-bar share-tabs-4" role="tablist" aria-label="便便报告周期与联盟PK">
+      <div class="share-tabs-bar share-tabs-4" role="tablist" aria-label="档案与脱敏海报切换">
         <button class="share-tab-btn is-active" type="button" role="tab" data-share-tab="single" aria-selected="true">
-          日报
+          单笔档案
         </button>
         <button class="share-tab-btn" type="button" role="tab" data-share-tab="weekly" aria-selected="false">
-          周报
+          7 日事实
         </button>
         <button class="share-tab-btn" type="button" role="tab" data-share-tab="monthly" aria-selected="false">
-          月报
+          月度汇总
         </button>
-        <button class="share-tab-btn" type="button" role="tab" data-share-tab="pk" aria-selected="false">
-          联盟 PK
+        <button class="share-tab-btn" type="button" role="tab" data-share-tab="poster" aria-selected="false">
+          脱敏海报
         </button>
       </div>
 
       <div class="sheet-scroll-body">
-        <!-- TAB 1: Single Run Stage Clear Settlement -->
-        <article id="shareCardSingle" class="settlement-card" data-mood="gold" aria-label="单次关卡结算卡">
+        <div id="reportScopeBar" class="v82-scope-bar">
+          <span id="reportScopeText">当前数据：<strong>示例预览</strong></span>
+          <button id="reportScopeToggleBtn" class="v82-scope-toggle-btn" type="button">只看本人记录</button>
+        </div>
+
+        <!-- TAB 1: Single Entry Archive -->
+        <article id="shareCardSingle" class="settlement-card" data-mood="gold" aria-label="单笔毛毡档案">
           <div class="settlement-card-head">
             <div class="settlement-head-copy">
-              <span id="singleStageKicker" class="settlement-kicker">STAGE CLEAR · 第 42 关通关结算</span>
-              <strong id="singleMoodLabel" class="settlement-mood-title">金绒凯旋剧场</strong>
+              <span id="singleStageKicker" class="settlement-kicker">便便日记 · 个人手账档案</span>
+              <strong id="singleMoodLabel" class="settlement-mood-title">毛毡小剧场档案</strong>
             </div>
             <button id="toggleStageMotionBtn" class="stage-motion-chip" type="button" aria-pressed="true">
               🎬 动态小剧场
             </button>
           </div>
 
-          <!-- Animated Stop-Motion Wool Mini-Theater Stage (Normal Modes: gold / desert / storm) -->
           <div id="singleNormalStage" class="mini-theater-stage">
             <div class="felt-curtain felt-curtain-left" aria-hidden="true"></div>
             <div class="felt-curtain felt-curtain-right" aria-hidden="true"></div>
 
-            <!-- Mood Prop Layer: Gold (floating stars & sparkles) -->
             <div class="stage-props stage-props-gold" aria-hidden="true">
               <svg class="prop-star prop-star-1" viewBox="0 0 24 24"><path d="M12 2L14.7 8.5L21.5 9.2L16.3 13.8L17.9 20.6L12 17L6.1 20.6L7.7 13.8L2.5 9.2L9.3 8.5Z" fill="#E8B243" stroke="#9B6919" stroke-width="1.2"/></svg>
               <svg class="prop-star prop-star-2" viewBox="0 0 24 24"><path d="M12 2L14.7 8.5L21.5 9.2L16.3 13.8L17.9 20.6L12 17L6.1 20.6L7.7 13.8L2.5 9.2L9.3 8.5Z" fill="#F2C96B" stroke="#9B6919" stroke-width="1.2"/></svg>
-              <svg class="prop-star prop-star-3" viewBox="0 0 24 24"><path d="M12 3L13.8 9.2L20 11L13.8 12.8L12 19L10.2 12.8L4 11L10.2 9.2Z" fill="#FFF2B8" stroke="#B68021" stroke-width="1.1"/></svg>
               <span class="prop-sparkle prop-sparkle-1"></span>
               <span class="prop-sparkle prop-sparkle-2"></span>
             </div>
 
-            <!-- Mood Prop Layer: Desert (sand dunes, wind wisps, stitched sweat drops) -->
             <div class="stage-props stage-props-desert" aria-hidden="true">
               <div class="prop-dune prop-dune-back"></div>
               <div class="prop-dune prop-dune-front"></div>
-              <svg class="prop-wind prop-wind-1" viewBox="0 0 80 24" fill="none"><path d="M4 14C18 14 26 7 40 7C50 7 54 12 48 15C44 17 38 15 39 12" stroke="#C58B5B" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="4 4"/><path d="M14 20H66" stroke="#D39D6E" stroke-width="2" stroke-linecap="round" stroke-dasharray="5 5"/></svg>
-              <svg class="prop-sweat prop-sweat-1" viewBox="0 0 18 24" fill="none"><path d="M9 2C9 2 16 11 16 15.5C16 19.4 12.9 22 9 22C5.1 22 2 19.4 2 15.5C2 11 9 2 9 2Z" fill="#B6D5E4" stroke="#6E92A4" stroke-width="1.4"/></svg>
-              <svg class="prop-sweat prop-sweat-2" viewBox="0 0 18 24" fill="none"><path d="M9 2C9 2 16 11 16 15.5C16 19.4 12.9 22 9 22C5.1 22 2 19.4 2 15.5C2 11 9 2 9 2Z" fill="#CFE6F0" stroke="#6E92A4" stroke-width="1.4"/></svg>
+              <svg class="prop-wind prop-wind-1" viewBox="0 0 80 24" fill="none"><path d="M4 14C18 14 26 7 40 7C50 7 54 12 48 15C44 17 38 15 39 12" stroke="#C58B5B" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="4 4"/></svg>
             </div>
 
-            <!-- Mood Prop Layer: Storm (bobbing felt waves & wool raindrops) -->
             <div class="stage-props stage-props-storm" aria-hidden="true">
               <span class="prop-rain prop-rain-1"></span>
               <span class="prop-rain prop-rain-2"></span>
               <span class="prop-rain prop-rain-3"></span>
-              <span class="prop-rain prop-rain-4"></span>
               <div class="prop-wave prop-wave-back"></div>
               <div class="prop-wave prop-wave-front"></div>
             </div>
 
             <div class="stage-center-actor">
               <div class="stage-plush-frame">
-                <img id="shareDailyImg" src="assets/felt/bristol_4.jpg" alt="本关出场毛毡团子" />
+                <img id="shareDailyImg" src="assets/felt/bristol_4.jpg" alt="出场毛毡团子" />
               </div>
               <div class="stage-pedestal" aria-hidden="true"></div>
             </div>
 
-            <!-- Slamming Stitched Rank Stamp -->
-            <div id="singleRankStamp" class="settlement-rank-stamp" aria-label="本关评级">
-              <strong id="singleRankGrade">SSS</strong>
-              <span id="singleRankTitle">完美通关</span>
-              <em id="singleRankScore">96 分</em>
+            <div id="singleRankStamp" class="settlement-rank-stamp" aria-label="入档印章">
+              <strong id="singleRankGrade">已入档</strong>
+              <span id="singleRankTitle">如实记录</span>
+              <em id="singleRankScore">私人手账</em>
             </div>
           </div>
 
-          <!-- Serious Calm Care Stage (Red-Flag ONLY: Zero Game Score / Zero Jokes / Zero PK) -->
           <div id="singleCareStage" class="care-clinic-stage" hidden>
             <div class="care-clinic-visual">
-              <img src="assets/felt/stage_doctor_bear.jpg" alt="大橘猫猫医生静音诊室" />
+              <img src="assets/felt/stage_doctor_bear.jpg" alt="大橘猫安全守护提示" />
             </div>
             <div class="care-clinic-body">
-              <span class="care-badge">大橘猫猫医生静音诊室 · 暂停通关计分</span>
-              <h3>本次记录含需关注医学信号，已关闭游戏结算与 PK</h3>
-              <p id="singleCareNote">
-                检测到异常颜色或持续水样记录，已暂停游戏计分与 PK，建议先通过大橘猫 3 步问诊排查饮食染色后再决定是否就医。
-              </p>
-              <p class="care-disclaimer">免责声明：大橘猫仅提供日常参考建议，不构成任何医疗建议或专业诊断</p>
+              <span class="care-badge">大橘猫安全守护 · 已关闭趣味展示与外发</span>
+              <h3 id="singleCareTitle">这条记录包含需关注信号</h3>
+              <div id="singleCareEmergency" class="v82-emergency-strip"></div>
+              <p id="singleCareNote"></p>
+              <p class="care-disclaimer">免责声明：本提示仅作日常参考，不替代专业医生面诊或急诊判断。</p>
               <button id="singleCareOpenDoctorBtn" class="btn-care-primary btn-full" type="button">
-                查看 30 天就医报告
+                查看 30 天个人记录摘要
               </button>
             </div>
           </div>
 
-          <!-- Normal Single-Run HUD & Simple Analysis -->
           <div id="singleNormalDetails" class="settlement-body-stack">
             <h3 id="shareDailyHeadline" class="settlement-headline">
-              “昨夜重辣火锅企图搞事，被四号金冠团优雅镇压！”
+              “丝滑金冠团准时登台，如实记下今天这一笔。”
             </h3>
 
-            <!-- 3-Column Game Stat HUD -->
             <div class="settlement-hud-grid">
               <div class="hud-cell">
-                <span>本关团子</span>
+                <span>记录形态</span>
                 <strong id="hudToyLabel">4型 金冠团</strong>
               </div>
               <div class="hud-cell">
-                <span>通关用时</span>
-                <strong id="hudTimeLabel">4分18秒 · 不伤痔</strong>
+                <span>本次用时</span>
+                <strong id="hudTimeLabel">未记录</strong>
               </div>
               <div class="hud-cell">
-                <span>顺畅状态</span>
-                <strong id="hudEaseLabel">顺畅无压</strong>
+                <span>体感 / 颜色</span>
+                <strong id="hudEaseLabel">未填</strong>
               </div>
             </div>
 
-            <!-- Collapsible / Hover-Expand Analysis & PK Ribbon (Keeps Report Visual-First!) -->
             <details class="v8-fold v8-hover-fold">
               <summary class="v8-fold-summary">
-                <span>侦探简析与下关建议</span>
+                <span>本次标签、备注与日常照顾提醒</span>
                 <span class="v8-fold-chev" aria-hidden="true">▾</span>
               </summary>
               <div class="v8-fold-body">
                 <div class="settlement-analysis-box">
                   <div class="analysis-line">
-                    <span id="shareDailyConf" class="analysis-tag">🔍 侦探归因 89%</span>
-                    <p id="shareDailyDeduction">策略反推近 12–24h：虽有重辣挑战，但温水与蔬果打底稳住全场。</p>
+                    <span id="shareDailyConf" class="analysis-tag">📝 本次记录事实</span>
+                    <p id="shareDailyDeduction">你未额外勾选饮食标签，记录仅保存于本机。</p>
                   </div>
                   <div class="analysis-line">
-                    <span class="analysis-tag tag-supply">🧭 下关补给</span>
-                    <p id="singleNextSupply">继续保持当前饮水节奏，明天稳稳冲刺四号金冠连胜！</p>
+                    <span class="analysis-tag tag-supply">🍵 温和照顾</span>
+                    <p id="singleNextSupply">顺其自然，按自己的身体节奏补充温水与作息即可。</p>
                   </div>
-                </div>
-
-                <!-- Toggleable PK Challenge Ribbon (Embedded inside Card & Exported PNG!) -->
-                <div id="singlePkRibbon" class="pk-challenge-ribbon">
-                  <span id="singlePkRibbonText">⚔️ 本关战力 96 分 · 口令 PUTONG-PK-842 · 不服来毛毡擂台晒你的团子！</span>
                 </div>
               </div>
             </details>
           </div>
-
-          <div class="postcard-footer-note v6-sr-hidden">
-            <span class="postcard-privacy-badge">隐私脱敏 · 隐藏具体时刻</span>
-            <span class="postcard-signature">便便日记 · 大便档案</span>
-          </div>
         </article>
 
-        <!-- TAB 2: Weekly Season Settlement -->
-        <article id="shareCardWeekly" class="settlement-card" data-mood="gold" aria-label="每周赛季结算卡" hidden>
+        <!-- TAB 2: Factual 7-Day Trend -->
+        <article id="shareCardWeekly" class="settlement-card" data-mood="gold" aria-label="近 7 日事实趋势" hidden>
           <div class="settlement-card-head">
             <div class="settlement-head-copy">
-              <span id="weeklyKicker" class="settlement-kicker">WEEKLY SEASON · 本周毛毡赛季结算</span>
-              <strong id="weeklyMoodTitle" class="settlement-mood-title">金绒稳态周 · 黄金守门员</strong>
+              <span id="weeklyKicker" class="settlement-kicker">7-DAY FACTS · 近 7 日事实回顾</span>
+              <strong id="weeklyMoodTitle" class="settlement-mood-title">近 7 日真实记录</strong>
             </div>
-            <span id="weeklyPowerPill" class="stitched-tag tag-gold">综合战力 84 分</span>
+            <span id="weeklyPowerPill" class="stitched-tag tag-gold">共记 0 笔</span>
           </div>
 
-          <!-- Compact Animated Weekly Mini-Stage -->
-          <div class="mini-theater-stage mini-theater-compact">
-            <div class="felt-curtain felt-curtain-left" aria-hidden="true"></div>
-            <div class="felt-curtain felt-curtain-right" aria-hidden="true"></div>
-            <div class="stage-props stage-props-gold" aria-hidden="true">
-              <svg class="prop-star prop-star-1" viewBox="0 0 24 24"><path d="M12 2L14.7 8.5L21.5 9.2L16.3 13.8L17.9 20.6L12 17L6.1 20.6L7.7 13.8L2.5 9.2L9.3 8.5Z" fill="#E8B243" stroke="#9B6919" stroke-width="1.2"/></svg>
-              <svg class="prop-star prop-star-2" viewBox="0 0 24 24"><path d="M12 2L14.7 8.5L21.5 9.2L16.3 13.8L17.9 20.6L12 17L6.1 20.6L7.7 13.8L2.5 9.2L9.3 8.5Z" fill="#F2C96B" stroke="#9B6919" stroke-width="1.2"/></svg>
-            </div>
-            <div class="stage-props stage-props-desert" aria-hidden="true">
-              <div class="prop-dune prop-dune-front"></div>
-              <svg class="prop-wind prop-wind-1" viewBox="0 0 80 24" fill="none"><path d="M4 14C18 14 26 7 40 7C50 7 54 12 48 15" stroke="#C58B5B" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="4 4"/></svg>
-            </div>
-            <div class="stage-props stage-props-storm" aria-hidden="true">
-              <span class="prop-rain prop-rain-1"></span>
-              <span class="prop-rain prop-rain-2"></span>
-              <div class="prop-wave prop-wave-front"></div>
-            </div>
-            <div class="stage-center-actor">
-              <div class="stage-plush-frame stage-plush-sm">
-                <img id="weeklyHeroImg" src="assets/felt/bristol_4.jpg" alt="本周主打毛毡团子" />
-              </div>
-              <div class="stage-pedestal" aria-hidden="true"></div>
-            </div>
-            <div class="settlement-rank-stamp stamp-sm">
-              <strong id="weeklyRankGrade">S</strong>
-              <span id="weeklyRankLabel">黄金守门员</span>
-            </div>
-          </div>
-
-          <!-- 7-Day Felt Attendance Track -->
           <div class="weekly-track-box">
             <div class="weekly-track-head">
-              <span>本周 7 日毛毡出勤轨</span>
-              <small id="weeklyAttendanceSummary">出勤 7/7 日</small>
+              <span>近 7 天日历轨（区分“未记录”与“今日无排便”）</span>
+              <small id="weeklyAttendanceSummary">排便频率存在正常个体差异</small>
             </div>
             <div id="weeklySevenDayTrack" class="seven-day-track"></div>
           </div>
 
-          <!-- 4 Compact Weekly Score Pills -->
           <div id="weeklyScorePills" class="weekly-pills-grid"></div>
 
-          <!-- Weekly Analysis Strip (Collapsed by default, expands on hover/tap) -->
-          <details class="v8-fold v8-hover-fold">
+          <details class="v8-fold v8-hover-fold" open>
             <summary class="v8-fold-summary">
-              <span>本周背刺与趋势简评</span>
+              <span>近 7 日事实问答与标签共现</span>
               <span class="v8-fold-chev" aria-hidden="true">▾</span>
             </summary>
             <div class="v8-fold-body">
               <div class="settlement-analysis-box">
                 <div class="analysis-line">
-                  <span class="analysis-tag">⚠️ 本周头号背刺</span>
-                  <p id="weeklyTopCulprit">重辣火锅 + 冰美式：触发 1 次偏软预警，其余 6 日稳态过关。</p>
+                  <span class="analysis-tag">🏷️ 标签统计</span>
+                  <p id="weeklyTopCulprit"></p>
                 </div>
                 <div class="analysis-line">
-                  <span class="analysis-tag tag-supply">📈 趋势简评</span>
-                  <p id="weeklyTrendVerdict">本周 3–4 型黄金率稳居高位，下周继续守住 5 分钟内不伤痔防线！</p>
+                  <span class="analysis-tag tag-supply">📊 填答完整度</span>
+                  <p id="weeklyTrendVerdict"></p>
                 </div>
-              </div>
-
-              <div id="weeklyPkRibbon" class="pk-challenge-ribbon">
-                <span id="weeklyPkRibbonText">⚔️ 本周战力 84 分（领先阿哲 +26 分）· 口令 PUTONG-PK-842 接战！</span>
               </div>
             </div>
           </details>
-
-          <div class="postcard-footer-note v6-sr-hidden">
-            <span class="postcard-privacy-badge">周度脱敏战报 · 可直接发好友群 PK</span>
-            <span class="postcard-signature">便便日记 · 周报</span>
-          </div>
         </article>
 
-        <!-- TAB 3: Monthly Grand Finale Settlement -->
-        <article id="shareCardMonthly" class="settlement-card" data-mood="gold" aria-label="每月终极结算卡" hidden>
+        <!-- TAB 3: Factual Monthly Summary -->
+        <article id="shareCardMonthly" class="settlement-card" data-mood="gold" aria-label="月度事实汇总" hidden>
           <div class="settlement-card-head">
             <div class="settlement-head-copy">
-              <span class="settlement-kicker">MONTHLY FINALE · 月度终极毛毡结算</span>
-              <strong id="postcardMonthLabel" class="settlement-mood-title">2026 · 11 月剧场月刊</strong>
+              <span class="settlement-kicker">MONTHLY SUMMARY · 本月事实汇总</span>
+              <strong id="postcardMonthLabel" class="settlement-mood-title">2026 · 11 月个人手账</strong>
             </div>
-            <span id="monthlyTitleBadge" class="stitched-tag tag-gold">金绒收藏家</span>
-          </div>
-
-          <!-- Compact Animated Monthly Stage -->
-          <div class="mini-theater-stage mini-theater-compact">
-            <div class="felt-curtain felt-curtain-left" aria-hidden="true"></div>
-            <div class="felt-curtain felt-curtain-right" aria-hidden="true"></div>
-            <div class="stage-props stage-props-gold" aria-hidden="true">
-              <svg class="prop-star prop-star-1" viewBox="0 0 24 24"><path d="M12 2L14.7 8.5L21.5 9.2L16.3 13.8L17.9 20.6L12 17L6.1 20.6L7.7 13.8L2.5 9.2L9.3 8.5Z" fill="#E8B243" stroke="#9B6919" stroke-width="1.2"/></svg>
-              <svg class="prop-star prop-star-2" viewBox="0 0 24 24"><path d="M12 2L14.7 8.5L21.5 9.2L16.3 13.8L17.9 20.6L12 17L6.1 20.6L7.7 13.8L2.5 9.2L9.3 8.5Z" fill="#F2C96B" stroke="#9B6919" stroke-width="1.2"/></svg>
-            </div>
-            <div class="stage-props stage-props-desert" aria-hidden="true">
-              <div class="prop-dune prop-dune-front"></div>
-            </div>
-            <div class="stage-props stage-props-storm" aria-hidden="true">
-              <div class="prop-wave prop-wave-front"></div>
-            </div>
-            <div class="stage-center-actor">
-              <div class="stage-plush-frame stage-plush-sm">
-                <img id="postcardSignatureImg" src="assets/felt/bristol_4.jpg" alt="本月代表毛毡团子" />
-              </div>
-              <div class="stage-pedestal" aria-hidden="true"></div>
-            </div>
-            <div class="settlement-rank-stamp stamp-sm">
-              <strong id="monthlyRankGrade">S+</strong>
-              <span id="postcardRankPill">4型头牌</span>
-            </div>
+            <span id="monthlyTitleBadge" class="stitched-tag tag-gold">严格按记录重算</span>
           </div>
 
           <h3 id="postcardAwardQuote" class="settlement-headline">
-            「本月肠道稳如毛毡大师，成功化解 3 次火锅突袭」
+            本月共记录 0 笔，所有数字均由本地记录实时重算。
           </h3>
 
-          <!-- Bristol 1-7 Stitched Wool Distribution Bar Chart -->
           <div class="monthly-chart-box">
             <div class="weekly-track-head">
-              <span>本月 Bristol 1–7 羊毛柱状分布</span>
-              <small id="monthlyTopTriggerText">头号考验：重辣火锅</small>
+              <span>Bristol 1–7 实际分布（柱高之和 = 已选形态笔数）</span>
+              <small id="monthlyTopTriggerText">未选形态：0 笔</small>
             </div>
             <div id="monthlyBristolBars" class="bristol-wool-bars"></div>
           </div>
 
           <div id="postcardStatsRow" class="postcard-stats-grid">
             <div class="postcard-stat-cell">
-              <strong id="pcTotalCheckins">28 场</strong>
-              <span>本月通关</span>
+              <strong id="pcTotalCheckins">0 次</strong>
+              <span>排便总次</span>
             </div>
             <div class="postcard-stat-cell">
-              <strong id="pcIdealRate">79%</strong>
-              <span>3–4型达标</span>
+              <strong id="pcIdealRate">—</strong>
+              <span>3–4 型占比</span>
             </div>
             <div class="postcard-stat-cell">
-              <strong id="pcBestStreak">92%</strong>
-              <span>不伤痔通关率</span>
+              <strong id="pcBestStreak">0 天</strong>
+              <span>无排便天数</span>
             </div>
-          </div>
-
-          <div id="monthlyPkRibbon" class="pk-challenge-ribbon">
-            <span id="monthlyPkRibbonText">⚔️ 月度战力 86 分 · 口令 PUTONG-PK-842 · 晒出你的本月团子图鉴！</span>
           </div>
 
           <div class="postcard-footer-note">
-            <span class="postcard-privacy-badge">隐私护盾已开启 · 仅展示脱敏月度战报</span>
-            <span class="postcard-signature">噗通剧场 · 手工毛毡公报</span>
+            <span class="postcard-privacy-badge">仅存本机 · 可在下方一键查看 30 天个人记录摘要</span>
+            <span class="postcard-signature">便便日记 · 个人手账</span>
           </div>
         </article>
 
-        <!-- TAB 4: Head-to-Head Friend PK Battle Card -->
-        <article id="shareCardPk" class="postcard-canvas-card" aria-label="好友 PK 战报分享卡" hidden>
+        <!-- TAB 4: 100% Desensitive Aesthetic Theater Poster -->
+        <article id="shareCardPk" class="postcard-canvas-card" aria-label="脱敏毛毡剧团海报" hidden>
           <div class="postcard-top-row">
             <div class="postcard-brand-col">
-              <span class="postcard-kicker">WOOL ARENA BATTLE CARD</span>
-              <strong id="sharePkTitle" class="postcard-month">好友毛毡擂台 · 战报卡</strong>
+              <span class="postcard-kicker">FELT THEATER POSTER · 零隐私美学海报</span>
+              <strong id="posterTitlePreview" class="postcard-month">便便日记 · 今日毛毡小剧场</strong>
             </div>
             <div class="postal-stamp-box" aria-hidden="true">
-              <span class="postal-stamp-code">PK</span>
-              <span id="sharePkOutcomeStamp" class="postal-stamp-label">本轮胜出</span>
+              <span class="postal-stamp-code">便便</span>
+              <span class="postal-stamp-label">手工毛毡</span>
             </div>
           </div>
 
-          <div class="share-pk-matchup">
-            <div class="share-pk-side">
-              <img id="sharePkMyImg" src="assets/felt/bristol_4.jpg" alt="我的团子" />
-              <strong>你 · <span id="sharePkMyScore">86</span>分</strong>
-              <small id="sharePkMyToy">4型 丝滑金冠团</small>
+          <div class="v82-sticker-stage" style="margin-bottom:10px;padding:14px 12px;">
+            <div class="v82-sticker-actor">
+              <img id="posterHeroImg" src="assets/felt/bristol_4.jpg" alt="自选出镜毛毡演员" />
             </div>
-            <span class="pk-vs-mini">VS</span>
-            <div class="share-pk-side">
-              <img id="sharePkRivalImg" src="assets/felt/bristol_6.jpg" alt="对手团子" />
-              <strong><span id="sharePkRivalName">阿哲</span> · <span id="sharePkRivalScore">58</span>分</strong>
-              <small id="sharePkRivalToy">6型 炸毛摊软团</small>
-            </div>
+            <strong id="posterActorLabel" style="display:block;font-size:14px;color:var(--felt-espresso);margin-bottom:4px;">
+              今日特邀演员：丝滑金冠团
+            </strong>
+            <p id="posterQuotePreview" class="v82-sticker-body" style="margin:0;">
+              “把容易不好意思的小事，做成一座温柔的手工毛毡小剧场。”
+            </p>
           </div>
 
-          <h3 id="sharePkVerdict" class="postcard-award share-pk-verdict">
-            「本轮绝杀！你的四号丝滑金冠团丝滑碾压阿哲昨夜火锅召唤的六号摊软团！」
-          </h3>
+          <div class="stitched-panel" style="margin-bottom:8px;">
+            <div class="panel-head">
+              <h3>自选出镜演员（与真实记录解耦，防反推）</h3>
+              <span class="panel-legend">仅美学展示</span>
+            </div>
+            <div id="posterActorPicker" class="v82-actor-picker"></div>
+            <div id="posterQuoteChips" class="trigger-chips-wrap" style="margin-top:6px;"></div>
+          </div>
 
-          <div class="postcard-footer-note">
-            <span id="sharePkCodeNote" class="postcard-privacy-badge">口令：PUTONG-PK-842 · 来战</span>
-            <span class="postcard-signature">噗通剧场 · 友谊毛毡擂台</span>
+          <div class="v82-caption-preview-box">
+            <strong>实际复制文案预览（统一署名《便便日记》，零分型/零分数/零时刻）：</strong>
+            <span id="posterCaptionPreview"></span>
           </div>
         </article>
       </div>
 
       <div class="sheet-footer settlement-footer">
-        <div id="pkRibbonToggleRow" class="pk-toggle-row">
-          <span class="pk-toggle-label">⚔️ 分享图附带好友 PK 战帖条</span>
-          <button
-            id="includePkRibbonToggle"
-            class="felt-switch felt-switch-sm"
-            type="button"
-            role="switch"
-            aria-checked="true"
-            aria-label="附带好友 PK 战帖条"
-          >
-            <span class="felt-switch-knob"></span>
+        <div id="reportArchiveFooter" class="sheet-footer-split">
+          <button id="reportOpenSummaryBtn" class="btn-primary-felt btn-full" type="button">
+            30 天个人记录摘要
+          </button>
+          <button id="reportSwitchPosterBtn" class="btn-secondary-felt btn-full" type="button">
+            制作脱敏海报
           </button>
         </div>
-        <div class="sheet-footer-split">
+        <div id="reportPosterFooter" class="sheet-footer-split" hidden>
           <button id="savePostcardImgBtn" class="btn-primary-felt btn-full" type="button">
-            保存高清分享图
+            保存脱敏高清海报
           </button>
           <button id="copyPostcardTextBtn" class="btn-secondary-felt btn-full" type="button">
-            复制分享文案
+            复制脱敏文案
           </button>
         </div>
       </div>
     </section>
 
-    <!-- SHEET 7: Toilet Check-In & Must-Go Ranking (`必拉榜`) -->
+    <!-- SHEET 7: Private Toilet Memo & Optional Public Spot Notes -->
     <section
       id="toiletSheet"
       class="felt-sheet toilet-sheet"
@@ -1223,87 +1130,98 @@
       <div class="sheet-handle" aria-hidden="true"></div>
       <div class="sheet-header">
         <div>
-          <h2 id="toiletSheetTitle" class="sheet-title">厕所打卡 · 必拉榜</h2>
-          <p class="sheet-subtitle">按位置、空气质量与清洁度实时计算口碑榜</p>
+          <h2 id="toiletSheetTitle" class="sheet-title">我的坑位备忘</h2>
+          <p class="sheet-subtitle">住宅与公司默认仅存私人备忘，公共场所可记录无障碍与纸巾信息</p>
         </div>
         <button class="sheet-close-btn" type="button" data-close-sheet aria-label="关闭">×</button>
       </div>
 
-      <div class="share-tabs-bar toilet-tabs-bar" role="tablist" aria-label="必拉榜与打卡切换">
+      <div class="share-tabs-bar toilet-tabs-bar" role="tablist" aria-label="坑位列表与新增切换">
         <button id="toiletTabRankBtn" class="share-tab-btn is-active" type="button" role="tab" data-toilet-tab="rank" aria-selected="true">
-          必拉榜
+          私人备忘录
         </button>
         <button id="toiletTabAddBtn" class="share-tab-btn" type="button" role="tab" data-toilet-tab="add" aria-selected="false">
-          打卡新厕所
+          记录新坑位
         </button>
       </div>
 
       <div class="sheet-scroll-body">
-        <!-- Tab 1: Must-Go Leaderboard -->
         <div id="toiletRankPane" class="toilet-pane">
+          <div class="v82-scope-bar">
+            <span><strong>隐私默认保护：</strong>家/工位仅留本机，不参与任何公开榜</span>
+          </div>
           <div id="toiletMustGoList" class="toilet-list"></div>
         </div>
 
-        <!-- Tab 2: New Toilet Check-In Form -->
         <form id="toiletCheckinForm" class="toilet-form" hidden>
           <div class="toilet-field">
-            <label for="toiletNameInput">厕所位置名称</label>
-            <input id="toiletNameInput" class="toilet-input" type="text" placeholder="例如：国贸三期 B2 东侧 / 公司 12F 隐秘单间" maxlength="26" required />
+            <label for="toiletNameInput">位置名称</label>
+            <input id="toiletNameInput" class="toilet-input" type="text" placeholder="例如：国贸商城 B1 东南角 / 家里主卫" maxlength="26" required />
           </div>
 
           <div class="toilet-field">
-            <label for="toiletAreaInput">所在区域 / 楼层（可选）</label>
-            <input id="toiletAreaInput" class="toilet-input" type="text" placeholder="例如：朝阳区 · 写字楼西侧走廊尽头" maxlength="30" />
+            <label for="toiletAreaInput">楼层 / 方位说明（可选）</label>
+            <input id="toiletAreaInput" class="toilet-input" type="text" placeholder="例如：B1 电梯旁 · 营业时间 10:00–22:00" maxlength="30" />
+          </div>
+
+          <div class="toilet-field">
+            <label>隐私属性（默认仅存私人备忘）</label>
+            <div class="ease-pills" id="toiletScopePicker" role="radiogroup">
+              <button class="ease-pill is-active" type="button" data-spot-scope="private" aria-checked="true">🔒 仅私人备忘</button>
+              <button class="ease-pill" type="button" data-spot-scope="public" aria-checked="false">🏬 公共场所攻略</button>
+            </div>
           </div>
 
           <div class="toilet-rate-row">
             <div class="toilet-rate-block">
-              <span>空气质量</span>
-              <div id="toiletAirStars" class="star-picker" role="radiogroup" aria-label="空气质量评分"></div>
-              <small id="toiletAirLabel">清风无味</small>
+              <span>空气体验</span>
+              <div id="toiletAirStars" class="star-picker" role="radiogroup" aria-label="空气体验评分"></div>
+              <small id="toiletAirLabel">清新舒适</small>
             </div>
             <div class="toilet-rate-block">
-              <span>清洁度</span>
-              <div id="toiletCleanStars" class="star-picker" role="radiogroup" aria-label="清洁度评分"></div>
+              <span>整洁程度</span>
+              <div id="toiletCleanStars" class="star-picker" role="radiogroup" aria-label="整洁程度评分"></div>
               <small id="toiletCleanLabel">一尘不染</small>
             </div>
           </div>
 
           <div class="toilet-field">
-            <label>口碑加分标签</label>
+            <label>实用设施标签</label>
             <div id="toiletTagPicker" class="trigger-chips-wrap"></div>
           </div>
 
           <div class="toilet-field">
-            <label for="toiletNoteInput">一句话坑位测评（可选）</label>
-            <input id="toiletNoteInput" class="toilet-input" type="text" placeholder="例如：音乐轻柔、纸巾厚实、信号满格" maxlength="40" />
+            <label for="toiletNoteInput">实用备忘（可选）</label>
+            <input id="toiletNoteInput" class="toilet-input" type="text" placeholder="例如：有免费纸巾、有挂钩、有无障碍间" maxlength="40" />
           </div>
 
           <button id="toiletSubmitBtn" class="btn-primary-felt btn-full" type="submit">
-            提交打卡 · 计入必拉榜
+            保存到我的坑位备忘
           </button>
         </form>
       </div>
 
       <div class="sheet-footer">
         <button id="toiletQuickAddFooterBtn" class="btn-secondary-felt btn-full" type="button">
-          + 打卡记录一个新厕所
+          + 记录一个新坑位
         </button>
       </div>
     </section>
 
-    <!-- STOP-MOTION FELT CUTSCENE OVERLAY (Plays after 完成录入 -> Freezes into Today's Archive!) -->
+    <!-- STOP-MOTION FELT CUTSCENE OVERLAY (Saved FIRST -> Optional Mute / Skip) -->
     <div id="feltCutsceneOverlay" class="cutscene-overlay" data-persona="champion" role="dialog" aria-modal="true" aria-label="毛毡过场小动画" hidden>
       <div class="cutscene-theater">
         <div class="cutscene-curtain cutscene-curtain-left" aria-hidden="true"></div>
         <div class="cutscene-curtain cutscene-curtain-right" aria-hidden="true"></div>
 
-        <button id="cutsceneSkipBtn" class="cutscene-skip-btn" type="button">跳过 ›</button>
+        <div class="cutscene-top-actions">
+          <button id="cutsceneMuteBtn" class="cutscene-skip-btn" type="button" aria-pressed="false">🔊 声音</button>
+          <button id="cutsceneSkipBtn" class="cutscene-skip-btn" type="button">跳过 ›</button>
+        </div>
 
         <div class="cutscene-stage-inner">
-          <span id="cutsceneEpisodeTag" class="cutscene-kicker">第 43 场 · 毛毡定格小剧场</span>
+          <span id="cutsceneEpisodeTag" class="cutscene-kicker">便便日记 · 记录已保存</span>
 
-          <!-- Persona Props Layer -->
           <div class="cutscene-props cutscene-props-champion" aria-hidden="true">
             <span class="cs-star cs-star-1">★</span>
             <span class="cs-star cs-star-2">✦</span>
@@ -1324,17 +1242,17 @@
           </div>
 
           <div id="cutsceneActorWrap" class="cutscene-actor-wrap">
-            <img id="cutsceneMascotImg" class="cutscene-mascot-img" src="assets/felt/bristol_4.jpg" alt="今日登场毛毡团子" />
+            <img id="cutsceneMascotImg" class="cutscene-mascot-img" src="assets/felt/bristol_4.jpg" alt="出场毛毡团子" />
           </div>
 
           <div class="cutscene-copy">
-            <strong id="cutscenePersonaTitle" class="cutscene-title">丝滑金冠团 · 优雅登场！</strong>
-            <p id="cutscenePersonaSub" class="cutscene-sub">“丝滑收工，今日肠道状态满分。”</p>
+            <strong id="cutscenePersonaTitle" class="cutscene-title">丝滑金冠团 · 温柔入档</strong>
+            <p id="cutscenePersonaSub" class="cutscene-sub">“如实记下今天这一笔，数据已妥善保存在本机。”</p>
           </div>
 
           <div id="cutsceneSeal" class="cutscene-seal">
-            <span id="cutsceneSealGrade">SSS</span>
-            <small>大便档案已定格</small>
+            <span id="cutsceneSealGrade">已入档</span>
+            <small>便便日记 · 私人手账</small>
           </div>
         </div>
       </div>
@@ -1343,11 +1261,11 @@
     <!-- Elastic Wool-Toy & Stamp Confirmation Toast -->
     <div id="stampFeedback" class="stamp-feedback" aria-live="polite" hidden>
       <img id="stampFeedbackImg" class="stamp-feedback-img" src="assets/felt/bristol_4.jpg" alt="" hidden />
-      <span id="stampFeedbackText">已盖章发布！</span>
+      <span id="stampFeedbackText">已保存！</span>
     </div>
   </main>
 
-  <!-- DESKTOP-ONLY (>= 920px) Collapsible Quick Demo Drawer (Hidden by Default for Pure Minimalism) -->
+  <!-- DESKTOP-ONLY (>= 920px) Collapsible Quick Demo Drawer -->
   <button
     id="directorToggleBtn"
     class="director-fab"
@@ -1361,10 +1279,10 @@
   <aside id="directorRail" class="director-rail is-collapsed" aria-label="快捷体验台">
     <div class="director-rail-head">
       <div class="director-rail-head-top">
-        <h2>快捷体验台</h2>
+        <h2>快捷体验台 (V8.2)</h2>
         <button id="directorCloseBtn" class="director-close-btn" type="button" aria-label="收起体验台">×</button>
       </div>
-      <p>一键预览不同画风结算、周月赛季与红灯诊室。</p>
+      <p>一键验收补记、事实趋势、脱敏海报、轻关心与三色安全提示。</p>
     </div>
 
     <nav class="director-rail-nav" aria-label="演示节点导航">
@@ -1374,45 +1292,49 @@
       </button>
       <button class="director-jump-btn" type="button" data-demo-action="log">
         <span class="jump-num">②</span>
-        <span class="jump-label">5秒记录（存完弹结算）</span>
-      </button>
-      <button class="director-jump-btn" type="button" data-demo-action="settle_gold">
-        <span class="jump-num">③</span>
-        <span class="jump-label">单次结算·金绒凯旋(4型)</span>
-      </button>
-      <button class="director-jump-btn" type="button" data-demo-action="settle_desert">
-        <span class="jump-num">④</span>
-        <span class="jump-label">单次结算·荒漠攻坚(1型)</span>
-      </button>
-      <button class="director-jump-btn" type="button" data-demo-action="settle_storm">
-        <span class="jump-num">⑤</span>
-        <span class="jump-label">单次结算·暴风急行(6型)</span>
+        <span class="jump-label">一键补记（含空值/日期）</span>
       </button>
       <button class="director-jump-btn" type="button" data-demo-action="settle_weekly">
-        <span class="jump-num">⑥</span>
-        <span class="jump-label">每周赛季结算</span>
+        <span class="jump-num">③</span>
+        <span class="jump-label">7 日事实趋势</span>
       </button>
       <button class="director-jump-btn" type="button" data-demo-action="settle_monthly">
-        <span class="jump-num">⑦</span>
-        <span class="jump-label">每月终极结算</span>
+        <span class="jump-num">④</span>
+        <span class="jump-label">月度严格汇总</span>
+      </button>
+      <button class="director-jump-btn" type="button" data-demo-action="poster">
+        <span class="jump-num">⑤</span>
+        <span class="jump-label">脱敏剧团海报</span>
       </button>
       <button class="director-jump-btn" type="button" data-demo-action="pk">
-        <span class="jump-num">⑧</span>
-        <span class="jump-label">好友毛毡擂台 PK</span>
+        <span class="jump-num">⑥</span>
+        <span class="jump-label">1v1 轻关心贴纸</span>
+      </button>
+      <button class="director-jump-btn" type="button" data-demo-action="summary">
+        <span class="jump-num">⑦</span>
+        <span class="jump-label">30 天个人记录摘要</span>
       </button>
       <button class="director-jump-btn" type="button" data-demo-action="eightmin">
-        <span class="jump-num">⑨</span>
-        <span class="jump-label">8分钟防痔疮警报</span>
+        <span class="jump-num">⑧</span>
+        <span class="jump-label">久坐提醒（稍后再说）</span>
       </button>
-      <button class="director-jump-btn" type="button" data-demo-action="redflag">
+      <button class="director-jump-btn" type="button" data-demo-action="redflag_clay">
+        <span class="jump-num">⑨</span>
+        <span class="jump-label">安全分支·陶土灰白</span>
+      </button>
+      <button class="director-jump-btn" type="button" data-demo-action="redflag_black">
         <span class="jump-num">⑩</span>
-        <span class="jump-label">红灯→大橘猫医生</span>
+        <span class="jump-label">安全分支·柏油黑</span>
+      </button>
+      <button class="director-jump-btn" type="button" data-demo-action="redflag_red">
+        <span class="jump-num">⑪</span>
+        <span class="jump-label">安全分支·鲜红/暗红</span>
       </button>
     </nav>
 
     <div class="director-rail-foot">
       <button id="directorResetBtn" class="director-reset-btn" type="button" data-demo-action="reset">
-        ↺ 重置演示数据
+        ↺ 重置演示示例
       </button>
       <p class="director-tip">提示：记录仅存于本机浏览器缓存，手机端自动隐藏本体验台。</p>
     </div>

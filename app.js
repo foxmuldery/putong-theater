@@ -1,625 +1,497 @@
 /* ==========================================================================
-   《噗通剧场》— Interactive Needle-Felted Wool Toy Theater App Logic
-   Zero dependencies · 100% localStorage · Zero food metaphors for stool shapes
+   《便便日记》V8.2 — Interactive Needle-Felted Wool Toy Theater App
+   Red-Team Hardened · Zero Dependencies · 100% LocalStorage
    ========================================================================== */
 
 (() => {
   'use strict';
 
-  const STORAGE_KEY = 'putong_theater_state_v3';
+  const STORAGE_KEY = 'bb_diary_state_v8_2';
+  const GATE_SESSION_KEY = 'bb_diary_gate_unlocked_v8';
+  const GATE_EXPECTED_HASH = 0x95d40b46; // passcode: tiger
 
-  // 100% Non-Food Adorable Wool-Felt Nature & Plush Bristol 1-7 Roster
+  // --------------------------------------------------------------------------
+  // 1. Core Clinical & Wool-Felt Constants (Non-Food, Factual Physical Descriptors)
+  // --------------------------------------------------------------------------
   const BRISTOL_TOYS = [
     {
       type: 1,
       name: '硬球小团',
-      shortName: '硬球团',
+      shortName: '1型 硬颗粒',
+      physicalDesc: '分离硬球或颗粒状，难以排出',
       img: 'assets/felt/bristol_1.jpg',
-      advice: '偏干偏硬，多喝温水',
-      clinicalLabel: '1型（硬球状/干结）',
-      statusText: '偏干警戒',
-      statusClass: 'status-dry',
-      stamp: '缺水警戒',
-      stampTone: 'dry'
+      advice: '形态偏干硬，可留意饮水与膳食纤维摄入',
+      clinicalLabel: '1型（分离硬颗粒）',
+      statusText: '偏干硬',
+      statusClass: 'status-dry'
     },
     {
       type: 2,
-      name: '疙瘩憋劲团',
-      shortName: '疙瘩团',
+      name: '疙瘩小团',
+      shortName: '2型 凹凸块',
+      physicalDesc: '香肠状但表面凹凸不平、呈团块粘连',
       img: 'assets/felt/bristol_2.jpg',
-      advice: '凹凸偏干，补充膳食纤维',
-      clinicalLabel: '2型（团块凹凸状）',
+      advice: '形态略干结，建议循序补水并温和活动',
+      clinicalLabel: '2型（凹凸团块状）',
       statusText: '略偏干',
-      statusClass: 'status-dry',
-      stamp: '纤维急召',
-      stampTone: 'dry'
+      statusClass: 'status-dry'
     },
     {
       type: 3,
-      name: '缝线微裂团',
-      shortName: '微裂团',
+      name: '微裂小团',
+      shortName: '3型 表面微裂',
+      physicalDesc: '条状成型，表面带有细小裂纹',
       img: 'assets/felt/bristol_3.jpg',
-      advice: '轻微裂纹，再多喝半杯水',
+      advice: '常见成型范围，保持日常饮水节律即可',
       clinicalLabel: '3型（表面微裂条状）',
-      statusText: '稳健及格',
-      statusClass: 'status-good',
-      stamp: '稳健及格',
-      stampTone: 'gold'
+      statusText: '常见成型',
+      statusClass: 'status-good'
     },
     {
       type: 4,
       name: '丝滑金冠团',
-      shortName: '金冠团',
+      shortName: '4型 光滑柔软',
+      physicalDesc: '光滑柔软的条状，易于排出',
       img: 'assets/felt/bristol_4.jpg',
-      advice: '丝滑完美！佩戴金色小皇冠的五星冠军',
-      clinicalLabel: '4型（光滑柔软条状·理想）',
-      statusText: '五星冠军',
-      statusClass: 'status-good',
-      stamp: '五星金绒',
-      stampTone: 'gold'
+      advice: '常见理想成型状态，继续保持温和作息',
+      clinicalLabel: '4型（光滑柔软条状）',
+      statusText: '光滑成型',
+      statusClass: 'status-good'
     },
     {
       type: 5,
       name: '软绵小绒团',
-      shortName: '小绒团',
+      shortName: '5型 柔软块状',
+      physicalDesc: '边缘清晰的柔软团块，排出较轻松',
       img: 'assets/felt/bristol_5.jpg',
-      advice: '略软偏快，规律饮食',
-      clinicalLabel: '5型（边缘清晰软团）',
-      statusText: '略软偏快',
-      statusClass: 'status-soft',
-      stamp: '轻柔偏软',
-      stampTone: 'soft'
+      advice: '形态略偏软，留意饮食规律与纤维平衡',
+      clinicalLabel: '5型（边缘清晰软块）',
+      statusText: '略偏软',
+      statusClass: 'status-soft'
     },
     {
       type: 6,
-      name: '炸毛摊软团',
-      shortName: '摊软团',
+      name: '松散绒团',
+      shortName: '6型 糊状松散',
+      physicalDesc: '边缘蓬松不规则的糊状软便',
       img: 'assets/felt/bristol_6.jpg',
-      advice: '偏稀，注意休息与清淡',
-      clinicalLabel: '6型（糊状松散/轻度腹泻）',
-      statusText: '轻度偏稀',
-      statusClass: 'status-soft',
-      stamp: '绒浪预警',
-      stampTone: 'soft'
+      advice: '形态偏稀松，注意清淡饮食、补水与休息',
+      clinicalLabel: '6型（糊状松散）',
+      statusText: '糊状偏稀',
+      statusClass: 'status-soft'
     },
     {
       type: 7,
-      name: '委屈小水洼',
-      shortName: '小水洼',
+      name: '小水洼团',
+      shortName: '7型 水样无固体',
+      physicalDesc: '完全水样，不含固体块',
       img: 'assets/felt/bristol_7.jpg',
-      advice: '水样腹泻，及时补液休息',
-      clinicalLabel: '7型（水样无固体/腹泻）',
-      statusText: '水样警报',
-      statusClass: 'status-soft',
-      stamp: '雨云急报',
-      stampTone: 'soft'
+      advice: '水样稀便注意及时补液，若持续或伴发热腹痛请及时就医',
+      clinicalLabel: '7型（完全水样）',
+      statusText: '水样稀便',
+      statusClass: 'status-soft'
     }
   ];
 
-  // 6-Color Health Radar
   const COLOR_OPTIONS = [
-    { id: 'golden', name: '黄金', sub: '正常', swatch: '#C99638', redFlag: false },
-    { id: 'brown', name: '黄褐', sub: '正常', swatch: '#8B5E34', redFlag: false },
-    { id: 'green', name: '偏绿', sub: '蔬菜/稍快', swatch: '#6B8450', redFlag: false },
-    { id: 'black', name: '柏油黑', sub: '警报', swatch: '#282524', redFlag: true },
-    { id: 'red', name: '鲜红/暗红', sub: '警报', swatch: '#9E342E', redFlag: true },
-    { id: 'clay', name: '陶土灰白', sub: '警报', swatch: '#B8B0A0', redFlag: true }
-  ];
-
-  // Dietary & Lifestyle Trigger Tags
-  const TRIGGER_TAGS = [
-    '冰美式',
-    '重辣火锅',
-    '奶茶乳糖',
-    '熬夜',
-    '压力大',
-    '喝水少',
-    '久坐'
+    { id: 'golden', name: '黄棕/金黄', sub: '常见', swatch: '#C99638', redFlag: false },
+    { id: 'brown', name: '黄褐/深棕', sub: '常见', swatch: '#8B5E34', redFlag: false },
+    { id: 'green', name: '偏绿', sub: '绿叶菜/偏快', swatch: '#6B8450', redFlag: false },
+    { id: 'black', name: '柏油黑', sub: '需留意', swatch: '#282524', redFlag: true },
+    { id: 'red', name: '鲜红/暗红', sub: '需留意', swatch: '#9E342E', redFlag: true },
+    { id: 'clay', name: '陶土灰白', sub: '需留意', swatch: '#B8B0A0', redFlag: true }
   ];
 
   const EASE_OPTIONS = ['顺畅', '费力', '急促'];
-  const DURATION_PRESETS = [150, 258, 375, 520]; // 2:30, 4:18, 6:15, 8:40
+  const TRIGGER_TAGS = ['咖啡', '辛辣', '乳制品', '饮酒', '熬夜', '压力大', '饮水少', '久坐', '服药/补剂'];
+  const DURATION_CYCLE = [null, 120, 240, 360, 480]; // null = 未记录
 
-  // Calm Medical Red-Flag Guidance (Orange Tabby Cat Doctor on Duty)
-  const RED_FLAG_GUIDE = {
-    black: {
-      dept: '建议挂号：消化内科',
-      explanation:
-        '大橘猫猫医生注意到本次记录为“柏油黑”。若近期未食用动物血制品、黑芝麻，也未服用铁剂或铋剂，黑便可能提示上消化道出血，建议尽早前往消化内科做粪便潜血等检查。'
+  const HERO_POSES = {
+    default: 'assets/felt/stage_hero_felt.jpg',
+    sitting: 'assets/felt/stage_hero_sitting.jpg',
+    effort: 'assets/felt/stage_hero_effort.jpg',
+    overtime: 'assets/felt/stage_hero_overtime.jpg',
+    victory: 'assets/felt/stage_hero_victory.jpg'
+  };
+
+  const DOCTOR_POSES = {
+    default: 'assets/felt/stage_doctor_bear.jpg',
+    checkup: 'assets/felt/doctor_orange_checkup.jpg',
+    diet: 'assets/felt/doctor_orange_diet.jpg',
+    earnest: 'assets/felt/doctor_orange_earnest.jpg',
+    relieved: 'assets/felt/doctor_orange_relieved.jpg'
+  };
+
+  const CAMOUFLAGE_SKINS = [
+    { id: 'default', name: '便便日记', desc: '原始手工毛毡剧场外观（可在下方一键换皮）', badge: '日记' },
+    { id: 'notes', name: '随手备忘', desc: '伪装为极简日常备忘录标题与图标', badge: '备忘' },
+    { id: 'weather', name: '晴雨笔记', desc: '伪装为轻柔天气手账外观', badge: '晴雨' },
+    { id: 'water', name: '饮水时钟', desc: '伪装为日常喝水与作息记录', badge: '饮水' }
+  ];
+
+  // Decoupled Aesthetic Poster Quotes (Zero Bristol / Zero Score / Zero Timestamp / Unified Brand)
+  const POSTER_QUOTES = [
+    '今天也有好好照顾自己。',
+    '慢一点也没关系，给身体留五分钟。',
+    '多喝一杯温水，保持温柔节律。',
+    '在手工毛毡的小剧场里，接住今天的自己。'
+  ];
+
+  // 1v1 Zero-Privacy Wool-Felt Care Stickers
+  const CARE_STICKERS = {
+    tissue: {
+      id: 'tissue',
+      img: 'assets/felt/bristol_4.jpg',
+      title: '递一张毛毡纸巾',
+      body: '今天也辛苦啦，慢慢来别着急，照顾好自己的小肚子。',
+      caption: '《便便日记》递给你一张软乎乎的毛毡纸巾：今天也辛苦啦，慢慢来，别忘了多喝温水照顾自己。'
     },
-    red: {
-      dept: '建议挂号：肛肠科 / 消化内科',
-      explanation:
-        '大橘猫猫医生注意到本次记录为“鲜红/暗红”。在排除火龙果、甜菜根等饮食染色后，便中带血常见于痔疮、肛裂或下消化道出血，建议及时前往肛肠科或消化内科明确原因。'
+    water: {
+      id: 'water',
+      img: 'assets/felt/bristol_3.jpg',
+      title: '投喂一杯温水',
+      body: '忙碌间隙记得喝几口温水，给肠胃一点温和的缓冲时间。',
+      caption: '《便便日记》给你递来一杯温水：忙完手头的事记得歇一歇，照顾好身体节律呀。'
     },
-    clay: {
-      dept: '建议挂号：消化内科 / 肝胆外科',
-      explanation:
-        '大橘猫猫医生注意到本次记录为“陶土灰白”。粪便颜色明显变浅可能提示胆汁排泄受阻或肝胆胰通路异常，建议尽快前往消化内科做进一步检查。'
-    },
-    bristol7_streak: {
-      dept: '建议挂号：消化内科',
-      explanation:
-        '大橘猫猫医生注意到你已连续 2 次记录“7型水样腹泻”。频繁水样便容易引发脱水与电解质紊乱，请先少量多次补充电解质水；若伴随发热、腹痛或持续超过 24 小时，建议及时就医。'
+    hug: {
+      id: 'hug',
+      img: 'assets/felt/bristol_5.jpg',
+      title: '抱抱暖心毛毡团',
+      body: '状态有起伏很正常，不用给身体打分，今晚早点休息。',
+      caption: '《便便日记》送你一只软绵绵的毛毡拥抱：状态起起伏伏都很正常，今晚好好休息。'
     }
   };
 
-  // Discreet Home Screen Camouflage Skins (Bespoke Felt SVG Icons)
-  const CAMOUFLAGE_SKINS = [
-    {
-      id: 'default',
-      name: '便便日记',
-      subtitle: '手工毛毡肠道手账',
-      pillLabel: '伪装外观',
-      desc: '原始手工毛毡剧场外观（可在下方一键换皮）',
-      bg: 'linear-gradient(145deg, #F3DEAF, #E2B76A)',
-      svg: `<svg viewBox="0 0 36 36" fill="none"><path d="M10 23C10 17.5 13.5 13 18 13C22.5 13 26 17.5 26 23C26 25.5 23 27 18 27C13 27 10 25.5 10 23Z" fill="#FFF8E8" stroke="#6E4D2B" stroke-width="1.8"/><path d="M13 12L15.2 8.5L18 11.2L20.8 8.5L23 12H13Z" fill="#D99B38" stroke="#6E4D2B" stroke-width="1.5" stroke-linejoin="round"/><circle cx="15.4" cy="20" r="1.4" fill="#3E2D20"/><circle cx="20.6" cy="20" r="1.4" fill="#3E2D20"/><path d="M16.5 22.8C17.4 23.7 18.6 23.7 19.5 22.8" stroke="#3E2D20" stroke-width="1.5" stroke-linecap="round"/></svg>`
-    },
-    {
-      id: 'weather',
-      name: '毛毡天气',
-      subtitle: '今日晴 · 23°C',
-      pillLabel: '天气皮',
-      desc: '桌面显示为温柔毛毡云朵天气图标，借手机零尴尬',
-      bg: 'linear-gradient(145deg, #CADBE3, #96B5C6)',
-      svg: `<svg viewBox="0 0 36 36" fill="none"><circle cx="22.5" cy="13.5" r="4.8" fill="#F6C86B" stroke="#6E5228" stroke-width="1.5"/><path d="M10.5 24.5H23.5C25.9 24.5 27.5 22.8 27.5 20.6C27.5 18.5 25.9 16.9 23.8 16.8C23.1 14 20.7 12.2 17.8 12.2C14.3 12.2 11.6 14.9 11.6 18.3C9.6 18.7 8.3 20.2 8.3 22C8.3 23.5 9.3 24.5 10.5 24.5Z" fill="#FAF6EC" stroke="#536A78" stroke-width="1.6" stroke-linejoin="round"/></svg>`
-    },
-    {
-      id: 'journal',
-      name: '手帐笔记',
-      subtitle: '日常拼贴本',
-      pillLabel: '手帐皮',
-      desc: '桌面伪装为淡奶油线装手帐本，标题与顶栏同步低调',
-      bg: 'linear-gradient(145deg, #EADAC3, #CFAF88)',
-      svg: `<svg viewBox="0 0 36 36" fill="none"><rect x="9.5" y="7.5" width="17" height="21" rx="3.5" fill="#FFF9EE" stroke="#6D5037" stroke-width="1.7"/><path d="M14 13.5H22M14 18H22M14 22.5H19" stroke="#9B7553" stroke-width="1.6" stroke-linecap="round"/><path d="M7.8 12.5H11M7.8 18H11M7.8 23.5H11" stroke="#6D5037" stroke-width="1.6" stroke-linecap="round"/></svg>`
-    },
-    {
-      id: 'plant',
-      name: '绿植日志',
-      subtitle: '盆栽浇水志',
-      pillLabel: '绿植皮',
-      desc: '桌面伪装为软萌毛毡龟背竹养护记录，自然又治愈',
-      bg: 'linear-gradient(145deg, #CFE0C8, #97B38D)',
-      svg: `<svg viewBox="0 0 36 36" fill="none"><path d="M13 22H23L21.5 28.5H14.5L13 22Z" fill="#D58258" stroke="#63402D" stroke-width="1.6" stroke-linejoin="round"/><path d="M18 22V14" stroke="#4D6E48" stroke-width="1.8" stroke-linecap="round"/><path d="M18 17C14 17 11.2 14.5 11.5 10.8C15.2 10.6 18 13.2 18 17Z" fill="#7FA676" stroke="#466341" stroke-width="1.5"/><path d="M18 15.5C22 15.5 24.8 13 24.5 9.3C20.8 9.1 18 11.7 18 15.5Z" fill="#8FB584" stroke="#466341" stroke-width="1.5"/></svg>`
-    }
-  ];
+  // Immediate Emergency Red-Flag Notice (Always visible BEFORE any triage questions)
+  const EMERGENCY_BANNER_COPY = {
+    blood: '若出现大量便血、暗红血块、头晕心慌、出冷汗、剧烈腹痛或晕厥感，请跳过问卷立即前往急诊。',
+    black: '若出现柏油样发亮黑便伴头晕黑矇、心慌出冷汗、呕血或咖啡样呕吐物，请跳过问卷立即前往急诊。',
+    pale: '若伴随皮肤/眼白发黄（黄疸）、寒战高热、右上腹剧痛或剧烈恶心呕吐，请跳过问卷立即前往急诊。',
+    alarm: '若出现频繁水样泻伴明显口干少尿（脱水）、持续高热（≥38.5℃）、剧烈腹痛或意识淡漠，请立即就医/急诊。'
+  };
 
-  // =========================================================================
-  // WebAudio Soft Felt Tactile Synthesizer (Zero External Files)
-  // =========================================================================
+  // Strictly Isolated Per-Reason Triage Questions (Zero Cross-Wiring!)
+  const CARE_TRIAGE_QUESTIONS = {
+    blood: [
+      {
+        key: 'dye',
+        q: '最近 48 小时内，是否食用过红心火龙果、甜菜根、大量番茄酱或红色素食物？',
+        options: [
+          { value: 'yes', label: '有明确食用过' },
+          { value: 'no', label: '没有吃过这类食物' },
+          { value: 'unsure', label: '不确定 / 记不清了' }
+        ]
+      },
+      {
+        key: 'pattern',
+        q: '红色在本次排便中主要呈现为哪种情况？',
+        options: [
+          { value: 'mild', label: '仅厕纸少量鲜红擦拭感，或排便后短暂滴血' },
+          { value: 'high', label: '混在粪便内部 / 暗红血块 / 多次反复出现' }
+        ]
+      },
+      {
+        key: 'systemic',
+        q: '目前是否伴随以下身体不适？',
+        options: [
+          { value: 'none', label: '无明显全身不适，精神如常' },
+          { value: 'moderate', label: '肛周疼痛、里急后重或轻中度腹痛' },
+          { value: 'severe', label: '大量出血、头晕心慌、出冷汗、剧烈腹痛或发热' }
+        ]
+      }
+    ],
+    black: [
+      {
+        key: 'dye',
+        q: '最近 48 小时内，是否食用动物血/猪肝，或服用铁剂、铋剂（如枸橼酸铋钾）、活性炭？',
+        options: [
+          { value: 'yes', label: '有食用动物血或服用铁剂/铋剂' },
+          { value: 'no', label: '没有上述饮食或药物史' },
+          { value: 'unsure', label: '不确定 / 记不清了' }
+        ]
+      },
+      {
+        key: 'pattern',
+        q: '本次发黑粪便的质地与持续时间更接近哪一项？',
+        options: [
+          { value: 'mild', label: '成型偏黑、无明显腥臭，且为首次出现' },
+          { value: 'high', label: '柏油样发亮黏腻、有腥臭味，或连续 ≥2 天发黑' }
+        ]
+      },
+      {
+        key: 'systemic',
+        q: '目前是否伴随以下身体不适？',
+        options: [
+          { value: 'none', label: '无明显全身不适，精神如常' },
+          { value: 'moderate', label: '上腹隐痛、反酸烧心或轻度恶心' },
+          { value: 'severe', label: '头晕黑矇、心慌出冷汗、呕血或咖啡样呕吐物' }
+        ]
+      }
+    ],
+    pale: [
+      {
+        key: 'dye',
+        q: '近期是否做过消化道钡餐造影，或服用较大剂量的含铝/含钙抗酸药物？',
+        options: [
+          { value: 'yes', label: '近期做过钡餐或服过相关抗酸药' },
+          { value: 'no', label: '没有上述检查或用药' },
+          { value: 'unsure', label: '不确定 / 记不清了' }
+        ]
+      },
+      {
+        key: 'pattern',
+        q: '灰白色变化与小便颜色情况如何？',
+        options: [
+          { value: 'mild', label: '仅单次颜色略浅，小便颜色正常' },
+          { value: 'high', label: '明显陶土灰白 / 连续 ≥2 次 / 或小便呈浓茶色' }
+        ]
+      },
+      {
+        key: 'systemic',
+        q: '目前是否伴随以下症状？',
+        options: [
+          { value: 'none', label: '无明显不适，无皮肤发黄' },
+          { value: 'moderate', label: '食欲明显下降、厌油腻或右上腹闷胀' },
+          { value: 'severe', label: '皮肤或眼白发黄（黄疸）、寒战高热或右上腹剧痛' }
+        ]
+      }
+    ],
+    alarm: [
+      {
+        key: 'dye',
+        q: '最近 48 小时内，是否有明确外出就餐、生冷食物或旅行饮食变化？',
+        options: [
+          { value: 'yes', label: '有明确饮食变化或生冷进食' },
+          { value: 'no', label: '无明显饮食诱因' },
+          { value: 'unsure', label: '不确定' }
+        ]
+      },
+      {
+        key: 'pattern',
+        q: '过去 24 小时内水样稀便的频率如何？',
+        options: [
+          { value: 'mild', label: '1–2 次，能正常少量多次喝水' },
+          { value: 'high', label: '≥3 次、夜间痛醒，或夹带黏液/脓血' }
+        ]
+      },
+      {
+        key: 'systemic',
+        q: '目前是否伴随脱水或全身警示症状？',
+        options: [
+          { value: 'none', label: '精神尚可，小便量正常' },
+          { value: 'moderate', label: '明显口渴乏力、阵发腹痛或低热' },
+          { value: 'severe', label: '口干少尿/无尿、高热 ≥38.5℃、剧烈腹痛或意识淡漠' }
+        ]
+      }
+    ]
+  };
+
+  // --------------------------------------------------------------------------
+  // 2. WebAudio Gentle Tactile Engine (Respects Global & Cutscene Mute)
+  // --------------------------------------------------------------------------
   const FeltAudio = (() => {
     let ctx = null;
-    let enabled = true;
-
-    function getCtx() {
-      if (!enabled) return null;
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (!AudioCtx) return null;
-      if (!ctx) ctx = new AudioCtx();
+    function ensureCtx() {
+      if (!state?.settings?.soundEnabled) return null;
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return null;
+      if (!ctx) ctx = new Ctx();
       if (ctx.state === 'suspended') {
-        ctx.resume().catch(() => {});
+        try { ctx.resume(); } catch (_) {}
       }
       return ctx;
     }
 
-    function playTone(freqStart, freqEnd, duration, volume, type = 'sine', delay = 0) {
-      const ac = getCtx();
-      if (!ac) return;
-      const now = ac.currentTime + delay;
-      const osc = ac.createOscillator();
-      const gain = ac.createGain();
-      const filter = ac.createBiquadFilter();
-
-      osc.type = type;
-      osc.frequency.setValueAtTime(freqStart, now);
-      osc.frequency.exponentialRampToValueAtTime(Math.max(40, freqEnd), now + duration);
-
-      filter.type = 'lowpass';
-      filter.frequency.setValueAtTime(980, now);
-
-      gain.gain.setValueAtTime(0.0001, now);
-      gain.gain.linearRampToValueAtTime(volume, now + 0.014);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
-
-      osc.connect(filter);
-      filter.connect(gain);
-      gain.connect(ac.destination);
-
-      osc.start(now);
-      osc.stop(now + duration + 0.02);
+    function playTone(freq, dur = 0.08, type = 'sine', gainVal = 0.06, slideTo = null) {
+      const c = ensureCtx();
+      if (!c) return;
+      try {
+        const osc = c.createOscillator();
+        const gain = c.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, c.currentTime);
+        if (slideTo) {
+          osc.frequency.exponentialRampToValueAtTime(slideTo, c.currentTime + dur);
+        }
+        gain.gain.setValueAtTime(0.0001, c.currentTime);
+        gain.gain.linearRampToValueAtTime(gainVal, c.currentTime + 0.012);
+        gain.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + dur);
+        osc.connect(gain);
+        gain.connect(c.destination);
+        osc.start();
+        osc.stop(c.currentTime + dur + 0.02);
+      } catch (_) {}
     }
 
     return {
-      setEnabled(val) {
-        enabled = Boolean(val);
+      softTap() { playTone(420, 0.055, 'triangle', 0.045, 340); },
+      toyBounce() { playTone(320, 0.09, 'sine', 0.055, 520); },
+      gentleSave() {
+        playTone(440, 0.11, 'sine', 0.05, 523);
+        setTimeout(() => playTone(659, 0.16, 'sine', 0.045), 90);
       },
-      isEnabled() {
-        return enabled;
-      },
-      softTap() {
-        playTone(230, 145, 0.085, 0.08, 'triangle');
-      },
-      toyBounce() {
-        playTone(300, 440, 0.09, 0.085, 'sine');
-        playTone(440, 360, 0.08, 0.055, 'triangle', 0.05);
-      },
-      stampPublish() {
-        playTone(260, 180, 0.09, 0.1, 'triangle');
-        playTone(392, 523.25, 0.16, 0.07, 'sine', 0.06);
-        playTone(523.25, 659.25, 0.2, 0.055, 'sine', 0.14);
-      },
-      victoryFanfare() {
-        playTone(523.25, 523.25, 0.11, 0.075, 'triangle', 0);
-        playTone(659.25, 659.25, 0.12, 0.075, 'triangle', 0.09);
-        playTone(783.99, 783.99, 0.16, 0.08, 'sine', 0.18);
-        playTone(1046.5, 1046.5, 0.28, 0.065, 'sine', 0.28);
-      },
-      desertDrum() {
-        playTone(190, 120, 0.12, 0.09, 'triangle', 0);
-        playTone(260, 210, 0.14, 0.075, 'triangle', 0.12);
-      },
-      stormPlop() {
-        playTone(320, 520, 0.1, 0.075, 'sine', 0);
-        playTone(280, 460, 0.12, 0.07, 'sine', 0.11);
-      },
-      redFlagChime() {
-        playTone(329.63, 329.63, 0.34, 0.065, 'sine');
-        playTone(261.63, 261.63, 0.42, 0.055, 'sine', 0.16);
-      },
-      alertToast() {
-        playTone(360, 290, 0.1, 0.08, 'triangle');
-        playTone(360, 290, 0.1, 0.08, 'triangle', 0.14);
-      }
+      careBell() { playTone(392, 0.18, 'sine', 0.045, 330); }
     };
   })();
 
-  // =========================================================================
-  // Dynamic CARROT-Style Deadpan Comedy Engine (100% Zero Food Metaphors!)
-  // =========================================================================
-  function generateComedyBulletin({ bristol, triggers, durationSec, ease, color }) {
-    const toy = BRISTOL_TOYS.find((t) => t.type === bristol) || BRISTOL_TOYS[3];
-    const has = (tag) => triggers.includes(tag);
-    const overEight = durationSec >= 480;
-
-    if (color === 'green') {
-      return {
-        headline: '“绿意盎然的毛毡特快已进站，不是蔬菜吃多了，就是肠道刚踩了一脚地板油。”',
-        stamp: toy.stamp,
-        stampTone: toy.stampTone
-      };
-    }
-
-    if (overEight && bristol <= 2) {
-      return {
-        headline: `“蹲满 ${Math.floor(durationSec / 60)} 分钟才请出${toy.name}，手机电量比肠道还努力，赶紧喝杯温水吧！”`,
-        stamp: '久蹲警戒',
-        stampTone: 'dry'
-      };
-    }
-
-    if (bristol === 4) {
-      if (has('重辣火锅')) {
-        return {
-          headline: '“昨夜重辣火锅企图搞事，被四号金冠团优雅镇压！”',
-          stamp: '五星金绒',
-          stampTone: 'gold'
-        };
-      }
-      if (has('冰美式')) {
-        return {
-          headline: '“冰美式刚递上战书，丝滑金冠团淡定戴上皇冠：就这？”',
-          stamp: '五星金绒',
-          stampTone: 'gold'
-        };
-      }
-      if (has('熬夜') || has('压力大')) {
-        return {
-          headline: '“哪怕昨晚熬夜承压，四号金冠团依然交出了教科书级丝滑答卷。”',
-          stamp: '铁血金绒',
-          stampTone: 'gold'
-        };
-      }
-      return {
-        headline: '“丝滑金冠团准时登台，今天你的肠道配得上全体毛毡起立鼓掌。”',
-        stamp: '五星金绒',
-        stampTone: 'gold'
-      };
-    }
-
-    if (bristol === 3) {
-      if (has('喝水少') || has('久坐')) {
-        return {
-          headline: '“缝线微裂团带着轻微干纹报到：再多喝半杯温水，明天就能冲冠四号金绒！”',
-          stamp: '稳健及格',
-          stampTone: 'gold'
-        };
-      }
-      return {
-        headline: '“缝线微裂团稳健落地，距离五星金冠团只差半杯温水的距离。”',
-        stamp: '稳健及格',
-        stampTone: 'gold'
-      };
-    }
-
-    if (bristol === 1) {
-      if (has('喝水少')) {
-        return {
-          headline: '“硬球小团拒绝配合演出，肠道联名发函：饮水机就在三米外！”',
-          stamp: '缺水警戒',
-          stampTone: 'dry'
-        };
-      }
-      return {
-        headline: '“硬球小团叮咚报到，今日份水分预算严重赤字，立刻续杯温水。”',
-        stamp: '缺水警戒',
-        stampTone: 'dry'
-      };
-    }
-
-    if (bristol === 2) {
-      if (has('久坐') || has('压力大')) {
-        return {
-          headline: '“工位久坐把疙瘩憋劲团憋出了倔强脾气，今晚请务必给肠道批点膳食纤维。”',
-          stamp: '纤维急召',
-          stampTone: 'dry'
-        };
-      }
-      return {
-        headline: '“疙瘩憋劲团自带棱角登场，顺畅指数告急，蔬菜和温水请火速驰援。”',
-        stamp: '纤维急召',
-        stampTone: 'dry'
-      };
-    }
-
-    if (bristol === 5) {
-      if (has('奶茶乳糖')) {
-        return {
-          headline: '“奶茶乳糖轻推了一把，软绵小绒团提早交卷，今天饮食清淡点就好。”',
-          stamp: '轻柔偏软',
-          stampTone: 'soft'
-        };
-      }
-      return {
-        headline: '“软绵小绒团抢跑亮相，肠道节拍稍快半拍，规律三餐就能稳住阵脚。”',
-        stamp: '轻柔偏软',
-        stampTone: 'soft'
-      };
-    }
-
-    if (bristol === 6) {
-      if (has('冰美式') && has('熬夜')) {
-        return {
-          headline: '“冰美式联手熬夜发动突袭，炸毛摊软团当场接管戏台——早睡能救命！”',
-          stamp: '绒浪预警',
-          stampTone: 'soft'
-        };
-      }
-      if (has('重辣火锅')) {
-        return {
-          headline: '“昨夜重辣火锅的账单今早到账，炸毛摊软团提醒你：今天喝点温粥歇一歇。”',
-          stamp: '绒浪预警',
-          stampTone: 'soft'
-        };
-      }
-      if (has('冰美式') || has('奶茶乳糖')) {
-        return {
-          headline: '“冰饮刺客精准命中肠道防线，炸毛摊软团举牌抗议：下回换热饮吧！”',
-          stamp: '绒浪预警',
-          stampTone: 'soft'
-        };
-      }
-      return {
-        headline: '“炸毛摊软团临时加演一场，别慌，今天少油少辣多喝温水稳住节奏。”',
-        stamp: '绒浪预警',
-        stampTone: 'soft'
-      };
-    }
-
-    // Bristol 7 (single occurrence; 2 in a row triggers Red-Flag Calm Care)
-    if (ease === '急促' || has('重辣火锅') || has('冰美式')) {
-      return {
-        headline: '“委屈小水洼拉响一级水帘警报，立刻补充电解质水，今晚让肠胃彻底休假。”',
-        stamp: '雨云急报',
-        stampTone: 'soft'
-      };
-    }
-    return {
-      headline: '“委屈小水洼飘过剧场，注意保暖与补液；若连续出现请认真关注身体信号。”',
-      stamp: '雨云急报',
-      stampTone: 'soft'
-    };
+  // --------------------------------------------------------------------------
+  // 3. State & Seed Helpers (Strict Demo vs Personal Isolation)
+  // --------------------------------------------------------------------------
+  function pad2(n) {
+    return String(n).padStart(2, '0');
   }
 
-  // =========================================================================
-  // Seed Realistic 14-Day History (Zero Food Metaphors)
-  // =========================================================================
-  function createSeedState() {
-    const now = new Date();
-    function daysAgoISO(daysAgo, hour, minute) {
-      const d = new Date(now);
-      d.setDate(d.getDate() - daysAgo);
-      d.setHours(hour, minute, 0, 0);
-      return d.toISOString();
-    }
+  function toDateKey(ts) {
+    const d = new Date(ts);
+    return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+  }
 
-    const seedLogs = [
+  function toLocalDateTimeInputValue(ts) {
+    const d = new Date(ts);
+    return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}T${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+  }
+
+  function formatDuration(sec) {
+    if (sec === null || sec === undefined || Number.isNaN(Number(sec))) return '未记录';
+    const s = Math.max(0, Math.floor(Number(sec)));
+    const m = Math.floor(s / 60);
+    const rem = s % 60;
+    if (m === 0) return `${rem} 秒`;
+    return `${m} 分 ${pad2(rem)} 秒`;
+  }
+
+  function formatMMSS(sec) {
+    const s = Math.max(0, Math.floor(Number(sec) || 0));
+    return `${pad2(Math.floor(s / 60))}:${pad2(s % 60)}`;
+  }
+
+  function formatShortTime(ts) {
+    const d = new Date(ts);
+    const todayKey = toDateKey(Date.now());
+    const yestKey = toDateKey(Date.now() - 86400000);
+    const k = toDateKey(ts);
+    const hm = `${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+    if (k === todayKey) return `今天 ${hm}`;
+    if (k === yestKey) return `昨天 ${hm}`;
+    return `${d.getMonth() + 1}月${d.getDate()}日 ${hm}`;
+  }
+
+  function formatFullDate(ts) {
+    const d = new Date(ts);
+    return `${d.getMonth() + 1}/${d.getDate()} ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+  }
+
+  function getToy(type) {
+    return BRISTOL_TOYS.find((t) => t.type === Number(type)) || null;
+  }
+
+  function getColor(id) {
+    return COLOR_OPTIONS.find((c) => c.id === id) || null;
+  }
+
+  function normalizeCareReason(raw) {
+    if (raw === 'red' || raw === 'blood') return 'blood';
+    if (raw === 'black') return 'black';
+    if (raw === 'clay' || raw === 'pale') return 'pale';
+    if (raw === 'alarm' || raw === 'bristol7_streak') return 'alarm';
+    return 'alarm';
+  }
+
+  function buildSeedToilets() {
+    return [
       {
-        id: 'log-14',
-        timestamp: daysAgoISO(0, 8, 42),
-        bristol: 4,
-        color: 'golden',
-        triggers: ['重辣火锅'],
-        durationSec: 258,
-        ease: '顺畅',
-        headline: '“昨夜重辣火锅企图搞事，被四号金冠团优雅镇压！”',
-        stamp: '五星金绒',
-        stampTone: 'gold'
+        id: 't_home',
+        name: '家里主卫',
+        area: '私人日常',
+        scope: 'private',
+        air: 5,
+        clean: 5,
+        tags: ['有纸', '温水马桶', '安静'],
+        note: '最放松的主场，脚踏凳高度正好'
       },
       {
-        id: 'log-13',
-        timestamp: daysAgoISO(1, 9, 10),
-        bristol: 4,
-        color: 'brown',
-        triggers: [],
-        durationSec: 215,
-        ease: '顺畅',
-        headline: '“丝滑金冠团准时登台，今天你的肠道配得上全体毛毡起立鼓掌。”',
-        stamp: '五星金绒',
-        stampTone: 'gold'
+        id: 't_office',
+        name: '公司 12F 东侧单间',
+        area: '办公楼',
+        scope: 'private',
+        air: 4,
+        clean: 4,
+        tags: ['通风好', '有信号', '人少'],
+        note: '午休前后较空，隔音比西侧好'
       },
       {
-        id: 'log-12',
-        timestamp: daysAgoISO(2, 8, 25),
-        bristol: 3,
-        color: 'brown',
-        triggers: ['久坐'],
-        durationSec: 270,
-        ease: '顺畅',
-        headline: '“缝线微裂团带着轻微干纹报到：再多喝半杯温水，明天就能冲冠四号金绒！”',
-        stamp: '稳健及格',
-        stampTone: 'gold'
-      },
-      {
-        id: 'log-11',
-        timestamp: daysAgoISO(3, 10, 5),
-        bristol: 4,
-        color: 'golden',
-        triggers: [],
-        durationSec: 195,
-        ease: '顺畅',
-        headline: '“丝滑金冠团稳坐头牌，肠道秩序井然。”',
-        stamp: '五星金绒',
-        stampTone: 'gold'
-      },
-      {
-        id: 'log-10',
-        timestamp: daysAgoISO(4, 8, 50),
-        bristol: 4,
-        color: 'golden',
-        triggers: [],
-        durationSec: 240,
-        ease: '顺畅',
-        headline: '“四号金冠团佩戴小皇冠谢幕，状态稳如老狗。”',
-        stamp: '五星金绒',
-        stampTone: 'gold'
-      },
-      {
-        id: 'log-9',
-        timestamp: daysAgoISO(5, 9, 32),
-        bristol: 3,
-        color: 'brown',
-        triggers: ['喝水少'],
-        durationSec: 310,
-        ease: '顺畅',
-        headline: '“缝线微裂团稳健落地，再补半杯温水就是满分。”',
-        stamp: '稳健及格',
-        stampTone: 'gold'
-      },
-      {
-        id: 'log-8',
-        timestamp: daysAgoISO(6, 11, 18),
-        bristol: 6,
-        color: 'brown',
-        triggers: ['冰美式', '熬夜'],
-        durationSec: 280,
-        ease: '急促',
-        headline: '“冰美式联手熬夜发动突袭，炸毛摊软团当场接管戏台——早睡能救命！”',
-        stamp: '绒浪预警',
-        stampTone: 'soft'
-      },
-      {
-        id: 'log-7',
-        timestamp: daysAgoISO(7, 8, 40),
-        bristol: 4,
-        color: 'golden',
-        triggers: [],
-        durationSec: 210,
-        ease: '顺畅',
-        headline: '“丝滑金冠团丝滑登场，肠道五星好评。”',
-        stamp: '五星金绒',
-        stampTone: 'gold'
-      },
-      {
-        id: 'log-6',
-        timestamp: daysAgoISO(8, 21, 15),
-        bristol: 2,
-        color: 'brown',
-        triggers: ['喝水少', '久坐'],
-        durationSec: 440,
-        ease: '费力',
-        headline: '“工位久坐把疙瘩憋劲团憋出了倔强脾气，今晚请务必给肠道批点膳食纤维。”',
-        stamp: '纤维急召',
-        stampTone: 'dry'
-      },
-      {
-        id: 'log-5',
-        timestamp: daysAgoISO(9, 9, 12),
-        bristol: 4,
-        color: 'golden',
-        triggers: [],
-        durationSec: 225,
-        ease: '顺畅',
-        headline: '“丝滑金冠团准时营业。”',
-        stamp: '五星金绒',
-        stampTone: 'gold'
-      },
-      {
-        id: 'log-4',
-        timestamp: daysAgoISO(10, 14, 20),
-        bristol: 6,
-        color: 'green',
-        triggers: ['重辣火锅', '冰美式'],
-        durationSec: 330,
-        ease: '急促',
-        headline: '“冰美式加辣锅双重暴击，炸毛摊软团火速登场。”',
-        stamp: '绒浪预警',
-        stampTone: 'soft'
-      },
-      {
-        id: 'log-3',
-        timestamp: daysAgoISO(11, 8, 55),
-        bristol: 5,
-        color: 'brown',
-        triggers: ['奶茶乳糖'],
-        durationSec: 245,
-        ease: '顺畅',
-        headline: '“奶茶乳糖轻推了一把，软绵小绒团提早交卷。”',
-        stamp: '轻柔偏软',
-        stampTone: 'soft'
-      },
-      {
-        id: 'log-2',
-        timestamp: daysAgoISO(12, 9, 4),
-        bristol: 4,
-        color: 'golden',
-        triggers: [],
-        durationSec: 200,
-        ease: '顺畅',
-        headline: '“四号金冠团五星收官。”',
-        stamp: '五星金绒',
-        stampTone: 'gold'
-      },
-      {
-        id: 'log-1',
-        timestamp: daysAgoISO(13, 20, 48),
-        bristol: 1,
-        color: 'brown',
-        triggers: ['喝水少', '熬夜'],
-        durationSec: 495,
-        ease: '费力',
-        headline: '“硬球小团拒绝配合演出，饮水机就在三米外！”',
-        stamp: '缺水警戒',
-        stampTone: 'dry'
+        id: 't_mall',
+        name: '商圈 B1 静音隔间',
+        area: '公共备选',
+        scope: 'public',
+        air: 4,
+        clean: 5,
+        tags: ['保洁勤', '有挂钩', '有纸'],
+        note: '外出应急优选，洗手池干净'
       }
     ];
+  }
 
+  function buildSeedDemoLogs() {
+    const now = Date.now();
+    const day = 86400000;
+    const mk = (daysAgo, hour, min, bristol, color, ease, durationSec, triggers, memo, toiletId, entryType = 'bm') => {
+      const d = new Date(now - daysAgo * day);
+      d.setHours(hour, min, 0, 0);
+      return {
+        id: `demo_${daysAgo}_${hour}_${min}`,
+        ts: d.getTime(),
+        isDemo: true,
+        entryType,
+        bristol,
+        color,
+        ease,
+        durationSec,
+        triggers: triggers || [],
+        memo: memo || '',
+        toiletId: toiletId || 't_home',
+        careTriage: null
+      };
+    };
+
+    // 14-day realistic demo logs (clearly tagged isDemo: true, includes 1 explicit no_bm day & varied missingness)
+    return [
+      mk(0, 8, 22, 4, 'golden', '顺畅', 248, ['咖啡'], '晨起温水后很轻松', 't_home'),
+      mk(1, 9, 10, 3, 'brown', '顺畅', 310, ['久坐'], '', 't_office'),
+      mk(2, 21, 15, null, null, null, null, ['熬夜'], '出门在外未排便', null, 'no_bm'),
+      mk(3, 8, 45, 4, 'golden', '顺畅', 225, [], '', 't_home'),
+      mk(4, 14, 18, 6, 'brown', '急促', 190, ['辛辣', '乳制品'], '中午吃了偏辣外食', 't_office'),
+      mk(5, 8, 30, 4, 'golden', '顺畅', 260, ['咖啡'], '', 't_home'),
+      mk(7, 10, 5, 2, 'brown', '费力', 440, ['饮水少', '熬夜'], '前一天喝水偏少', 't_home'),
+      mk(8, 8, 40, 3, 'brown', '顺畅', 295, [], '', 't_home'),
+      mk(9, 19, 25, 5, 'green', '顺畅', 210, [], '吃了很多绿叶菜', 't_home'),
+      mk(11, 8, 50, 4, 'golden', '顺畅', 240, ['咖啡'], '', 't_office'),
+      mk(12, 13, 12, 6, 'brown', '急促', 180, ['辛辣'], '', 't_mall'),
+      mk(13, 8, 35, 4, 'brown', '顺畅', 270, [], '', 't_home')
+    ].sort((a, b) => b.ts - a.ts);
+  }
+
+  function createDefaultState() {
     return {
-      episode: 42,
-      logs: seedLogs,
+      version: '8.2',
+      logs: buildSeedDemoLogs(),
+      toilets: buildSeedToilets(),
+      activeSession: null,
       settings: {
         soundEnabled: true,
-        faceIdEnabled: true,
+        cutsceneEnabled: true,
+        reminderMin: 8,
+        faceIdBlur: false,
         camouflage: 'default'
+      },
+      ui: {
+        dataScope: 'demo',
+        activeShareTab: 'single',
+        posterActor: 4,
+        posterQuoteIdx: 0,
+        activeSticker: 'tissue',
+        selectedTrendDate: null,
+        selectedArchiveId: null
       }
     };
   }
@@ -627,3845 +499,2020 @@
   function loadState() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return createSeedState();
+      if (!raw) return createDefaultState();
       const parsed = JSON.parse(raw);
-      if (!parsed || !Array.isArray(parsed.logs) || parsed.logs.length === 0) {
-        return createSeedState();
+      const def = createDefaultState();
+      const merged = {
+        ...def,
+        ...parsed,
+        settings: { ...def.settings, ...(parsed.settings || {}) },
+        ui: { ...def.ui, ...(parsed.ui || {}) },
+        logs: Array.isArray(parsed.logs) ? parsed.logs : def.logs,
+        toilets: Array.isArray(parsed.toilets) && parsed.toilets.length ? parsed.toilets : def.toilets,
+        activeSession: parsed.activeSession || null
+      };
+      // Enforce valid dataScope
+      if (merged.ui.dataScope !== 'personal' && merged.ui.dataScope !== 'demo') {
+        merged.ui.dataScope = merged.logs.some((l) => !l.isDemo) ? 'personal' : 'demo';
       }
-      return parsed;
-    } catch (_err) {
-      return createSeedState();
+      return merged;
+    } catch (_) {
+      return createDefaultState();
     }
   }
+
+  let state = loadState();
 
   function saveState() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    } catch (_err) {
-      // Ignore storage quota errors in sandboxed iframes
-    }
+    } catch (_) {}
   }
 
-  // Preset Fun Rivals for Privacy-Safe Wool-Felt Arena PK
-  const PK_RIVALS = [
-    {
-      id: 'azhe',
-      label: '摸鱼搭子 · 阿哲',
-      shortName: '阿哲',
-      role: '摸鱼搭子',
-      bristol: 6,
-      triggerStory: '昨夜火锅',
-      avgMin: '6分12秒',
-      streak: 2,
-      breakdown: { ideal: 24, speed: 16, streak: 8, resilience: 10 },
-      score: 58
-    },
-    {
-      id: 'xiaolin',
-      label: '家里那位 · 小林',
-      shortName: '小林',
-      role: '家里那位',
-      bristol: 4,
-      triggerStory: '温水早睡',
-      avgMin: '3分40秒',
-      streak: 7,
-      breakdown: { ideal: 36, speed: 24, streak: 16, resilience: 13 },
-      score: 89
-    },
-    {
-      id: 'ami',
-      label: '冰美式战友 · 阿米',
-      shortName: '阿米',
-      role: '冰美式战友',
-      bristol: 2,
-      triggerStory: '冰美式少水',
-      avgMin: '7分20秒',
-      streak: 3,
-      breakdown: { ideal: 22, speed: 13, streak: 10, resilience: 11 },
-      score: 56
-    }
-  ];
+  // --------------------------------------------------------------------------
+  // 4. Red-Flag & Clinical Fact Logic
+  // --------------------------------------------------------------------------
+  function isBristol7Streak(targetEntry, allLogs) {
+    if (!targetEntry || targetEntry.entryType !== 'bm' || targetEntry.bristol !== 7) return false;
+    const pool = (allLogs || state.logs).filter(
+      (l) => l.isDemo === targetEntry.isDemo && l.entryType === 'bm' && l.bristol === 7
+    );
+    const windowMs = 48 * 3600 * 1000;
+    const nearby = pool.filter((l) => Math.abs(l.ts - targetEntry.ts) <= windowMs);
+    const distinctDays = new Set(nearby.map((l) => toDateKey(l.ts)));
+    return nearby.length >= 3 || distinctDays.size >= 2;
+  }
 
-  // =========================================================================
-  // Viral Feature 1: Felt Detective GI Strategy Diet Deduction Engine
-  // Deduces likely 12-24h diet/habits from stool form + color + effort + history
-  // =========================================================================
-  function inferLikelyDiet(entry, history = []) {
-    const bristol = Number(entry && entry.bristol) || 4;
-    const color = (entry && entry.color) || 'golden';
-    const durationSec = Number(entry && entry.durationSec) || 240;
-    const ease = (entry && entry.ease) || '顺畅';
-    const triggers = Array.isArray(entry && entry.triggers) ? entry.triggers : [];
-    const colObj = getColorObj(color);
+  function getEntryRedFlagReason(entry, allLogs) {
+    if (!entry || entry.entryType !== 'bm') return null;
+    if (entry.color === 'red') return 'blood';
+    if (entry.color === 'black') return 'black';
+    if (entry.color === 'clay') return 'pale';
+    if (entry.careTriage && entry.careTriage.reason) return normalizeCareReason(entry.careTriage.reason);
+    if (isBristol7Streak(entry, allLogs)) return 'alarm';
+    return null;
+  }
 
-    // Safety Red Line: NEVER run playful diet guesses on red-flag signals
-    if (colObj.redFlag) {
+  function isEntryRedFlag(entry, allLogs) {
+    return Boolean(getEntryRedFlagReason(entry, allLogs));
+  }
+
+  function evaluateCareTriage(rawReason, ans) {
+    const reason = normalizeCareReason(rawReason);
+    const dye = ans?.dye || 'unsure';
+    const pattern = ans?.pattern || 'mild';
+    const systemic = ans?.systemic || 'none';
+
+    // 1. Severe systemic warning -> IMMEDIATE EMERGENCY (explicitly separate from outpatient clinic)
+    if (systemic === 'severe') {
+      const severeMap = {
+        blood: '你勾选了大量出血、头晕心慌、剧烈腹痛或发热等危险信号。请立即前往急诊科评估，避免独自久等。',
+        black: '发黑/柏油样便伴随头晕黑矇、心慌出冷汗或呕血迹象，属于需紧急排查的上消化道出血警示，请立即前往急诊。',
+        pale: '灰白便伴随皮肤/眼白发黄（黄疸）、寒战高热或右上腹剧痛，提示胆道梗阻或急性炎症风险，请立即前往急诊。',
+        alarm: '频繁水样泻伴随明显脱水少尿、持续高热或剧烈腹痛，存在电解质紊乱与重症风险，请立即前往急诊。'
+      };
       return {
-        redFlagBlocked: true,
-        confidence: 0,
-        shortGuess: '红灯关注中，暂停饮食反推',
-        fullReason: '该颜色触发医学红灯关注，已交由大橘猫猫医生安心关护模式处理。',
-        suggestedTags: []
+        reason,
+        level: 'emergency',
+        badge: '立即急诊评估',
+        department: '急诊科（优先）',
+        title: '请跳过观察，立即前往急诊',
+        explanation: severeMap[reason],
+        pose: 'earnest'
       };
     }
 
-    // Personal historical trigger mining for same Bristol bucket
-    const sameBucketLogs = (Array.isArray(history) ? history : []).filter((h) => {
-      if (bristol <= 2) return h.bristol <= 2;
-      if (bristol >= 5) return h.bristol >= 5;
-      return h.bristol === bristol;
+    // 2. Tarry/persistent black stool -> ALWAYS urgent regardless of diet/iron history (ZERO contradiction!)
+    if (reason === 'black' && pattern === 'high') {
+      const exp =
+        dye === 'yes'
+          ? '虽然近期有食用动物血或服用铁剂/铋剂的记录，但“柏油样发亮黏腻 / 腥臭或连续 ≥2 天发黑”不能仅凭饮食或用药排除上消化道出血。建议尽快前往消化内科完成粪便潜血等检查。'
+          : '未明确食用动物血或服用铁剂/铋剂，且呈现柏油样黏腻或连续发黑，需警惕上消化道出血可能，建议尽快前往消化内科检查。';
+      return {
+        reason,
+        level: 'urgent',
+        badge: '建议尽快就医',
+        department: '建议科室：消化内科',
+        title: '建议尽快安排消化内科检查',
+        explanation: exp,
+        pose: 'earnest'
+      };
+    }
+
+    // 3. Other high-risk pattern or moderate systemic symptom -> Urgent outpatient
+    if (pattern === 'high' || systemic === 'moderate') {
+      const deptMap = {
+        blood: '建议科室：消化内科 / 肛肠科',
+        black: '建议科室：消化内科',
+        pale: '建议科室：消化内科 / 肝胆外科',
+        alarm: '建议科室：消化内科 / 肠道门诊'
+      };
+      const expMap = {
+        blood:
+          dye === 'yes'
+            ? '尽管近期食用过红色素食物，但你反馈存在混入粪便内部、暗红血块、反复出现或伴腹痛/肛周不适，仅靠饮食无法排除出血，建议尽快就医化验大便隐血。'
+            : '未明确食用红色素食物，且存在混入便中、暗红血块、反复出现或伴腹痛/肛周不适，建议尽快前往消化内科或肛肠科评估。',
+        black:
+          dye === 'yes'
+            ? '虽然近期有食用动物血或铁剂/铋剂史，但同时伴有上腹隐痛、反酸或恶心，建议尽快前往消化内科检查以稳妥排除出血。'
+            : '未明确食用动物血或铁剂/铋剂且伴有上腹不适，建议尽快前往消化内科检查粪便隐血。',
+        pale:
+          dye === 'yes'
+            ? '尽管近期做过钡餐或服过抗酸药，但若出现明显陶土灰白、连续 ≥2 次、小便浓茶色或右上腹闷胀，仍建议尽快前往消化内科/肝胆外科评估肝胆功能。'
+            : '无明确钡餐或抗酸药史，且出现明显陶土灰白、持续变浅、小便浓茶色或右上腹不适，建议尽快前往消化内科或肝胆外科检查肝功能与胆道超声。',
+        alarm:
+          '24 小时内水样泻频次偏高或已伴随口渴乏力、腹痛/低热，请注意补充口服补液盐并尽快就医明确病因。'
+      };
+      return {
+        reason,
+        level: 'urgent',
+        badge: '建议尽快就医',
+        department: deptMap[reason],
+        title: '建议尽快预约门诊评估',
+        explanation: expMap[reason],
+        pose: 'earnest'
+      };
+    }
+
+    // 4. Plausible diet/medication + mild pattern + zero systemic -> Observe 24-48h
+    if (dye === 'yes' && pattern === 'mild' && systemic === 'none') {
+      const obsDietMap = {
+        blood: '结合近期食用红心火龙果/甜菜根等红色素食物，且无全身不适，目前饮食染色可能性较高。可先观察 24–48 小时，若停食后仍发红或出现腹痛请及时就医。',
+        black: '结合近期食用动物血或服用铁剂/铋剂，且本次为首次成型偏黑、无全身不适，目前食物/药物染色可能性较高。可继续观察 24–48 小时，若转为柏油黏腻或停用后持续发黑请及时就医。',
+        pale: '结合近期钡餐造影或抗酸药史，且仅单次略浅、小便正常无不适，可先观察 24–48 小时。若颜色持续灰白或出现小便加深、皮肤发黄请立即就医。',
+        alarm: '结合近期饮食变化且目前水样便次数较少、可正常饮水，可先清淡饮食并少量多次补液观察 24 小时；若次数增多或发热请及时就医。'
+      };
+      return {
+        reason,
+        level: 'observe',
+        badge: '先观察 24–48 小时',
+        department: '暂居家观察',
+        title: '可先居家观察，留意下一次变化',
+        explanation: obsDietMap[reason],
+        pose: 'relieved'
+      };
+    }
+
+    // 5. No clear diet cause but mild + no systemic -> Close observation
+    const mildUnknownMap = {
+      blood: '未明确红色食物史，虽目前仅少量擦拭感且无全身不适，仍建议记录下 1–2 次变化；若再次见红或持续超过 48 小时，请前往肛肠科或消化内科排查。',
+      black: '未明确动物血或铁剂/铋剂史，虽目前成型且无全身不适，仍建议密切观察下 1–2 次排便颜色；若继续发黑，请尽快前往消化内科做粪便潜血检查。',
+      pale: '无明确钡餐或抗酸药史，虽仅单次偏浅且小便正常，仍请留意随后 24–48 小时大便与小便颜色；若仍偏灰白请前往消化内科检查。',
+      alarm: '目前频率尚可且无脱水表现，建议清淡饮食、及时补液并观察 24 小时；若持续未缓解或出现发热、腹痛请及时就医。'
+    };
+    const fallbackDept = {
+      blood: '观察 · 必要时肛肠/消化科',
+      black: '观察 · 必要时消化内科',
+      pale: '观察 · 必要时消化/肝胆科',
+      alarm: '观察 · 必要时消化内科'
+    };
+    return {
+      reason,
+      level: 'observe',
+      badge: '密切观察 · 必要时就医',
+      department: fallbackDept[reason],
+      title: '建议记录后续变化，持续则就医',
+      explanation: mildUnknownMap[reason],
+      pose: 'diet'
+    };
+  }
+
+  // --------------------------------------------------------------------------
+  // 5. Scoped Factual Statistics (ZERO Fabricated Offsets, 100% Reconciled Math)
+  // --------------------------------------------------------------------------
+  function getScopedLogs(scope) {
+    const s = scope || state.ui.dataScope;
+    const isDemoTarget = s === 'demo';
+    return state.logs
+      .filter((l) => Boolean(l.isDemo) === isDemoTarget)
+      .slice()
+      .sort((a, b) => b.ts - a.ts);
+  }
+
+  function getPersonalLogs() {
+    return state.logs
+      .filter((l) => !l.isDemo)
+      .slice()
+      .sort((a, b) => b.ts - a.ts);
+  }
+
+  function getDisplayLatestLog() {
+    const scoped = getScopedLogs(state.ui.dataScope);
+    if (scoped.length) return scoped[0];
+    return state.logs[0] || null;
+  }
+
+  function compute7DayStats(logs) {
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    const days = [];
+    for (let i = 6; i >= 0; i -= 1) {
+      const d = new Date(now.getTime() - i * 86400000);
+      const key = toDateKey(d.getTime());
+      const entries = logs.filter((l) => toDateKey(l.ts) === key);
+      const bmEntries = entries.filter((l) => l.entryType === 'bm');
+      const noBmEntries = entries.filter((l) => l.entryType === 'no_bm');
+      const hasRedFlag = bmEntries.some((e) => isEntryRedFlag(e, logs));
+      let status = 'nodata';
+      if (bmEntries.length > 0) status = 'bm';
+      else if (noBmEntries.length > 0) status = 'no_bm';
+      days.push({
+        dateKey: key,
+        weekday: ['日', '一', '二', '三', '四', '五', '六'][d.getDay()],
+        label: `${d.getMonth() + 1}/${d.getDate()}`,
+        entries,
+        bmEntries,
+        noBmEntries,
+        hasRedFlag,
+        status,
+        latestBm: bmEntries[0] || null
+      });
+    }
+
+    const weekBm = days.flatMap((d) => d.bmEntries);
+    const bmDaysCount = days.filter((d) => d.status === 'bm').length;
+    const noBmDaysCount = days.filter((d) => d.status === 'no_bm').length;
+    const noDataDaysCount = days.filter((d) => d.status === 'nodata').length;
+    const colorFilled = weekBm.filter((e) => Boolean(e.color)).length;
+    const easeFilled = weekBm.filter((e) => Boolean(e.ease)).length;
+    const durationFilled = weekBm.filter((e) => e.durationSec !== null && e.durationSec !== undefined).length;
+    const redFlagCount = weekBm.filter((e) => isEntryRedFlag(e, logs)).length;
+
+    return {
+      days,
+      weekBm,
+      totalBm: weekBm.length,
+      bmDaysCount,
+      noBmDaysCount,
+      noDataDaysCount,
+      colorFilled,
+      easeFilled,
+      durationFilled,
+      redFlagCount
+    };
+  }
+
+  function compute30DayStats(logs) {
+    const cutoff = Date.now() - 30 * 86400000;
+    const recent = logs.filter((l) => l.ts >= cutoff);
+    const bmLogs = recent.filter((l) => l.entryType === 'bm');
+    const noBmLogs = recent.filter((l) => l.entryType === 'no_bm');
+
+    // Exact Bristol 1..7 counts + unknownBristol -> sum ALWAYS === bmLogs.length
+    const bristolCounts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0 };
+    let unknownBristol = 0;
+    bmLogs.forEach((l) => {
+      if (l.bristol >= 1 && l.bristol <= 7) bristolCounts[l.bristol] += 1;
+      else unknownBristol += 1;
     });
-    const histCounts = {};
-    sameBucketLogs.forEach((h) => {
-      (h.triggers || []).forEach((t) => {
-        histCounts[t] = (histCounts[t] || 0) + 1;
+
+    const idealCount = bristolCounts[3] + bristolCounts[4];
+    const knownBristolTotal = bmLogs.length - unknownBristol;
+    const idealRate = knownBristolTotal > 0 ? Math.round((idealCount / knownBristolTotal) * 100) : null;
+
+    const durations = bmLogs.map((l) => l.durationSec).filter((v) => v !== null && v !== undefined && v > 0);
+    const avgDurationSec = durations.length
+      ? Math.round(durations.reduce((a, b) => a + b, 0) / durations.length)
+      : null;
+
+    const redFlagLogs = bmLogs.filter((l) => isEntryRedFlag(l, logs));
+    const colorKnown = bmLogs.filter((l) => Boolean(l.color)).length;
+    const easeKnown = bmLogs.filter((l) => Boolean(l.ease)).length;
+
+    // Distinct active calendar days in past 30 days
+    const bmDayKeys = new Set(bmLogs.map((l) => toDateKey(l.ts)));
+    const noBmDayKeys = new Set(noBmLogs.map((l) => toDateKey(l.ts)).filter((k) => !bmDayKeys.has(k)));
+    const recordedDays = bmDayKeys.size + noBmDayKeys.size;
+    const unrecordedDays = Math.max(0, 30 - recordedDays);
+
+    // Honest tag co-occurrence (frequency n only — NO fake causal percentages!)
+    const tagMap = {};
+    bmLogs.forEach((l) => {
+      (l.triggers || []).forEach((tag) => {
+        if (!tagMap[tag]) tagMap[tag] = { tag, total: 0, loose: 0, dry: 0, normal: 0 };
+        tagMap[tag].total += 1;
+        if (l.bristol === 6 || l.bristol === 7) tagMap[tag].loose += 1;
+        else if (l.bristol === 1 || l.bristol === 2) tagMap[tag].dry += 1;
+        else if (l.bristol === 3 || l.bristol === 4 || l.bristol === 5) tagMap[tag].normal += 1;
       });
     });
-    const topHistTrigger = Object.keys(histCounts).sort((a, b) => histCounts[b] - histCounts[a])[0];
+    const tagSummary = Object.values(tagMap).sort((a, b) => b.total - a.total);
 
-    const hour = entry && entry.timestamp ? new Date(entry.timestamp).getHours() : new Date().getHours();
-    const isMorning = hour >= 5 && hour <= 11;
-
-    if (color === 'green' && bristol <= 5) {
-      return {
-        redFlagBlocked: false,
-        confidence: 86,
-        shortGuess: '大量深绿叶菜 + 肠道快速通行',
-        fullReason: '反推近 12–24h：可能摄入较多深色绿叶菜，或肠道蠕动偏快导致胆绿素来不及完全转化。',
-        suggestedTags: ['冰美式']
-      };
-    }
-
-    if (bristol <= 2) {
-      const conf = durationSec >= 360 || ease === '费力' ? 91 : 85;
-      const histHint = topHistTrigger ? `（历史命中：${topHistTrigger}）` : '';
-      return {
-        redFlagBlocked: false,
-        confidence: conf,
-        shortGuess: `饮水不足 + 精制碳水/低纤维 + 久坐${histHint}`,
-        fullReason: `反推近 12–24h：大概率喝水偏少、外卖精制主食占比高且久坐偏多${topHistTrigger ? `；结合你的历史档案，「${topHistTrigger}」高频伴随干硬团子` : ''}。`,
-        suggestedTags: ['喝水少', '久坐']
-      };
-    }
-
-    if (bristol === 3) {
-      return {
-        redFlagBlocked: false,
-        confidence: 84,
-        shortGuess: '膳食纤维达标，但下午少喝了约 400ml 温水',
-        fullReason: '反推近 12–24h：蔬菜纤维底子不错，只是午后忙于工作少喝了一大杯温水，补上温水明天直冲四号金冠团。',
-        suggestedTags: ['喝水少']
-      };
-    }
-
-    if (bristol === 4) {
-      if (triggers.includes('重辣火锅') || triggers.includes('冰美式')) {
-        const challenger = triggers.includes('重辣火锅') ? '重辣火锅' : '冰美式';
-        return {
-          redFlagBlocked: false,
-          confidence: 89,
-          shortGuess: `${challenger}突袭，但温水与蔬果打底稳如泰山`,
-          fullReason: `反推近 12–24h：虽然经历了「${challenger}」考验，但你用充足温水、蔬果纤维和规律作息稳稳扛住了暴击！`,
-          suggestedTags: [challenger]
-        };
-      }
-      return {
-        redFlagBlocked: false,
-        confidence: 91,
-        shortGuess: '温热均衡正餐 + 蔬果纤维 + 饮水充足',
-        fullReason: '反推近 12–24h：大概率吃得温热规律、蔬菜纤维在线且饮水充沛，属于肠道五星模范作息。',
-        suggestedTags: []
-      };
-    }
-
-    if (bristol === 5 || bristol === 6) {
-      const conf = ease === '急促' ? 92 : 87;
-      if (topHistTrigger === '冰美式' || isMorning) {
-        return {
-          redFlagBlocked: false,
-          confidence: conf,
-          shortGuess: `冰美式 / 熬夜（或昨夜重辣火锅）`,
-          fullReason: `反推近 12–24h：结合你的历史背刺数据，「${topHistTrigger || '冰美式'}」联手熬夜或重口宵夜极易在次日召唤偏软团子。`,
-          suggestedTags: ['冰美式', '熬夜']
-        };
-      }
-      if (topHistTrigger === '重辣火锅') {
-        return {
-          redFlagBlocked: false,
-          confidence: conf,
-          shortGuess: '重辣火锅 / 烧烤油腻 + 冰饮刺激',
-          fullReason: '反推近 12–24h：高度疑似昨夜重油重辣或冰饮双重夹击，肠道连夜加速清场。',
-          suggestedTags: ['重辣火锅', '冰美式']
-        };
-      }
-      return {
-        redFlagBlocked: false,
-        confidence: conf,
-        shortGuess: '奶茶乳糖 / 冰美式或晚睡压力',
-        fullReason: '反推近 12–24h：可能喝了冰饮、含乳糖奶茶或近期压力晚睡导致肠道节拍偏快。',
-        suggestedTags: ['奶茶乳糖', '熬夜']
-      };
-    }
-
-    // Bristol 7 (single event)
     return {
-      redFlagBlocked: false,
-      confidence: 88,
-      shortGuess: '冰冷生食 / 重辣超载 · 建议少量多次补温水',
-      fullReason: '反推近 12–24h：高度疑似生冷刺激、重辣过载或受凉引起肠道快速通行；请先温和补充电解质水并注意休息。',
-      suggestedTags: ['重辣火锅', '冰美式']
+      recent,
+      bmLogs,
+      noBmLogs,
+      totalBm: bmLogs.length,
+      totalNoBm: noBmLogs.length,
+      bristolCounts,
+      unknownBristol,
+      knownBristolTotal,
+      idealCount,
+      idealRate,
+      avgDurationSec,
+      durationKnown: durations.length,
+      colorKnown,
+      easeKnown,
+      redFlagLogs,
+      bmDays: bmDayKeys.size,
+      noBmDays: noBmDayKeys.size,
+      unrecordedDays,
+      tagSummary
     };
   }
 
-  // =========================================================================
-  // Dynamic Settlement Mini-Theater Mood Helper (`gold` | `desert` | `storm` | `care`)
-  // =========================================================================
-  function getSettlementMoodTheme(type, isRedFlag = false) {
-    if (isRedFlag) {
-      return {
-        mood: 'care',
-        stageName: '大橘猫猫医生静音诊室',
-        bgTop: '#2D2520',
-        bgBottom: '#3A312A',
-        curtainColor: '#4A3C31',
-        stampBg: '#FBF4E4',
-        stampInk: '#2C3830',
-        accentColor: '#B47B34'
-      };
-    }
-    const t = Number(type) || 4;
-    if (t === 3 || t === 4) {
-      return {
-        mood: 'gold',
-        stageName: '金绒凯旋剧场',
-        bgTop: '#FDF4DC',
-        bgBottom: '#F7E3B5',
-        curtainColor: '#B5423A',
-        stampBg: '#FFF4CE',
-        stampInk: '#8E580B',
-        accentColor: '#C7821F'
-      };
-    }
-    if (t === 1 || t === 2) {
-      return {
-        mood: 'desert',
-        stageName: '荒漠攻坚剧场',
-        bgTop: '#F8E6D3',
-        bgBottom: '#ECCBA9',
-        curtainColor: '#B56B3A',
-        stampBg: '#FDE8D6',
-        stampInk: '#8E441A',
-        accentColor: '#B85C2B'
-      };
-    }
-    return {
-      mood: 'storm',
-      stageName: '暴风急行剧场',
-      bgTop: '#E4EDF1',
-      bgBottom: '#C9DCE5',
-      curtainColor: '#3B5268',
-      stampBg: '#EBF1F6',
-      stampInk: '#324C66',
-      accentColor: '#3D5F7D'
-    };
-  }
+  // --------------------------------------------------------------------------
+  // 6. DOM Cache & UI Runtime State
+  // --------------------------------------------------------------------------
+  const $ = (id) => document.getElementById(id);
 
-  // =========================================================================
-  // Application State
-  // =========================================================================
-  let state = loadState();
-  let currentMode = 'theater'; // 'theater' | 'redflag'
-  let activeRedFlagReason = 'black';
-  let activeSheet = null; // 'log' | 'insights' | 'doctor' | 'privacy' | 'pk' | 'postcard' | null
-  let activeRivalId = 'azhe';
-  let pkBanterCount = 0;
-  let activeShareTab = 'single'; // 'single' | 'weekly' | 'monthly' | 'pk'
-  let pkInviteCode = 'PUTONG-PK-842';
-  let includePkRibbon = true;
-  let stageStaticMode = false;
-  let settlementPreviewEntry = null;
-  let directorActiveHint = '';
+  let timerInterval = null;
+  let activeSheetId = null;
+  let cutsceneTimer = null;
+  let stampHideTimer = null;
 
-  // Draft state for 5-second logging drawer
-  const draft = {
+  let draft = {
+    mode: 'backfill', // 'backfill' | 'session'
+    ts: Date.now(),
     bristol: 4,
-    color: 'golden',
+    color: null,
+    ease: null,
+    durationSec: null,
     triggers: [],
-    ease: '顺畅',
-    durationPresetIdx: 1,
-    durationSec: 258
+    memo: '',
+    toiletId: null
   };
 
-  // Squat Timer state
-  const timer = {
-    running: false,
-    seconds: 0,
-    intervalId: null,
-    eightMinTriggered: false
-  };
-
-  // =========================================================================
-  // DOM References
-  // =========================================================================
-  const el = {
-    appShell: document.getElementById('appShell'),
-    stageHeroImg: document.getElementById('stageHeroImg'),
-    stageDoctorImg: document.getElementById('stageDoctorImg'),
-    brandButton: document.getElementById('brandButton'),
-    brandTitle: document.getElementById('brandTitle'),
-    brandSubtitle: document.getElementById('brandSubtitle'),
-    soundToggleBtn: document.getElementById('soundToggleBtn'),
-    privacyBtn: document.getElementById('privacyBtn'),
-    privacyPillLabel: document.getElementById('privacyPillLabel'),
-    timerPillBtn: document.getElementById('timerPillBtn'),
-    timerDisplay: document.getElementById('timerDisplay'),
-    playbillBadge: document.getElementById('playbillBadge'),
-    playbillText: document.getElementById('playbillText'),
-    demoEightMinBtn: document.getElementById('demoEightMinBtn'),
-
-    eightMinToast: document.getElementById('eightMinToast'),
-    closeToastBtn: document.getElementById('closeToastBtn'),
-    toastLogNowBtn: document.getElementById('toastLogNowBtn'),
-    toastResetTimerBtn: document.getElementById('toastResetTimerBtn'),
-
-    theaterCard: document.getElementById('theaterCard'),
-    latestToyThumb: document.getElementById('latestToyThumb'),
-    latestTimeLabel: document.getElementById('latestTimeLabel'),
-    latestBristolTag: document.getElementById('latestBristolTag'),
-    stageStampBadge: document.getElementById('stageStampBadge'),
-    comedyHeadline: document.getElementById('comedyHeadline'),
-    detectiveStrip: document.getElementById('detectiveStrip'),
-    detectiveConfBadge: document.getElementById('detectiveConfBadge'),
-    detectiveGuessText: document.getElementById('detectiveGuessText'),
-    detectiveFeedbackBtns: document.getElementById('detectiveFeedbackBtns'),
-    detectiveHitBtn: document.getElementById('detectiveHitBtn'),
-    detectiveMissBtn: document.getElementById('detectiveMissBtn'),
-    detectiveOverrideRow: document.getElementById('detectiveOverrideRow'),
-    detectiveOverrideChips: document.getElementById('detectiveOverrideChips'),
-    bulletinStats: document.getElementById('bulletinStats'),
-    openLogBtn: document.getElementById('openLogBtn'),
-    openPkBtn: document.getElementById('openPkBtn'),
-    openInsightsBtn: document.getElementById('openInsightsBtn'),
-    openShareDailyBtn: document.getElementById('openShareDailyBtn'),
-    openRedFlagDemoBtn: document.getElementById('openRedFlagDemoBtn'),
-
-    redFlagCard: document.getElementById('redFlagCard'),
-    careDepartmentBadge: document.getElementById('careDepartmentBadge'),
-    careExplanation: document.getElementById('careExplanation'),
-    careOpenReportBtn: document.getElementById('careOpenReportBtn'),
-    careExitBtn: document.getElementById('careExitBtn'),
-
-    sheetScrim: document.getElementById('sheetScrim'),
-    logDrawer: document.getElementById('logDrawer'),
-    insightsSheet: document.getElementById('insightsSheet'),
-    doctorSheet: document.getElementById('doctorSheet'),
-    privacySheet: document.getElementById('privacySheet'),
-    pkSheet: document.getElementById('pkSheet'),
-    postcardSheet: document.getElementById('postcardSheet'),
-
-    cycleDurationBtn: document.getElementById('cycleDurationBtn'),
-    logDurationLabel: document.getElementById('logDurationLabel'),
-    bristolPrevBtn: document.getElementById('bristolPrevBtn'),
-    bristolNextBtn: document.getElementById('bristolNextBtn'),
-    bristolRail: document.getElementById('bristolRail'),
-    bristolDotNav: document.getElementById('bristolDotNav'),
-    selectedBristolName: document.getElementById('selectedBristolName'),
-    selectedBristolStatus: document.getElementById('selectedBristolStatus'),
-    selectedBristolAdvice: document.getElementById('selectedBristolAdvice'),
-    colorGrid: document.getElementById('colorGrid'),
-    colorRedFlagHint: document.getElementById('colorRedFlagHint'),
-    draftDetectiveBox: document.getElementById('draftDetectiveBox'),
-    draftDetectiveConf: document.getElementById('draftDetectiveConf'),
-    draftDetectiveText: document.getElementById('draftDetectiveText'),
-    adoptDetectiveTagsBtn: document.getElementById('adoptDetectiveTagsBtn'),
-    triggerChips: document.getElementById('triggerChips'),
-    easeGroup: document.getElementById('easeGroup'),
-    publishLogBtn: document.getElementById('publishLogBtn'),
-
-    insightsKpiStrip: document.getElementById('insightsKpiStrip'),
-    trendChart: document.getElementById('trendChart'),
-    trendSelectedDetail: document.getElementById('trendSelectedDetail'),
-    historyList: document.getElementById('historyList'),
-    correlationList: document.getElementById('correlationList'),
-    insightsToPkBtn: document.getElementById('insightsToPkBtn'),
-    insightsToPostcardBtn: document.getElementById('insightsToPostcardBtn'),
-    easterEggToggleBtn: document.getElementById('easterEggToggleBtn'),
-    easterEggChevron: document.getElementById('easterEggChevron'),
-    easterEggBody: document.getElementById('easterEggBody'),
-    eggCurrencyValue: document.getElementById('eggCurrencyValue'),
-    eggSubNote: document.getElementById('eggSubNote'),
-    insightsToDoctorBtn: document.getElementById('insightsToDoctorBtn'),
-    insightsToLogBtn: document.getElementById('insightsToLogBtn'),
-
-    doctorDateRange: document.getElementById('doctorDateRange'),
-    clinicalAlertBanner: document.getElementById('clinicalAlertBanner'),
-    doctorMetricsGrid: document.getElementById('doctorMetricsGrid'),
-    doctorTableBody: document.getElementById('doctorTableBody'),
-    printReportBtn: document.getElementById('printReportBtn'),
-    doctorBackBtn: document.getElementById('doctorBackBtn'),
-
-    faceIdToggleBtn: document.getElementById('faceIdToggleBtn'),
-    camouflagePreviewIcon: document.getElementById('camouflagePreviewIcon'),
-    camouflagePreviewName: document.getElementById('camouflagePreviewName'),
-    camouflagePreviewDesc: document.getElementById('camouflagePreviewDesc'),
-    camouflageGrid: document.getElementById('camouflageGrid'),
-    resetDemoDataBtn: document.getElementById('resetDemoDataBtn'),
-
-    pkRivalTabs: document.getElementById('pkRivalTabs'),
-    pkInviteCodePill: document.getElementById('pkInviteCodePill'),
-    pkMyImg: document.getElementById('pkMyImg'),
-    pkMyToyName: document.getElementById('pkMyToyName'),
-    pkMyScore: document.getElementById('pkMyScore'),
-    pkRivalImg: document.getElementById('pkRivalImg'),
-    pkRivalName: document.getElementById('pkRivalName'),
-    pkRivalToyName: document.getElementById('pkRivalToyName'),
-    pkRivalScore: document.getElementById('pkRivalScore'),
-    pkVerdictBanner: document.getElementById('pkVerdictBanner'),
-    pkBarsGrid: document.getElementById('pkBarsGrid'),
-    pkBanterCounter: document.getElementById('pkBanterCounter'),
-    pkSendTissueBtn: document.getElementById('pkSendTissueBtn'),
-    pkSendWaterBtn: document.getElementById('pkSendWaterBtn'),
-    pkCopyInviteBtn: document.getElementById('pkCopyInviteBtn'),
-    pkToShareBtn: document.getElementById('pkToShareBtn'),
-
-    shareCardSingle: document.getElementById('shareCardSingle'),
-    shareCardWeekly: document.getElementById('shareCardWeekly'),
-    shareCardMonthly: document.getElementById('shareCardMonthly'),
-    shareCardPk: document.getElementById('shareCardPk'),
-
-    singleStageKicker: document.getElementById('singleStageKicker'),
-    singleMoodLabel: document.getElementById('singleMoodLabel'),
-    toggleStageMotionBtn: document.getElementById('toggleStageMotionBtn'),
-    singleNormalStage: document.getElementById('singleNormalStage'),
-    singleCareStage: document.getElementById('singleCareStage'),
-    singleCareNote: document.getElementById('singleCareNote'),
-    singleCareOpenDoctorBtn: document.getElementById('singleCareOpenDoctorBtn'),
-    singleNormalDetails: document.getElementById('singleNormalDetails'),
-    shareDailyImg: document.getElementById('shareDailyImg'),
-    singleRankStamp: document.getElementById('singleRankStamp'),
-    singleRankGrade: document.getElementById('singleRankGrade'),
-    singleRankTitle: document.getElementById('singleRankTitle'),
-    singleRankScore: document.getElementById('singleRankScore'),
-    shareDailyHeadline: document.getElementById('shareDailyHeadline'),
-    hudToyLabel: document.getElementById('hudToyLabel'),
-    hudTimeLabel: document.getElementById('hudTimeLabel'),
-    hudEaseLabel: document.getElementById('hudEaseLabel'),
-    shareDailyConf: document.getElementById('shareDailyConf'),
-    shareDailyDeduction: document.getElementById('shareDailyDeduction'),
-    singleNextSupply: document.getElementById('singleNextSupply'),
-    singlePkRibbon: document.getElementById('singlePkRibbon'),
-    singlePkRibbonText: document.getElementById('singlePkRibbonText'),
-
-    weeklyKicker: document.getElementById('weeklyKicker'),
-    weeklyMoodTitle: document.getElementById('weeklyMoodTitle'),
-    weeklyPowerPill: document.getElementById('weeklyPowerPill'),
-    weeklyHeroImg: document.getElementById('weeklyHeroImg'),
-    weeklyRankGrade: document.getElementById('weeklyRankGrade'),
-    weeklyRankLabel: document.getElementById('weeklyRankLabel'),
-    weeklyAttendanceSummary: document.getElementById('weeklyAttendanceSummary'),
-    weeklySevenDayTrack: document.getElementById('weeklySevenDayTrack'),
-    weeklyScorePills: document.getElementById('weeklyScorePills'),
-    weeklyTopCulprit: document.getElementById('weeklyTopCulprit'),
-    weeklyTrendVerdict: document.getElementById('weeklyTrendVerdict'),
-    weeklyPkRibbon: document.getElementById('weeklyPkRibbon'),
-    weeklyPkRibbonText: document.getElementById('weeklyPkRibbonText'),
-
-    postcardMonthLabel: document.getElementById('postcardMonthLabel'),
-    monthlyTitleBadge: document.getElementById('monthlyTitleBadge'),
-    postcardSignatureImg: document.getElementById('postcardSignatureImg'),
-    monthlyRankGrade: document.getElementById('monthlyRankGrade'),
-    postcardRankPill: document.getElementById('postcardRankPill'),
-    postcardAwardQuote: document.getElementById('postcardAwardQuote'),
-    monthlyTopTriggerText: document.getElementById('monthlyTopTriggerText'),
-    monthlyBristolBars: document.getElementById('monthlyBristolBars'),
-    pcTotalCheckins: document.getElementById('pcTotalCheckins'),
-    pcIdealRate: document.getElementById('pcIdealRate'),
-    pcBestStreak: document.getElementById('pcBestStreak'),
-    monthlyPkRibbon: document.getElementById('monthlyPkRibbon'),
-    monthlyPkRibbonText: document.getElementById('monthlyPkRibbonText'),
-
-    sharePkTitle: document.getElementById('sharePkTitle'),
-    sharePkOutcomeStamp: document.getElementById('sharePkOutcomeStamp'),
-    sharePkMyImg: document.getElementById('sharePkMyImg'),
-    sharePkMyScore: document.getElementById('sharePkMyScore'),
-    sharePkMyToy: document.getElementById('sharePkMyToy'),
-    sharePkRivalImg: document.getElementById('sharePkRivalImg'),
-    sharePkRivalName: document.getElementById('sharePkRivalName'),
-    sharePkRivalScore: document.getElementById('sharePkRivalScore'),
-    sharePkRivalToy: document.getElementById('sharePkRivalToy'),
-    sharePkVerdict: document.getElementById('sharePkVerdict'),
-    sharePkCodeNote: document.getElementById('sharePkCodeNote'),
-
-    pkRibbonToggleRow: document.getElementById('pkRibbonToggleRow'),
-    includePkRibbonToggle: document.getElementById('includePkRibbonToggle'),
-    savePostcardImgBtn: document.getElementById('savePostcardImgBtn'),
-    copyPostcardTextBtn: document.getElementById('copyPostcardTextBtn'),
-
-    stampFeedback: document.getElementById('stampFeedback'),
-    stampFeedbackImg: document.getElementById('stampFeedbackImg'),
-    stampFeedbackText: document.getElementById('stampFeedbackText'),
-    directorRail: document.getElementById('directorRail')
-  };
-
-  // =========================================================================
-  // Formatting Utilities
-  // =========================================================================
-  function pad2(n) {
-    return String(n).padStart(2, '0');
-  }
-
-  function formatMMSS(sec) {
-    const mins = Math.floor(sec / 60);
-    const rem = sec % 60;
-    return `${pad2(mins)}:${pad2(rem)}`;
-  }
-
-  function formatDurationCN(sec) {
-    const mins = Math.floor(sec / 60);
-    const rem = sec % 60;
-    if (mins === 0) return `${rem} 秒`;
-    if (rem === 0) return `${mins} 分钟`;
-    return `${mins} 分 ${pad2(rem)} 秒`;
-  }
-
-  function formatLogTimeLabel(isoStr) {
-    const d = new Date(isoStr);
-    const now = new Date();
-    const isToday =
-      d.getFullYear() === now.getFullYear() &&
-      d.getMonth() === now.getMonth() &&
-      d.getDate() === now.getDate();
-    const timePart = `${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
-    if (isToday) return `今日剧报 · ${timePart}`;
-    return `${d.getMonth() + 1}月${d.getDate()}日 · ${timePart}`;
-  }
-
-  function formatShortDate(isoStr) {
-    const d = new Date(isoStr);
-    return `${d.getMonth() + 1}/${d.getDate()}`;
-  }
-
-  function formatClinicalDateTime(isoStr) {
-    const d = new Date(isoStr);
-    return `${pad2(d.getMonth() + 1)}-${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
-  }
-
-  function getToy(type) {
-    return BRISTOL_TOYS.find((t) => t.type === type) || BRISTOL_TOYS[3];
-  }
-
-  function getColorObj(id) {
-    return COLOR_OPTIONS.find((c) => c.id === id) || COLOR_OPTIONS[0];
-  }
-
-  function computeCalmStreak() {
-    let streak = 0;
-    for (const item of state.logs) {
-      const col = getColorObj(item.color);
-      if (!col.redFlag && item.bristol >= 3 && item.bristol <= 5) {
-        streak += 1;
-      } else {
-        break;
-      }
-    }
-    return Math.max(streak, 1);
-  }
-
-  let feedbackTimerId = null;
-  function showStampFeedback(text, toyImgSrc = '') {
-    el.stampFeedbackText.textContent = text;
-    if (toyImgSrc && el.stampFeedbackImg) {
-      el.stampFeedbackImg.src = toyImgSrc;
-      el.stampFeedbackImg.hidden = false;
-    } else if (el.stampFeedbackImg) {
-      el.stampFeedbackImg.hidden = true;
-    }
-    el.stampFeedback.hidden = true;
-    void el.stampFeedback.offsetWidth;
-    el.stampFeedback.hidden = false;
-    clearTimeout(feedbackTimerId);
-    feedbackTimerId = setTimeout(() => {
-      el.stampFeedback.hidden = true;
-    }, toyImgSrc ? 2100 : 1550);
-  }
-
-  function syncDirectorRailActive() {
-    if (!el.directorRail) return;
-    let activeKey = 'home';
-    if (activeSheet === 'log') activeKey = 'log';
-    else if (activeSheet === 'pk') activeKey = 'pk';
-    else if (activeSheet === 'postcard') {
-      if (directorActiveHint) {
-        activeKey = directorActiveHint;
-      } else if (activeShareTab === 'weekly') {
-        activeKey = 'settle_weekly';
-      } else if (activeShareTab === 'monthly') {
-        activeKey = 'settle_monthly';
-      } else if (activeShareTab === 'pk') {
-        activeKey = 'pk';
-      } else {
-        const entry = settlementPreviewEntry || state.logs[0];
-        const m = getSettlementMoodTheme(entry ? entry.bristol : 4, false).mood;
-        activeKey = m === 'desert' ? 'settle_desert' : m === 'storm' ? 'settle_storm' : 'settle_gold';
-      }
-    } else if (currentMode === 'redflag') {
-      activeKey = 'redflag';
-    } else if (!el.eightMinToast.hidden) {
-      activeKey = 'eightmin';
-    }
-
-    el.directorRail.querySelectorAll('.director-jump-btn').forEach((btn) => {
-      btn.classList.toggle('is-active', btn.dataset.demoAction === activeKey);
-    });
-  }
-
-  function renderHomeDetectiveStrip() {
-    if (!el.detectiveStrip) return;
-    const latest = state.logs[0];
-    if (!latest) return;
-
-    const deduction = inferLikelyDiet(latest, state.logs.slice(1));
-    if (deduction.redFlagBlocked) {
-      el.detectiveStrip.hidden = true;
-      return;
-    }
-
-    el.detectiveStrip.hidden = false;
-    el.detectiveOverrideRow.hidden = true;
-
-    if (latest.detectiveConfirmed) {
-      el.detectiveConfBadge.textContent = '已破案入档';
-      el.detectiveConfBadge.classList.add('is-confirmed');
-      const confirmedTags = latest.triggers && latest.triggers.length
-        ? latest.triggers.join(' + ')
-        : deduction.shortGuess;
-      el.detectiveGuessText.textContent = `实锤线索：${confirmedTags}（已同步背刺榜）`;
-      el.detectiveFeedbackBtns.hidden = true;
-    } else {
-      el.detectiveConfBadge.textContent = `侦探反推 ${deduction.confidence}%`;
-      el.detectiveConfBadge.classList.remove('is-confirmed');
-      el.detectiveGuessText.textContent = `猜你吃了：${deduction.shortGuess}`;
-      el.detectiveFeedbackBtns.hidden = false;
-    }
-  }
-
-  // =========================================================================
-  // Home Theater & Red-Flag Calm Care Rendering
-  // =========================================================================
-  function renderTopBarAndSkin() {
-    const skin =
-      CAMOUFLAGE_SKINS.find((s) => s.id === state.settings.camouflage) || CAMOUFLAGE_SKINS[0];
-
-    el.appShell.dataset.camouflage = skin.id;
-    el.brandTitle.textContent = skin.name;
-    el.brandSubtitle.textContent =
-      currentMode === 'redflag' ? '大橘猫猫医生值班' : skin.subtitle;
-    el.privacyPillLabel.textContent = skin.pillLabel;
-    document.title = `${skin.name} · ${skin.subtitle}`;
-
-    el.soundToggleBtn.setAttribute('aria-pressed', String(state.settings.soundEnabled));
-    FeltAudio.setEnabled(state.settings.soundEnabled);
-  }
-
-  let activeHeroPose = 'default';
-
-  function setHeroStagePose(pose) {
-    const layers = document.querySelectorAll('.stage-image-hero[data-hero-pose]');
-    layers.forEach((img) => {
-      img.classList.toggle('is-visible', Boolean(pose) && img.dataset.heroPose === pose);
-    });
-  }
-
-  function renderHomeStage(animatePop = false) {
-    const latest = state.logs[0];
-    const toy = getToy(latest.bristol);
-    const streak = computeCalmStreak();
-
-    el.appShell.dataset.mode = currentMode;
-
-    if (currentMode === 'redflag') {
-      setHeroStagePose(null);
-      el.theaterCard.hidden = true;
-      el.redFlagCard.hidden = false;
-      el.playbillText.textContent = '大橘猫猫医生 · 安心问诊中';
-      renderCareTriageView();
-    } else {
-      setDoctorPose(null);
-      setHeroStagePose(activeHeroPose || 'default');
-      el.redFlagCard.hidden = true;
-      el.theaterCard.hidden = false;
-
-      el.playbillText.textContent = `第 ${state.episode} 场 · ${toy.name}`;
-      el.latestToyThumb.src = toy.img;
-      el.latestToyThumb.alt = toy.name;
-      el.latestTimeLabel.textContent = formatLogTimeLabel(latest.timestamp);
-      el.latestBristolTag.textContent = `${toy.type}型 · ${toy.name}`;
-      el.stageStampBadge.textContent = latest.stamp || toy.stamp;
-      el.stageStampBadge.dataset.tone = latest.stampTone || toy.stampTone;
-      el.comedyHeadline.textContent = latest.headline;
-      el.bulletinStats.textContent = `耗时 ${formatDurationCN(latest.durationSec)} · ${latest.ease} · 连续 ${streak} 日安泰`;
-      renderHomeDetectiveStrip();
-
-      if (animatePop) {
-        el.theaterCard.classList.remove('is-fresh-pop');
-        el.latestToyThumb.classList.remove('is-spring-bounce');
-        if (el.playbillBadge) el.playbillBadge.classList.remove('is-fresh-pop');
-        void el.theaterCard.offsetWidth;
-        el.theaterCard.classList.add('is-fresh-pop');
-        el.latestToyThumb.classList.add('is-spring-bounce');
-        if (el.playbillBadge) el.playbillBadge.classList.add('is-fresh-pop');
-      }
-    }
-
-    renderTopBarAndSkin();
-    syncDirectorRailActive();
-  }
-
-  // =========================================================================
-  // Big Orange Cat 3-Step Sequential Triage Questionnaire
-  // =========================================================================
-  const careTriageState = {
+  let triageState = {
+    active: false,
     reason: 'blood',
     step: 0,
-    answers: {}
+    answers: {},
+    entryId: null,
+    result: null
   };
 
-  const CARE_TRIAGE_QUESTIONS = {
-    blood: [
-      {
-        key: 'dye',
-        question: '先别慌，大橘猫先排查饮食染色：近 24–48 小时吃过红心火龙果、甜菜根、大量番茄或辣椒吗？',
-        options: [
-          { label: '吃过红心火龙果 / 甜菜根等', value: 'yes' },
-          { label: '完全没吃过', value: 'no' },
-          { label: '不太确定', value: 'unsure' }
-        ]
-      },
-      {
-        key: 'pattern',
-        question: '这次见红具体是什么情况？最近持续多久了？',
-        options: [
-          { label: '仅厕纸擦拭见鲜红，或轻微刺痛', value: 'mild' },
-          { label: '混在大便里，或偏暗红色', value: 'moderate' },
-          { label: '已经连续出现 2 天以上', value: 'high' }
-        ]
-      },
-      {
-        key: 'systemic',
-        question: '最后问一下，最近身体整体感觉怎么样？',
-        options: [
-          { label: '没有任何不舒服，精神很好', value: 'none' },
-          { label: '轻微腹胀、隐痛或没胃口', value: 'mild' },
-          { label: '头晕乏力 / 发烧 / 剧烈腹痛 / 近期消瘦', value: 'severe' }
-        ]
-      }
-    ],
-    black: [
-      {
-        key: 'dye',
-        question: '先别慌，大橘猫先排查饮食和药物：近 24–48 小时吃过鸭血/猪血、黑芝麻，或铁剂/胃药铋剂吗？',
-        options: [
-          { label: '吃过动物血 / 铁剂 / 铋剂胃药', value: 'yes' },
-          { label: '完全没吃过', value: 'no' },
-          { label: '不太确定', value: 'unsure' }
-        ]
-      },
-      {
-        key: 'pattern',
-        question: '这次黑便的质地和持续时间怎么样？',
-        options: [
-          { label: '偶发一次，成形和气味和平时一样', value: 'mild' },
-          { label: '发亮粘稠像柏油，气味偏腥臭', value: 'high' },
-          { label: '已经连续出现 2 天以上', value: 'high' }
-        ]
-      },
-      {
-        key: 'systemic',
-        question: '最后问一下，最近身体整体感觉怎么样？',
-        options: [
-          { label: '没有任何不舒服，精神很好', value: 'none' },
-          { label: '轻微胃部隐痛、反酸或胀气', value: 'mild' },
-          { label: '头晕心慌 / 乏力 / 剧烈胃痛或黑便加重', value: 'severe' }
-        ]
-      }
-    ],
-    pale: [
-      {
-        key: 'dye',
-        question: '先别急，大橘猫先排查检查和药物：最近几天做过钡餐检查，或吃过含铝/铋的抗酸胃药吗？',
-        options: [
-          { label: '做过钡餐 / 吃过抗酸胃药', value: 'yes' },
-          { label: '都没有', value: 'no' },
-          { label: '不太确定', value: 'unsure' }
-        ]
-      },
-      {
-        key: 'pattern',
-        question: '除了大便偏白/灰白，最近还有这些变化吗？',
-        options: [
-          { label: '仅这一次，小便颜色正常', value: 'mild' },
-          { label: '小便明显变深黄 / 像浓茶色', value: 'high' },
-          { label: '已经连续出现 2 天以上', value: 'high' }
-        ]
-      },
-      {
-        key: 'systemic',
-        question: '最后问一下，最近身体整体感觉怎么样？',
-        options: [
-          { label: '没有任何不舒服，精神很好', value: 'none' },
-          { label: '右上腹轻微发闷、厌油腻或没胃口', value: 'mild' },
-          { label: '皮肤或眼白发黄 / 发烧 / 剧烈腹痛', value: 'severe' }
-        ]
-      }
-    ],
-    alarm: [
-      {
-        key: 'dye',
-        question: '大橘猫先了解一下诱因：近 24–48 小时吃过生冷外卖、隔夜食物，或者受凉了吗？',
-        options: [
-          { label: '吃过生冷 / 重口外卖或受凉', value: 'yes' },
-          { label: '饮食规律，没有明显诱因', value: 'no' },
-          { label: '不太确定', value: 'unsure' }
-        ]
-      },
-      {
-        key: 'pattern',
-        question: '这几天排便频率和持续时间怎么样？',
-        options: [
-          { label: '刚开始，每天 1–2 次偏稀', value: 'mild' },
-          { label: '一天跑 4 次以上，水样停不下来', value: 'high' },
-          { label: '已经持续 3 天以上还没缓解', value: 'high' }
-        ]
-      },
-      {
-        key: 'systemic',
-        question: '最后问一下，最近身体整体感觉怎么样？',
-        options: [
-          { label: '精神还不错，能正常喝水吃饭', value: 'none' },
-          { label: '轻微腹痛、乏力或口干', value: 'mild' },
-          { label: '高烧 / 明显脱水头晕 / 伴随剧烈腹痛', value: 'severe' }
-        ]
-      }
-    ]
+  let spotFormState = {
+    scope: 'private',
+    air: 4,
+    clean: 4,
+    tags: []
   };
 
-  function evaluateCareTriage(reason, ans) {
-    const guide = RED_FLAG_GUIDE[reason] || RED_FLAG_GUIDE.black;
-    const isUrgent =
-      ans.systemic === 'severe' ||
-      (ans.dye !== 'yes' && ans.pattern === 'high') ||
-      (reason === 'pale' && ans.pattern === 'high');
-
-    const isLikelyDiet =
-      ans.dye === 'yes' && ans.pattern === 'mild' && ans.systemic === 'none';
-
-    if (isLikelyDiet) {
-      const dyeMap = {
-        blood: '红心火龙果、甜菜根或红色蔬果',
-        black: '动物血制品、深色食物或铁剂/铋剂胃药',
-        pale: '近期钡餐或抗酸胃药',
-        alarm: '生冷外卖或受凉刺激'
-      };
-      return {
-        level: 'safe',
-        badge: '大概率饮食影响',
-        dept: '建议居家观察 24–48h',
-        title: '大概率是暂时性影响，先不用过度紧张',
-        explanation: `结合你的回答，这次变化很可能与「${dyeMap[reason] || '近期饮食'}」有关，且目前无明显不适。建议接下来 1–2 天清淡饮食、多喝温水观察；如果停吃后颜色或性状仍未恢复正常，再考虑挂号排查。`,
-        safeFirst: true
-      };
+  // --------------------------------------------------------------------------
+  // 7. Stage, Poses, Toast Feedback & Camouflage
+  // --------------------------------------------------------------------------
+  function setHeroPose(poseKey) {
+    const img = $('stageHeroImg');
+    if (!img) return;
+    const key = HERO_POSES[poseKey] ? poseKey : 'default';
+    img.dataset.heroPose = key;
+    if (img.getAttribute('src') !== HERO_POSES[key]) {
+      img.setAttribute('src', HERO_POSES[key]);
     }
-
-    if (isUrgent) {
-      return {
-        level: 'urgent',
-        badge: '重点提醒 · 建议尽快面诊评估',
-        dept: guide.dept.replace('建议挂号：', '可优先考虑：'),
-        title: '综合你的情况，建议尽快去医院让医生看看',
-        explanation: `你的回答中出现了持续异常或伴随明显身体不适（且并非单纯饮食染色）。大橘猫建议不要硬扛，尽早携带近 30 天记录前往医院做针对性检查，早确认早安心。`,
-        safeFirst: false
-      };
-    }
-
-    const obsMap = {
-      blood: '排除饮食染色后，偶发擦拭见鲜红较常见于局部痔疮或肛裂；若混在便中或反复出现，建议预约肛肠科或消化内科做一次基础排查。',
-      black: '未明确食用动物血或铁剂/铋剂的情况下出现黑便，建议留意接下来 1–2 次排便颜色；若仍偏黑或伴胃部不适，建议预约消化内科检查。',
-      pale: '非药物引起的灰白便值得多留意 1–2 天，同时注意小便颜色与食欲；若持续发白，建议预约消化内科或肝胆科排查。',
-      alarm: '肠道目前仍在敏感期，建议少量多次补充温水或口服补液盐、暂避生冷油腻；若超过 48–72 小时未缓解，建议前往消化内科看看。'
-    };
-    return {
-      level: 'observe',
-      badge: '建议观察并酌情预约门诊',
-      dept: guide.dept.replace('建议挂号：', '可参考挂号：'),
-      title: '结合你的情况，建议留意变化并考虑门诊排查',
-      explanation: obsMap[reason] || guide.explanation,
-      safeFirst: false
-    };
   }
 
-  function setDoctorPose(pose) {
-    const layers = document.querySelectorAll('.stage-image-doctor[data-doctor-pose]');
-    layers.forEach((img) => {
-      img.classList.toggle('is-visible', Boolean(pose) && img.dataset.doctorPose === pose);
-    });
+  function setDoctorPose(poseKey) {
+    const img = $('stageDoctorImg');
+    if (!img) return;
+    const key = DOCTOR_POSES[poseKey] ? poseKey : 'default';
+    img.dataset.doctorPose = key;
+    if (img.getAttribute('src') !== DOCTOR_POSES[key]) {
+      img.setAttribute('src', DOCTOR_POSES[key]);
+    }
   }
 
-  function renderCareTriageView() {
-    const triageView = document.getElementById('careTriageView');
-    const resultView = document.getElementById('careResultView');
-    const stepBadge = document.getElementById('careStepBadge');
-    const qText = document.getElementById('careQuestionText');
-    const optList = document.getElementById('careOptionsList');
-    const resultBadge = document.getElementById('careResultBadge');
-    const resultTitle = document.getElementById('careResultTitle');
-    const actionsRow = document.getElementById('careActionsRow');
-    if (!triageView || !resultView) return;
+  function setAppMode(mode) {
+    const shell = $('appShell');
+    if (shell) shell.dataset.mode = mode === 'care' ? 'care' : 'theater';
+  }
 
-    const questions = CARE_TRIAGE_QUESTIONS[careTriageState.reason] || CARE_TRIAGE_QUESTIONS.blood;
-    const dots = document.querySelectorAll('[data-care-dot]');
-
-    if (careTriageState.step < questions.length) {
-      triageView.hidden = false;
-      resultView.hidden = true;
-      const stepPoseMap = ['diet', 'default', 'checkup'];
-      setDoctorPose(stepPoseMap[careTriageState.step] || 'default');
-      const cur = questions[careTriageState.step];
-      if (stepBadge) stepBadge.textContent = `大橘猫小问诊 · ${careTriageState.step + 1}/${questions.length}`;
-      if (qText) qText.textContent = cur.question;
-      dots.forEach((dot, idx) => {
-        dot.classList.toggle('is-active', idx === careTriageState.step);
-        dot.classList.toggle('is-done', idx < careTriageState.step);
-      });
-
-      if (optList) {
-        optList.innerHTML = '';
-        cur.options.forEach((opt) => {
-          const btn = document.createElement('button');
-          btn.type = 'button';
-          btn.className = 'care-option-btn';
-          btn.innerHTML = `<span>${opt.label}</span><span class="care-option-arrow" aria-hidden="true">›</span>`;
-          btn.addEventListener('click', () => {
-            FeltAudio.softTap();
-            careTriageState.answers[cur.key] = opt.value;
-            careTriageState.step += 1;
-            renderCareTriageView();
-          });
-          optList.appendChild(btn);
-        });
-      }
-      return;
-    }
-
-    // Completed all 3 steps -> render personalized conclusion + matching doctor pose
-    triageView.hidden = true;
-    resultView.hidden = false;
-    const verdict = evaluateCareTriage(careTriageState.reason, careTriageState.answers);
-    setDoctorPose(verdict.level === 'safe' ? 'relieved' : 'earnest');
-    if (resultBadge) {
-      resultBadge.textContent = verdict.badge;
-      resultBadge.dataset.level = verdict.level;
-    }
-    if (el.careDepartmentBadge) el.careDepartmentBadge.textContent = verdict.dept;
-    if (resultTitle) resultTitle.textContent = verdict.title;
-    if (el.careExplanation) el.careExplanation.textContent = verdict.explanation;
-    if (actionsRow) actionsRow.classList.toggle('is-safe-first', Boolean(verdict.safeFirst));
-    if (el.careExitBtn && el.careOpenReportBtn) {
-      if (verdict.safeFirst) {
-        el.careExitBtn.textContent = '放心了，回剧场';
-        el.careOpenReportBtn.textContent = '导出 30 天记录';
+  function showStampFeedback(text, imgSrc) {
+    const wrap = $('stampFeedback');
+    const txt = $('stampFeedbackText');
+    const img = $('stampFeedbackImg');
+    if (!wrap || !txt) return;
+    txt.textContent = text;
+    if (img) {
+      if (imgSrc) {
+        img.src = imgSrc;
+        img.hidden = false;
       } else {
-        el.careOpenReportBtn.textContent = '生成 30 天病历单';
-        el.careExitBtn.textContent = '回到剧场';
+        img.hidden = true;
       }
     }
+    wrap.hidden = false;
+    wrap.classList.remove('is-visible');
+    void wrap.offsetWidth;
+    wrap.classList.add('is-visible');
+    clearTimeout(stampHideTimer);
+    stampHideTimer = setTimeout(() => {
+      wrap.classList.remove('is-visible');
+      setTimeout(() => {
+        wrap.hidden = true;
+      }, 220);
+    }, 2400);
   }
 
-  function startCareTriage(reason) {
-    careTriageState.reason = CARE_TRIAGE_QUESTIONS[reason] ? reason : 'blood';
-    careTriageState.step = 0;
-    careTriageState.answers = {};
-  }
-
-  function enterRedFlagMode(reason = 'blood', silent = false) {
-    activeRedFlagReason = RED_FLAG_GUIDE[reason] ? reason : 'blood';
-    startCareTriage(activeRedFlagReason);
-    currentMode = 'redflag';
-    closeAllSheets();
-    hideEightMinToast();
-    renderHomeStage(false);
-    if (!silent) FeltAudio.redFlagChime();
-  }
-
-  function exitRedFlagMode() {
-    currentMode = 'theater';
-    renderHomeStage(true);
-    FeltAudio.softTap();
-  }
-
-  // =========================================================================
-  // Live Squat Timer & 8-Minute Hemorrhoid-Guard Toast
-  // =========================================================================
-  function updateTimerUI() {
-    const formatted = formatMMSS(timer.seconds);
-    el.timerDisplay.textContent = formatted;
-    el.timerPillBtn.classList.toggle('is-running', timer.running);
-    el.timerPillBtn.classList.toggle('is-overtime', timer.seconds >= 480);
-
-    const bigEl = document.getElementById('sessionTimerBig');
-    const hintEl = document.getElementById('sessionTimerHint');
-    if (bigEl) {
-      bigEl.textContent = formatted;
-      bigEl.classList.toggle('is-overtime', timer.seconds >= 480);
+  function applyCamouflage() {
+    const skin = CAMOUFLAGE_SKINS.find((s) => s.id === state.settings.camouflage) || CAMOUFLAGE_SKINS[0];
+    document.body.dataset.camouflage = skin.id;
+    const brandTitle = $('brandTitle');
+    const brandSub = $('brandSubtitle');
+    if (brandTitle) brandTitle.textContent = skin.name;
+    if (brandSub) {
+      brandSub.textContent = skin.id === 'default' ? '手工毛毡剧场' : '日常轻记录';
     }
-    if (hintEl) {
-      if (timer.seconds >= 480) {
-        hintEl.textContent = '已满 8 分钟护痔防线，建议准备收工啦';
-      } else if (timer.seconds >= 180) {
-        hintEl.textContent = '节奏正好，别刷手机太久哦';
-      } else {
-        hintEl.textContent = '8 分钟内最护痔 · 放轻松慢慢来';
-      }
+    const prevIcon = $('camouflagePreviewIcon');
+    const prevName = $('camouflagePreviewName');
+    const prevDesc = $('camouflagePreviewDesc');
+    if (prevIcon) prevIcon.dataset.skin = skin.id;
+    if (prevName) prevName.textContent = skin.name;
+    if (prevDesc) prevDesc.textContent = skin.desc;
+
+    document.body.classList.toggle('is-privacy-blur', Boolean(state.settings.faceIdBlur));
+    const faceBtn = $('faceIdToggleBtn');
+    if (faceBtn) faceBtn.setAttribute('aria-pressed', String(Boolean(state.settings.faceIdBlur)));
+    const privLbl = $('privacyPillLabel');
+    if (privLbl) privLbl.textContent = state.settings.faceIdBlur ? '伪装隐私：已遮罩' : '伪装隐私';
+  }
+
+  function syncSettingsUI() {
+    const soundBtn = $('soundToggleBtn');
+    if (soundBtn) {
+      soundBtn.setAttribute('aria-pressed', String(Boolean(state.settings.soundEnabled)));
+      soundBtn.textContent = state.settings.soundEnabled ? '🔊 音效：开' : '🔇 音效：关';
     }
-  }
+    const cutBtn = $('cutscenePrefToggleBtn');
+    const cutLbl = $('cutscenePrefLabel');
+    if (cutBtn) cutBtn.setAttribute('aria-pressed', String(Boolean(state.settings.cutsceneEnabled)));
+    if (cutLbl) cutLbl.textContent = state.settings.cutsceneEnabled ? '过场动画：开' : '过场动画：关';
 
-  function showEightMinToast(playAudio = true) {
-    if (currentMode === 'redflag') return;
-    activeHeroPose = 'overtime';
-    setHeroStagePose('overtime');
-    el.eightMinToast.hidden = false;
-    if (playAudio) FeltAudio.alertToast();
-    syncDirectorRailActive();
-  }
+    const muteBtn = $('cutsceneMuteBtn');
+    if (muteBtn) muteBtn.textContent = state.settings.soundEnabled ? '🔊 静音' : '🔇 已静音';
 
-  function hideEightMinToast() {
-    if (el.eightMinToast.hidden) return;
-    el.eightMinToast.hidden = true;
-    if (currentMode !== 'redflag') {
-      activeHeroPose = sessionActive ? 'sitting' : 'default';
-      setHeroStagePose(activeHeroPose);
-    }
-    syncDirectorRailActive();
-  }
-
-  function toggleSquatTimer() {
-    FeltAudio.softTap();
-    if (timer.running) {
-      timer.running = false;
-      clearInterval(timer.intervalId);
-      timer.intervalId = null;
-      if (timer.seconds >= 15) {
-        draft.durationSec = timer.seconds;
-      }
-      updateTimerUI();
-      showStampFeedback(`已暂停计时 · ${formatMMSS(timer.seconds)}`);
-      return;
-    }
-
-    timer.running = true;
-    updateTimerUI();
-    timer.intervalId = setInterval(() => {
-      timer.seconds += 1;
-      updateTimerUI();
-      if (timer.seconds >= 480 && !timer.eightMinTriggered) {
-        timer.eightMinTriggered = true;
-        showEightMinToast(true);
-      }
-    }, 1000);
-  }
-
-  function resetSquatTimer() {
-    timer.running = false;
-    timer.seconds = 0;
-    timer.eightMinTriggered = false;
-    clearInterval(timer.intervalId);
-    timer.intervalId = null;
-    updateTimerUI();
-    hideEightMinToast();
-  }
-
-  function triggerEightMinAlert() {
-    closeAllSheets();
-    if (currentMode === 'redflag') {
-      currentMode = 'theater';
-      renderHomeStage(false);
-    }
-    timer.seconds = 482; // 08:02
-    timer.eightMinTriggered = true;
-    draft.durationSec = 482;
-    updateTimerUI();
-    showEightMinToast(true);
-  }
-
-  // =========================================================================
-  // Sheet Management
-  // =========================================================================
-  function closeAllSheets() {
-    activeSheet = null;
-    el.sheetScrim.hidden = true;
-    el.logDrawer.hidden = true;
-    el.insightsSheet.hidden = true;
-    el.doctorSheet.hidden = true;
-    el.privacySheet.hidden = true;
-    if (el.pkSheet) el.pkSheet.hidden = true;
-    if (el.postcardSheet) el.postcardSheet.hidden = true;
-    const toiletSheet = document.getElementById('toiletSheet');
-    if (toiletSheet) toiletSheet.hidden = true;
-    syncDirectorRailActive();
-  }
-
-  function openSheet(name) {
-    closeAllSheets();
-    hideEightMinToast();
-    activeSheet = name;
-    el.sheetScrim.hidden = false;
-    if (name === 'log') el.logDrawer.hidden = false;
-    if (name === 'insights') el.insightsSheet.hidden = false;
-    if (name === 'doctor') el.doctorSheet.hidden = false;
-    if (name === 'privacy') el.privacySheet.hidden = false;
-    if (name === 'pk' && el.pkSheet) el.pkSheet.hidden = false;
-    if (name === 'postcard' && el.postcardSheet) el.postcardSheet.hidden = false;
-    const toiletSheet = document.getElementById('toiletSheet');
-    if (name === 'toilet' && toiletSheet) toiletSheet.hidden = false;
-    syncDirectorRailActive();
-  }
-
-  // =========================================================================
-  // Sheet 1: 5-Second Single-Hand Logging Drawer
-  // =========================================================================
-  function renderDraftDetective() {
-    if (!el.draftDetectiveBox) return;
-    const pred = inferLikelyDiet(
-      {
-        bristol: draft.bristol,
-        color: draft.color,
-        durationSec: draft.durationSec,
-        ease: draft.ease,
-        triggers: draft.triggers,
-        timestamp: new Date().toISOString()
-      },
-      state.logs
-    );
-
-    if (pred.redFlagBlocked) {
-      el.draftDetectiveBox.hidden = true;
-      return;
-    }
-
-    el.draftDetectiveBox.hidden = false;
-    el.draftDetectiveConf.textContent = `策略预判 ${pred.confidence}%`;
-    el.draftDetectiveText.textContent = pred.fullReason;
-    el.adoptDetectiveTagsBtn.hidden = pred.suggestedTags.length === 0;
-  }
-
-  function selectBristolType(nextType, shouldScroll = true) {
-    const clamped = Math.max(1, Math.min(7, nextType));
-    draft.bristol = clamped;
-    FeltAudio.toyBounce();
-    renderBristolRail(shouldScroll, true);
-    renderBristolDotNav();
-    renderSelectedBristolCaption();
-    renderDraftDetective();
-    renderPublishButtonLabel();
-  }
-
-  function renderBristolDotNav() {
-    if (!el.bristolDotNav) return;
-    el.bristolDotNav.innerHTML = '';
-    BRISTOL_TOYS.forEach((toy) => {
-      const dot = document.createElement('button');
-      dot.type = 'button';
-      dot.className = 'bristol-dot-btn';
-      if (draft.bristol === toy.type) dot.classList.add('is-active');
-      dot.textContent = draft.bristol === toy.type ? `${toy.type}型` : String(toy.type);
-      dot.title = `${toy.type}型 · ${toy.name}`;
-      dot.addEventListener('click', () => {
-        selectBristolType(toy.type, true);
-      });
-      el.bristolDotNav.appendChild(dot);
-    });
-  }
-
-  function renderBristolRail(scrollToSelected = false, bounceSelected = false) {
-    el.bristolRail.innerHTML = '';
-
-    BRISTOL_TOYS.forEach((toy) => {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'bristol-card';
-      btn.setAttribute('role', 'radio');
-      btn.setAttribute('aria-checked', String(draft.bristol === toy.type));
-      btn.dataset.bristol = String(toy.type);
-
-      if (draft.bristol === toy.type) {
-        btn.classList.add('is-selected');
-        if (bounceSelected) btn.classList.add('is-bouncing');
-      }
-
-      btn.innerHTML = `
-        <div class="bristol-card-img-wrap">
-          <img class="bristol-card-img" src="${toy.img}" alt="${toy.type}型 ${toy.name}" />
-        </div>
-        <span class="bristol-card-num">${toy.type}型</span>
-        <span class="bristol-card-name">${toy.shortName}</span>
-      `;
-
-      btn.addEventListener('click', () => {
-        selectBristolType(toy.type, true);
-      });
-
-      el.bristolRail.appendChild(btn);
-    });
-
-    renderBristolDotNav();
-
-    if (scrollToSelected) {
-      const activeBtn = el.bristolRail.querySelector('.bristol-card.is-selected');
-      if (activeBtn) {
-        requestAnimationFrame(() => {
-          activeBtn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-        });
-      }
-    }
-  }
-
-  function renderSelectedBristolCaption() {
-    const toy = getToy(draft.bristol);
-    el.selectedBristolName.textContent = `${toy.type}型 · ${toy.name}`;
-    el.selectedBristolStatus.textContent = toy.statusText;
-    el.selectedBristolStatus.className = `status-tag ${toy.statusClass}`;
-    el.selectedBristolAdvice.textContent = toy.advice;
-  }
-
-  function renderColorRadar() {
-    el.colorGrid.innerHTML = '';
-    COLOR_OPTIONS.forEach((opt) => {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'color-swatch-btn';
-      if (opt.redFlag) btn.classList.add('is-redflag');
-      if (draft.color === opt.id) btn.classList.add('is-selected');
-      btn.setAttribute('role', 'radio');
-      btn.setAttribute('aria-checked', String(draft.color === opt.id));
-
-      btn.innerHTML = `
-        <span class="color-swatch-dot" style="background:${opt.swatch};"></span>
-        <span class="color-swatch-copy">
-          <strong>${opt.name}</strong>
-          <small>${opt.redFlag ? '红灯警报' : opt.sub}</small>
-        </span>
-      `;
-
-      btn.addEventListener('click', () => {
-        draft.color = opt.id;
-        FeltAudio.softTap();
-        renderColorRadar();
-        renderDraftDetective();
-        renderPublishButtonLabel();
-      });
-
-      el.colorGrid.appendChild(btn);
-    });
-
-    const selectedColor = getColorObj(draft.color);
-    const willBeConsecutive7 =
-      draft.bristol === 7 && state.logs[0] && state.logs[0].bristol === 7;
-    el.colorRedFlagHint.hidden = !(selectedColor.redFlag || willBeConsecutive7);
-  }
-
-  function renderTriggerChips() {
-    el.triggerChips.innerHTML = '';
-    TRIGGER_TAGS.forEach((tag) => {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'trigger-chip';
-      const active = draft.triggers.includes(tag);
-      if (active) btn.classList.add('is-active');
-      btn.textContent = tag;
+    document.querySelectorAll('[data-reminder-min]').forEach((btn) => {
+      const m = Number(btn.getAttribute('data-reminder-min'));
+      const active = m === Number(state.settings.reminderMin || 8);
+      btn.classList.toggle('is-active', active);
       btn.setAttribute('aria-pressed', String(active));
-
-      btn.addEventListener('click', () => {
-        FeltAudio.softTap();
-        if (draft.triggers.includes(tag)) {
-          draft.triggers = draft.triggers.filter((t) => t !== tag);
-        } else {
-          draft.triggers = [...draft.triggers, tag];
-        }
-        renderTriggerChips();
-      });
-
-      el.triggerChips.appendChild(btn);
     });
   }
 
-  function renderEaseGroup() {
-    el.easeGroup.innerHTML = '';
-    EASE_OPTIONS.forEach((easeName) => {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'ease-pill';
-      if (draft.ease === easeName) btn.classList.add('is-active');
-      btn.textContent = easeName;
-      btn.setAttribute('role', 'radio');
-      btn.setAttribute('aria-checked', String(draft.ease === easeName));
+  // --------------------------------------------------------------------------
+  // 8. Persistent Active Sitting Timer (Survives Reload + Non-Destructive Snooze)
+  // --------------------------------------------------------------------------
+  function getSessionElapsedSec() {
+    if (!state.activeSession || !state.activeSession.startedAt) return 0;
+    return Math.max(0, Math.floor((Date.now() - state.activeSession.startedAt) / 1000));
+  }
 
-      btn.addEventListener('click', () => {
-        draft.ease = easeName;
-        FeltAudio.softTap();
-        renderEaseGroup();
-        renderDraftDetective();
-      });
+  function showSittingReminderToast(reminderMin) {
+    const toast = $('eightMinToast');
+    if (!toast) return;
+    const tag = $('toastReminderTag');
+    const quote = $('toastReminderQuote');
+    if (tag) tag.textContent = `坐姿已满 ${reminderMin} 分钟`;
+    if (quote) {
+      quote.textContent = `你已静坐满 ${reminderMin} 分钟。若暂无便意，建议先起身活动放松，避免久坐增加肛周压力。`;
+    }
+    toast.hidden = false;
+    FeltAudio.careBell();
+  }
 
-      el.easeGroup.appendChild(btn);
+  function hideSittingReminderToast() {
+    const toast = $('eightMinToast');
+    if (toast) toast.hidden = true;
+  }
+
+  function updateSessionTick() {
+    const timerDisplay = $('timerDisplay');
+    const timerBig = $('sessionTimerBig');
+    const timerHint = $('sessionTimerHint');
+    const timerPill = $('timerPillBtn');
+
+    if (!state.activeSession || !state.activeSession.running) {
+      if (timerDisplay) timerDisplay.textContent = '00:00';
+      if (timerPill) timerPill.classList.remove('is-running');
+      return;
+    }
+
+    const sec = getSessionElapsedSec();
+    const mmss = formatMMSS(sec);
+    if (timerDisplay) timerDisplay.textContent = mmss;
+    if (timerBig) timerBig.textContent = mmss;
+    if (timerPill) timerPill.classList.add('is-running');
+
+    const remMin = Number(state.activeSession.reminderMin || state.settings.reminderMin || 8);
+    const remSec = remMin * 60;
+    const snoozedUntil = Number(state.activeSession.snoozedUntilSec || 0);
+
+    if (sec >= remSec) {
+      setHeroPose('overtime');
+      if (timerHint) timerHint.textContent = `已超过 ${remMin} 分钟提醒线，留意放松起身`;
+    } else if (sec >= Math.floor(remSec * 0.6)) {
+      setHeroPose('effort');
+      if (timerHint) timerHint.textContent = `慢慢来，满 ${remMin} 分钟时会轻声提醒你`;
+    } else {
+      setHeroPose('sitting');
+      if (timerHint) timerHint.textContent = `安心进行中 · ${remMin} 分钟时温和提醒`;
+    }
+
+    if (sec >= remSec && sec >= snoozedUntil) {
+      const toast = $('eightMinToast');
+      if (toast && toast.hidden) {
+        showSittingReminderToast(remMin);
+        // Prevent re-firing every second until snoozed or dismissed
+        state.activeSession.snoozedUntilSec = sec + 3600;
+        saveState();
+      }
+    }
+  }
+
+  function ensureTimerLoop() {
+    if (timerInterval) clearInterval(timerInterval);
+    if (state.activeSession && state.activeSession.running) {
+      updateSessionTick();
+      timerInterval = setInterval(updateSessionTick, 1000);
+    }
+  }
+
+  function startPoopSession() {
+    const defaultSpot = state.toilets[0] ? state.toilets[0].id : null;
+    state.activeSession = {
+      startedAt: Date.now(),
+      running: true,
+      reminderMin: Number(state.settings.reminderMin || 8),
+      snoozedUntilSec: 0,
+      toiletId: defaultSpot
+    };
+    saveState();
+    hideSittingReminderToast();
+    FeltAudio.toyBounce();
+    renderHomeTheater();
+    ensureTimerLoop();
+  }
+
+  function cancelPoopSession() {
+    state.activeSession = null;
+    saveState();
+    if (timerInterval) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+    }
+    hideSittingReminderToast();
+    setHeroPose('default');
+    renderHomeTheater();
+    showStampFeedback('已取消本次计时');
+  }
+
+  function snoozeSittingReminder() {
+    if (!state.activeSession) {
+      hideSittingReminderToast();
+      return;
+    }
+    const elapsed = getSessionElapsedSec();
+    // CRITICAL RED-TEAM FIX: Do NOT reset startedAt or timer seconds! Only defer next reminder by 5 minutes.
+    state.activeSession.snoozedUntilSec = elapsed + 300;
+    saveState();
+    hideSittingReminderToast();
+    FeltAudio.softTap();
+    showStampFeedback('已延后 5 分钟提醒（保留总时长）');
+  }
+
+  function finishSessionAndOpenLog() {
+    const elapsed = Math.max(1, getSessionElapsedSec());
+    const toiletId = state.activeSession?.toiletId || null;
+    state.activeSession = null;
+    saveState();
+    if (timerInterval) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+    }
+    hideSittingReminderToast();
+    renderHomeTheater();
+    openLogDrawer({ mode: 'session', durationSec: elapsed, toiletId });
+  }
+
+  // --------------------------------------------------------------------------
+  // 9. Home Theater Rendering
+  // --------------------------------------------------------------------------
+  function renderHomeTheater() {
+    const idleView = $('homeIdleView');
+    const sessionView = $('homeSessionView');
+    const redFlagCard = $('redFlagCard');
+    const theaterCard = $('theaterCard');
+
+    if (triageState.active) {
+      setAppMode('care');
+      if (theaterCard) theaterCard.hidden = true;
+      if (redFlagCard) redFlagCard.hidden = false;
+      return;
+    }
+
+    setAppMode('theater');
+    if (redFlagCard) redFlagCard.hidden = true;
+    if (theaterCard) theaterCard.hidden = false;
+
+    const isRunning = Boolean(state.activeSession && state.activeSession.running);
+    if (idleView) idleView.hidden = isRunning;
+    if (sessionView) sessionView.hidden = !isRunning;
+
+    if (isRunning) {
+      const spot = state.toilets.find((t) => t.id === state.activeSession.toiletId) || state.toilets[0];
+      const spotNameEl = $('sessionToiletName');
+      if (spotNameEl) spotNameEl.textContent = spot ? spot.name : '未选坑位';
+      updateSessionTick();
+      return;
+    }
+
+    const latest = getDisplayLatestLog();
+    const demoBadge = $('homeDemoBadge');
+    const tagEl = $('latestBristolTag');
+    const timeEl = $('latestTimeLabel');
+    const headlineEl = $('comedyHeadline');
+    const playbillText = $('playbillText');
+    const thumbEl = $('latestToyThumb');
+    const stampEl = $('stageStampBadge');
+
+    if (!latest) {
+      if (demoBadge) demoBadge.hidden = true;
+      if (tagEl) tagEl.textContent = '尚无记录';
+      if (timeEl) timeEl.textContent = '随时开始';
+      if (headlineEl) headlineEl.textContent = '点击“开始大便”或“刚拉完 · 补记一笔”，留下你的第一条个人记录。';
+      if (playbillText) playbillText.textContent = '记录仅保存在本地设备';
+      if (stampEl) stampEl.textContent = '待记录';
+      setHeroPose('default');
+      return;
+    }
+
+    if (demoBadge) demoBadge.hidden = !latest.isDemo;
+    if (timeEl) timeEl.textContent = formatShortTime(latest.ts);
+
+    const isAbnormal = isEntryRedFlag(latest);
+    if (latest.entryType === 'no_bm') {
+      if (tagEl) tagEl.textContent = '今日未排便';
+      if (headlineEl) headlineEl.textContent = '已明确记录为“今日未排便”，与漏记天数分开统计。';
+      if (playbillText) playbillText.textContent = '无排便记录已存档';
+      if (stampEl) stampEl.textContent = '无排便';
+      setHeroPose('default');
+    } else if (isAbnormal) {
+      const col = getColor(latest.color);
+      if (tagEl) tagEl.textContent = col ? `需留意 · ${col.name}` : '需留意 · 水样稀便';
+      if (headlineEl) {
+        headlineEl.textContent = '最近一条记录含异常提示，已切换为冷静档案展示，可在“档案”或“近30天摘要”中查看详情。';
+      }
+      if (playbillText) playbillText.textContent = '异常提示已静默归档';
+      if (stampEl) stampEl.textContent = '需留意';
+      setHeroPose('default');
+    } else {
+      const toy = getToy(latest.bristol);
+      if (tagEl) tagEl.textContent = toy ? `${toy.type}型 · ${toy.name}` : '形态未选';
+      if (thumbEl && toy) thumbEl.src = toy.img;
+      if (headlineEl) {
+        headlineEl.textContent = toy
+          ? `${toy.physicalDesc}。${toy.advice}。`
+          : '已按你的选择跳过形态，仅记录时间与个人备注。';
+      }
+      if (playbillText) {
+        playbillText.textContent = latest.isDemo
+          ? '当前展示示例预览 · 新增记录后自动切换个人模式'
+          : `最近记录：${formatDuration(latest.durationSec)}`;
+      }
+      if (stampEl) stampEl.textContent = toy ? toy.statusText : '已存档';
+      setHeroPose('default');
+    }
+  }
+
+  // --------------------------------------------------------------------------
+  // 10. Sheet Navigation Manager
+  // --------------------------------------------------------------------------
+  function openSheet(sheetId) {
+    closeAllSheets(true);
+    const sheet = $(sheetId);
+    const scrim = $('sheetScrim');
+    if (!sheet) return;
+    activeSheetId = sheetId;
+    if (scrim) scrim.hidden = false;
+    sheet.hidden = false;
+    const popover = $('moreMenuPopover');
+    if (popover) popover.hidden = true;
+    const moreBtn = $('moreMenuBtn');
+    if (moreBtn) moreBtn.setAttribute('aria-expanded', 'false');
+    FeltAudio.softTap();
+  }
+
+  function closeAllSheets(silent) {
+    document.querySelectorAll('.felt-sheet').forEach((el) => {
+      el.hidden = true;
     });
+    const scrim = $('sheetScrim');
+    if (scrim) scrim.hidden = true;
+    activeSheetId = null;
+    if (!silent) FeltAudio.softTap();
   }
 
-  function renderPublishButtonLabel() {
-    const selectedColor = getColorObj(draft.color);
-    const willBeConsecutive7 =
-      draft.bristol === 7 && state.logs[0] && state.logs[0].bristol === 7;
-    el.colorRedFlagHint.hidden = !(selectedColor.redFlag || willBeConsecutive7);
-    el.publishLogBtn.textContent =
-      selectedColor.redFlag || willBeConsecutive7 ? '完成录入 · 进入大橘猫问诊' : '完成录入';
+  // --------------------------------------------------------------------------
+  // 11. Sheet 1: Log Drawer (Backfill & Session Finish, Uncertain Options)
+  // --------------------------------------------------------------------------
+  function openLogDrawer(opts = {}) {
+    const mode = opts.mode === 'session' ? 'session' : 'backfill';
+    draft = {
+      mode,
+      ts: opts.ts || Date.now(),
+      bristol: opts.bristol !== undefined ? opts.bristol : 4,
+      color: opts.color !== undefined ? opts.color : null, // NEVER silent default brown!
+      ease: opts.ease !== undefined ? opts.ease : null, // NEVER silent default!
+      durationSec: mode === 'session' ? Math.max(1, Number(opts.durationSec || 1)) : null,
+      triggers: Array.isArray(opts.triggers) ? opts.triggers.slice() : [],
+      memo: opts.memo || '',
+      toiletId: opts.toiletId || null
+    };
+
+    const titleEl = $('logDrawerTitle');
+    if (titleEl) titleEl.textContent = mode === 'session' ? '记录本次排便' : '刚拉完 · 快速补记';
+
+    const dtInput = $('logDateTimeInput');
+    if (dtInput) dtInput.value = toLocalDateTimeInputValue(draft.ts);
+
+    const memoInput = $('logMemoInput');
+    if (memoInput) memoInput.value = draft.memo;
+
+    renderLogDrawer();
+    openSheet('logDrawer');
   }
 
-  function openLogDrawer(preselectBristol, explicitDurationSec) {
-    if (typeof preselectBristol === 'number' && preselectBristol >= 1 && preselectBristol <= 7) {
-      draft.bristol = preselectBristol;
-    } else {
-      draft.bristol = 4;
-    }
-    draft.color = 'golden';
-    draft.triggers = [];
-    draft.ease = '顺畅';
-    if (typeof explicitDurationSec === 'number' && explicitDurationSec > 0) {
-      draft.durationSec = explicitDurationSec;
-    } else if (timer.seconds >= 1) {
-      draft.durationSec = timer.seconds;
-    } else {
-      draft.durationSec = DURATION_PRESETS[draft.durationPresetIdx];
+  function renderLogDrawer() {
+    // Duration pill
+    const durLbl = $('logDurationLabel');
+    if (durLbl) durLbl.textContent = formatDuration(draft.durationSec);
+
+    // Bristol Rail with clear physical descriptor right inside each wool-felt card
+    const rail = $('bristolRail');
+    if (rail) {
+      rail.innerHTML = BRISTOL_TOYS.map((toy) => {
+        const isSel = draft.bristol === toy.type;
+        return `
+          <button
+            class="bristol-card ${isSel ? 'is-selected' : ''}"
+            type="button"
+            data-bristol-type="${toy.type}"
+            aria-pressed="${isSel}"
+          >
+            <div class="bristol-card-img-wrap">
+              <img class="bristol-card-img" src="${toy.img}" alt="${toy.clinicalLabel}" />
+            </div>
+            <span class="bristol-card-num">${toy.type} 型</span>
+            <strong class="bristol-card-name">${toy.name}</strong>
+            <span class="v82-bristol-desc">${toy.physicalDesc}</span>
+          </button>
+        `;
+      }).join('');
+      const selCard = rail.querySelector('.bristol-card.is-selected');
+      if (selCard && selCard.scrollIntoView) {
+        try {
+          selCard.scrollIntoView({ behavior: 'instant', inline: 'center', block: 'nearest' });
+        } catch (_) {}
+      }
     }
 
-    el.logDurationLabel.textContent = formatDurationCN(draft.durationSec);
-    renderBristolRail(true, false);
-    renderSelectedBristolCaption();
-    renderColorRadar();
-    renderTriggerChips();
-    renderEaseGroup();
-    renderLogToiletChips();
-    renderDraftDetective();
-    renderPublishButtonLabel();
-    openSheet('log');
+    const uncBristolBtn = $('bristolUncertainBtn');
+    if (uncBristolBtn) {
+      const isNull = draft.bristol === null;
+      uncBristolBtn.classList.toggle('is-active', isNull);
+      uncBristolBtn.setAttribute('aria-pressed', String(isNull));
+    }
+
+    const selToy = getToy(draft.bristol);
+    const nameEl = $('selectedBristolName');
+    const statEl = $('selectedBristolStatus');
+    const advEl = $('selectedBristolAdvice');
+    if (selToy) {
+      if (nameEl) nameEl.textContent = `${selToy.type}型 · ${selToy.name}`;
+      if (statEl) {
+        statEl.textContent = selToy.statusText;
+        statEl.className = `bristol-status-pill ${selToy.statusClass}`;
+      }
+      if (advEl) advEl.textContent = `${selToy.physicalDesc} · ${selToy.advice}`;
+    } else {
+      if (nameEl) nameEl.textContent = '形态：不确定 / 已跳过';
+      if (statEl) {
+        statEl.textContent = '可不填';
+        statEl.className = 'bristol-status-pill';
+      }
+      if (advEl) advEl.textContent = '不会强行归类为 4 型，档案与摘要将如实标为“未选形态”。';
+    }
+
+    // Color Grid + Uncertain button
+    const colorGrid = $('colorGrid');
+    if (colorGrid) {
+      colorGrid.innerHTML = COLOR_OPTIONS.map((c) => {
+        const isSel = draft.color === c.id;
+        return `
+          <button
+            class="color-swatch-btn ${isSel ? 'is-selected' : ''} ${c.redFlag ? 'is-redflag' : ''}"
+            type="button"
+            data-color-id="${c.id}"
+            aria-pressed="${isSel}"
+          >
+            <span class="color-swatch-dot" style="background:${c.swatch}"></span>
+            <span class="color-swatch-copy">
+              <strong>${c.name}</strong>
+              <small>${c.sub}</small>
+            </span>
+          </button>
+        `;
+      }).join('');
+    }
+
+    const uncColorBtn = $('colorUncertainBtn');
+    if (uncColorBtn) {
+      const isNull = draft.color === null;
+      uncColorBtn.classList.toggle('is-active', isNull);
+      uncColorBtn.setAttribute('aria-pressed', String(isNull));
+    }
+
+    const selColor = getColor(draft.color);
+    const rfHint = $('colorRedFlagHint');
+    if (rfHint) {
+      if (selColor && selColor.redFlag) {
+        rfHint.hidden = false;
+        rfHint.textContent = `已选“${selColor.name}”：保存后将跳过趣味过场，直接进入冷静自查与就医指引。`;
+      } else {
+        rfHint.hidden = true;
+      }
+    }
+
+    // Ease buttons (toggleable, optional)
+    const easeGroup = $('easeGroup');
+    if (easeGroup) {
+      easeGroup.innerHTML = EASE_OPTIONS.map((e) => {
+        const isSel = draft.ease === e;
+        return `
+          <button class="ease-pill ${isSel ? 'is-active' : ''}" type="button" data-ease-val="${e}" aria-pressed="${isSel}">
+            ${e}
+          </button>
+        `;
+      }).join('');
+    }
+
+    // Triggers
+    const trigWrap = $('triggerChips');
+    if (trigWrap) {
+      trigWrap.innerHTML = TRIGGER_TAGS.map((t) => {
+        const isSel = draft.triggers.includes(t);
+        return `
+          <button class="trigger-chip ${isSel ? 'is-active' : ''}" type="button" data-trigger-val="${t}" aria-pressed="${isSel}">
+            ${t}
+          </button>
+        `;
+      }).join('');
+    }
+
+    // Toilet chips
+    const toiletWrap = $('logToiletChips');
+    if (toiletWrap) {
+      toiletWrap.innerHTML = state.toilets
+        .map((sp) => {
+          const isSel = draft.toiletId === sp.id;
+          const scopeLbl = sp.scope === 'public' ? '公共' : '私人';
+          return `
+            <button class="trigger-chip ${isSel ? 'is-active' : ''}" type="button" data-log-toilet="${sp.id}" aria-pressed="${isSel}">
+              [${scopeLbl}] ${sp.name}
+            </button>
+          `;
+        })
+        .join('');
+    }
   }
 
   function publishCurrentDraft() {
-    const prevLog = state.logs[0];
-    const selectedColor = getColorObj(draft.color);
-    const isConsecutive7 = draft.bristol === 7 && prevLog && prevLog.bristol === 7;
+    const dtInput = $('logDateTimeInput');
+    if (dtInput && dtInput.value) {
+      const parsedTs = new Date(dtInput.value).getTime();
+      if (!Number.isNaN(parsedTs)) draft.ts = parsedTs;
+    }
+    const memoInput = $('logMemoInput');
+    draft.memo = memoInput ? memoInput.value.trim() : '';
 
-    const comedy = generateComedyBulletin({
-      bristol: draft.bristol,
-      triggers: draft.triggers,
-      durationSec: draft.durationSec,
-      ease: draft.ease,
-      color: draft.color
-    });
-
-    const activeSpot = getSelectedToiletSpot();
-    const newEntry = {
-      id: `log-${Date.now()}`,
-      timestamp: new Date().toISOString(),
+    const entry = {
+      id: `log_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      ts: draft.ts,
+      isDemo: false,
+      entryType: 'bm',
       bristol: draft.bristol,
       color: draft.color,
-      triggers: [...draft.triggers],
-      durationSec: draft.durationSec,
       ease: draft.ease,
-      toiletId: activeSpot ? activeSpot.id : null,
-      toiletName: activeSpot ? activeSpot.name : '',
-      headline: comedy.headline,
-      stamp: comedy.stamp,
-      stampTone: comedy.stampTone
+      durationSec: draft.durationSec,
+      triggers: draft.triggers.slice(),
+      memo: draft.memo,
+      toiletId: draft.toiletId,
+      careTriage: null
     };
 
-    if (activeSpot) {
-      activeSpot.visits = (activeSpot.visits || 0) + 1;
-    }
-
-    state.logs.unshift(newEntry);
-    state.episode += 1;
+    // SAVE-FIRST GUARANTEE: persist before any animation or triage!
+    state.logs.unshift(entry);
+    state.logs.sort((a, b) => b.ts - a.ts);
+    state.ui.dataScope = 'personal';
+    state.ui.selectedArchiveId = entry.id;
     saveState();
-    resetPoopSessionUI();
 
-    if (selectedColor.redFlag) {
-      enterRedFlagMode(selectedColor.id, false);
+    closeAllSheets(true);
+    renderHomeTheater();
+
+    // Check red-flag trigger
+    const rfReason = getEntryRedFlagReason(entry, state.logs);
+    if (rfReason) {
+      startCareTriage(rfReason, entry.id);
       return;
     }
-    if (isConsecutive7) {
-      enterRedFlagMode('alarm', false);
+
+    // Normal entry: cutscene (if enabled) -> Single Archive
+    if (state.settings.cutsceneEnabled) {
+      playFeltCutscene(entry, () => {
+        openReportHub('single', entry.id);
+      });
+    } else {
+      FeltAudio.gentleSave();
+      showStampFeedback('已保存至个人档案');
+      openReportHub('single', entry.id);
+    }
+  }
+
+  function markNoBmToday() {
+    const todayKey = toDateKey(Date.now());
+    const existing = state.logs.find(
+      (l) => !l.isDemo && l.entryType === 'no_bm' && toDateKey(l.ts) === todayKey
+    );
+    if (existing) {
+      existing.ts = Date.now();
+    } else {
+      state.logs.unshift({
+        id: `nobm_${Date.now()}`,
+        ts: Date.now(),
+        isDemo: false,
+        entryType: 'no_bm',
+        bristol: null,
+        color: null,
+        ease: null,
+        durationSec: null,
+        triggers: [],
+        memo: '主动标记：今日未排便',
+        toiletId: null,
+        careTriage: null
+      });
+    }
+    state.logs.sort((a, b) => b.ts - a.ts);
+    state.ui.dataScope = 'personal';
+    saveState();
+    FeltAudio.gentleSave();
+    renderHomeTheater();
+    showStampFeedback('已记录：今日未排便（与未记录区分）');
+  }
+
+  // --------------------------------------------------------------------------
+  // 12. Save-First Cutscene Overlay (With Working Mute & Skip, Non-Judgmental Seal)
+  // --------------------------------------------------------------------------
+  function playFeltCutscene(entry, onComplete) {
+    const overlay = $('feltCutsceneOverlay');
+    if (!overlay) {
+      if (onComplete) onComplete();
       return;
     }
-
-    currentMode = 'theater';
-    activeHeroPose = draft.bristol === 3 || draft.bristol === 4 ? 'victory' : 'effort';
-    settlementPreviewEntry = null;
-    directorActiveHint = '';
-    closeAllSheets();
-    renderHomeStage(true);
-
-    // Play persona-matched Stop-Motion Felt Cutscene with sound -> freeze into Today's Archive!
-    playFeltArchiveCutscene(newEntry, () => {
-      openSettlement('single', { autoLaunch: false });
-    });
-  }
-
-  // =========================================================================
-  // Sheet 2: 14-Day 肠道背刺榜 Insights + Clickable History Archive
-  // =========================================================================
-  function selectInsightEntry(entryId) {
-    const entry = state.logs.find((l) => l.id === entryId) || state.logs[0];
-    if (!entry) return;
-
-    el.trendChart.querySelectorAll('.trend-dot-btn').forEach((d) => {
-      d.classList.toggle('is-active', d.dataset.entryId === entry.id);
-    });
-    if (el.historyList) {
-      el.historyList.querySelectorAll('.history-row').forEach((r) => {
-        const isSel = r.dataset.entryId === entry.id;
-        r.classList.toggle('is-selected', isSel);
-        r.setAttribute('aria-selected', String(isSel));
-      });
-    }
-    updateTrendDetail(entry);
-  }
-
-  function renderInsightsSheet() {
-    const recent14 = state.logs.slice(0, 14);
-    const count = recent14.length;
-    const idealCount = recent14.filter((l) => l.bristol === 3 || l.bristol === 4).length;
-    const idealRate = count ? Math.round((idealCount / count) * 100) : 0;
-    const avgSec = count
-      ? Math.round(recent14.reduce((sum, l) => sum + l.durationSec, 0) / count)
-      : 240;
-
-    el.insightsKpiStrip.innerHTML = `
-      <div class="kpi-tile">
-        <strong>${count} 次</strong>
-        <span>近 14 场记录</span>
-      </div>
-      <div class="kpi-tile">
-        <strong>${idealRate}%</strong>
-        <span>3–4型黄金达标</span>
-      </div>
-      <div class="kpi-tile">
-        <strong>${formatDurationCN(avgSec)}</strong>
-        <span>平均蹲坑耗时</span>
-      </div>
-    `;
-
-    // Render 14-day Wool Dot Trend Chart (oldest -> newest left-to-right)
-    const chronological = [...recent14].reverse();
-    el.trendChart.innerHTML = `
-      <div class="trend-y-axis" aria-hidden="true">
-        <span>7型</span>
-        <span>4型</span>
-        <span>1型</span>
-      </div>
-    `;
-
-    chronological.forEach((entry, idx) => {
-      const col = document.createElement('div');
-      col.className = 'trend-col';
-
-      const toy = getToy(entry.bristol);
-      const colorObj = getColorObj(entry.color);
-      // Map Bristol 1..7 to bottom % (8%..92%)
-      const bottomPct = 8 + ((entry.bristol - 1) / 6) * 84;
-      let dotClass = 'trend-dot-good';
-      if (colorObj.redFlag) dotClass = 'trend-dot-redflag';
-      else if (entry.bristol <= 2) dotClass = 'trend-dot-dry';
-      else if (entry.bristol >= 5) dotClass = 'trend-dot-soft';
-
-      const dotBtn = document.createElement('button');
-      dotBtn.type = 'button';
-      dotBtn.className = `trend-dot-btn ${dotClass}`;
-      dotBtn.dataset.entryId = entry.id;
-      dotBtn.style.bottom = `${bottomPct}%`;
-      dotBtn.title = `${formatShortDate(entry.timestamp)} · ${toy.type}型 ${toy.name}`;
-
-      dotBtn.addEventListener('click', () => {
-        FeltAudio.softTap();
-        selectInsightEntry(entry.id);
-      });
-
-      const stem = document.createElement('span');
-      stem.className = 'trend-stem';
-
-      const dayLabel = document.createElement('span');
-      dayLabel.className = 'trend-day-label';
-      dayLabel.textContent =
-        idx === chronological.length - 1 ? '最新' : idx % 3 === 0 ? formatShortDate(entry.timestamp) : '';
-
-      col.appendChild(stem);
-      col.appendChild(dotBtn);
-      col.appendChild(dayLabel);
-      el.trendChart.appendChild(col);
-    });
-
-    // Render Clickable 14-Day History List (newest -> oldest)
-    if (el.historyList) {
-      el.historyList.innerHTML = '';
-      recent14.forEach((entry) => {
-        const toy = getToy(entry.bristol);
-        const triggers = entry.triggers.length ? entry.triggers.join(' · ') : '日常稳态';
-        const row = document.createElement('button');
-        row.type = 'button';
-        row.className = 'history-row';
-        row.setAttribute('role', 'option');
-        row.dataset.entryId = entry.id;
-        row.innerHTML = `
-          <img class="history-row-thumb" src="${toy.img}" alt="${toy.name}" />
-          <div class="history-row-main">
-            <div class="history-row-top">
-              <strong>${toy.type}型 · ${toy.name}</strong>
-              <span class="history-row-time">${formatClinicalDateTime(entry.timestamp)}</span>
-            </div>
-            <div class="history-row-sub">${formatDurationCN(entry.durationSec)} · ${entry.ease} · ${triggers}</div>
-          </div>
-        `;
-        row.addEventListener('click', () => {
-          FeltAudio.toyBounce();
-          selectInsightEntry(entry.id);
-        });
-        el.historyList.appendChild(row);
-      });
-    }
-
-    if (recent14.length > 0) {
-      selectInsightEntry(recent14[0].id);
-    }
-
-    // Dynamic Trigger Backstab Correlation Leaderboard (Zero Food Metaphors for Stool!)
-    const coffeeLoose = recent14.filter((l) => l.triggers.includes('冰美式') && l.bristol >= 5).length;
-    const spicyLoose = recent14.filter((l) => l.triggers.includes('重辣火锅') && l.bristol >= 5).length;
-    const dryHard = recent14.filter((l) => l.triggers.includes('喝水少') && l.bristol <= 3).length;
-
-    const correlations = [
-      {
-        title: '冰美式 + 熬夜',
-        pct: Math.min(96, 82 + coffeeLoose * 3),
-        desc: '82% 概率触发 6 型炸毛摊软团（建议午后改喝温水）',
-        positive: false
-      },
-      {
-        title: '重辣火锅',
-        pct: Math.min(94, 74 + spicyLoose * 4),
-        desc: '次日高频召唤 6–7 型摊软团 / 小水洼',
-        positive: false
-      },
-      {
-        title: '喝水少 + 久坐',
-        pct: Math.min(92, 68 + dryHard * 4),
-        desc: '71% 概率召唤 1–2 型硬球团 / 疙瘩憋劲团',
-        positive: false
-      },
-      {
-        title: '每日温水达标 + 规律作息',
-        pct: 91,
-        desc: '91% 稳定召唤 4 型丝滑金冠团',
-        positive: true
-      }
-    ];
-
-    el.correlationList.innerHTML = correlations
-      .map(
-        (item) => `
-        <div class="corr-item ${item.positive ? 'is-positive' : ''}">
-          <div class="corr-row-top">
-            <strong>${item.title}</strong>
-            <span>${item.pct}% 关联</span>
-          </div>
-          <div class="corr-track">
-            <div class="corr-fill" style="width:${item.pct}%;"></div>
-          </div>
-          <p class="corr-desc">${item.desc}</p>
-        </div>
-      `
-      )
-      .join('');
-
-    // Collapsible Paid-Poop Easter Egg
-    const totalSec30 = state.logs.reduce((acc, l) => acc + l.durationSec, 0);
-    const totalMins = Math.max(68, Math.round(totalSec30 / 60) + 46);
-    const estYuan = Math.round(totalMins * 3.0);
-    el.eggCurrencyValue.textContent = `¥ ${estYuan}`;
-    el.eggSubNote.textContent = `按本地估算均薪与近 30 日累计 ${Math.floor(totalMins / 60)} 小时 ${totalMins % 60} 分有效时长折算。提醒：单次超过 8 分钟会亏掉肛周静脉健康哦！`;
-  }
-
-  function updateTrendDetail(entry) {
     const toy = getToy(entry.bristol);
-    const triggerText = entry.triggers.length ? entry.triggers.join(' · ') : '无明显诱因';
-    el.trendSelectedDetail.innerHTML = `
-      <img class="trend-detail-thumb" src="${toy.img}" alt="${toy.name}" />
-      <div class="trend-detail-body">
-        <div class="trend-detail-meta">
-          <strong>${toy.type}型 · ${toy.name}</strong>
-          <span>${formatClinicalDateTime(entry.timestamp)}</span>
-        </div>
-        <div class="trend-detail-sub">耗时 ${formatDurationCN(entry.durationSec)} · ${entry.ease} · 诱因：${triggerText}</div>
-        <p class="trend-detail-quote">${entry.headline}</p>
-      </div>
-    `;
-  }
+    const epTag = $('cutsceneEpisodeTag');
+    const mascot = $('cutsceneMascotImg');
+    const title = $('cutscenePersonaTitle');
+    const sub = $('cutscenePersonaSub');
+    const sealGrade = $('cutsceneSealGrade');
 
-  // =========================================================================
-  // Sheet 3: Clean Clinical 30-Day Doctor Report (Zero Jokes!)
-  // =========================================================================
-  function renderDoctorReport() {
-    const logs = state.logs.slice(0, 30);
-    const total = logs.length;
-    const avgSec = total ? Math.round(logs.reduce((s, l) => s + l.durationSec, 0) / total) : 0;
+    if (epTag) epTag.textContent = `《便便日记》· ${formatShortTime(entry.ts)}`;
+    if (mascot) mascot.src = toy ? toy.img : 'assets/felt/bristol_4.jpg';
+    if (title) title.textContent = toy ? `${toy.type}型 · ${toy.name}` : '本次记录已存档';
+    if (sub) sub.textContent = toy ? toy.physicalDesc : '已按你的选择跳过形态，数据已安全保存';
+    if (sealGrade) sealGrade.textContent = '已入档';
 
-    // Dominant Bristol type
-    const counts = {};
-    logs.forEach((l) => {
-      counts[l.bristol] = (counts[l.bristol] || 0) + 1;
-    });
-    let topType = 4;
-    let topCount = 0;
-    Object.keys(counts).forEach((k) => {
-      if (counts[k] > topCount) {
-        topCount = counts[k];
-        topType = Number(k);
-      }
-    });
-    const topPct = total ? Math.round((topCount / total) * 100) : 0;
+    syncSettingsUI();
+    overlay.hidden = false;
+    FeltAudio.gentleSave();
 
-    const redFlagColorLogs = logs.filter((l) => getColorObj(l.color).redFlag);
-    const wateryCount = logs.filter((l) => l.bristol === 7).length;
-    const hardCount = logs.filter((l) => l.bristol <= 2).length;
-
-    const oldestDate = logs.length ? formatShortDate(logs[logs.length - 1].timestamp) : '--';
-    const newestDate = logs.length ? formatShortDate(logs[0].timestamp) : '--';
-    el.doctorDateRange.textContent = `统计周期：${oldestDate} 至 ${newestDate} · 共 ${total} 条本地记录`;
-
-    if (redFlagColorLogs.length > 0 || wateryCount >= 2) {
-      const notes = [];
-      if (redFlagColorLogs.length > 0) {
-        const latestRF = redFlagColorLogs[0];
-        notes.push(
-          `发现 ${redFlagColorLogs.length} 次异常颜色记录（最近一次：${formatClinicalDateTime(latestRF.timestamp)}，${getColorObj(latestRF.color).name}）`
-        );
-      }
-      if (wateryCount >= 2) {
-        notes.push(`近30日出现 ${wateryCount} 次 Bristol 7型水样便`);
-      }
-      el.clinicalAlertBanner.hidden = false;
-      el.clinicalAlertBanner.textContent = `重点关注项：${notes.join('；')}。建议就诊时优先向消化内科或肛肠科医生出示下表。`;
-    } else {
-      el.clinicalAlertBanner.hidden = true;
-    }
-
-    el.doctorMetricsGrid.innerHTML = `
-      <div class="clinical-metric-box">
-        <span>排便频率估计</span>
-        <strong>${(total / 14).toFixed(1)} 次/日 · 较规律</strong>
-      </div>
-      <div class="clinical-metric-box">
-        <span>主要 Bristol 分型</span>
-        <strong>${topType}型为主（占 ${topPct}%）</strong>
-      </div>
-      <div class="clinical-metric-box">
-        <span>异常颜色警示</span>
-        <strong>${redFlagColorLogs.length > 0 ? `检出 ${redFlagColorLogs.length} 次需关注` : '无黑便 / 血便 / 陶土便'}</strong>
-      </div>
-      <div class="clinical-metric-box">
-        <span>均值耗时 / 偏离次数</span>
-        <strong>${(avgSec / 60).toFixed(1)} 分钟 · 干结 ${hardCount} / 水样 ${wateryCount}</strong>
-      </div>
-    `;
-
-    el.doctorTableBody.innerHTML = logs
-      .map((entry) => {
-        const toy = getToy(entry.bristol);
-        const col = getColorObj(entry.color);
-        const isAlert = col.redFlag || entry.bristol === 7;
-        const triggers = entry.triggers.length ? entry.triggers.join('、') : '—';
-        return `
-          <tr class="${isAlert ? 'is-redflag-row' : ''}">
-            <td>${formatClinicalDateTime(entry.timestamp)}</td>
-            <td>${toy.clinicalLabel}</td>
-            <td>${col.name}${col.redFlag ? '（异常）' : ''}</td>
-            <td>${formatDurationCN(entry.durationSec)} / ${entry.ease}</td>
-            <td>${triggers}</td>
-          </tr>
-        `;
-      })
-      .join('');
-  }
-
-  // =========================================================================
-  // Sheet 4: Privacy Vault & 1-Tap Home Screen Camouflage
-  // =========================================================================
-  function renderPrivacySheet() {
-    el.faceIdToggleBtn.setAttribute('aria-checked', String(state.settings.faceIdEnabled));
-
-    const activeSkin =
-      CAMOUFLAGE_SKINS.find((s) => s.id === state.settings.camouflage) || CAMOUFLAGE_SKINS[0];
-
-    el.camouflagePreviewIcon.style.background = activeSkin.bg;
-    el.camouflagePreviewIcon.innerHTML = activeSkin.svg;
-    el.camouflagePreviewName.textContent = activeSkin.name;
-    el.camouflagePreviewDesc.textContent = activeSkin.desc;
-
-    el.camouflageGrid.innerHTML = '';
-    CAMOUFLAGE_SKINS.forEach((skin) => {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'camo-option-btn';
-      if (skin.id === state.settings.camouflage) btn.classList.add('is-active');
-
-      btn.innerHTML = `
-        <span class="camo-mini-icon" style="background:${skin.bg};">${skin.svg}</span>
-        <span>
-          <strong>${skin.name}</strong>
-          <small>${skin.subtitle}</small>
-        </span>
-      `;
-
-      btn.addEventListener('click', () => {
-        state.settings.camouflage = skin.id;
-        saveState();
-        FeltAudio.toyBounce();
-        renderTopBarAndSkin();
-        renderPrivacySheet();
-        showStampFeedback(`已切换桌面伪装：${skin.name}`);
-      });
-
-      el.camouflageGrid.appendChild(btn);
-    });
-  }
-
-  // =========================================================================
-  // Gentle 2.5D Pointer Parallax on Handcrafted Wool Stage
-  // =========================================================================
-  function bindStageParallax() {
-    el.appShell.addEventListener('pointermove', (evt) => {
-      if (activeSheet) return;
-      const rect = el.appShell.getBoundingClientRect();
-      const nx = (evt.clientX - rect.left) / rect.width - 0.5;
-      const ny = (evt.clientY - rect.top) / rect.height - 0.5;
-      const px = (-nx * 10).toFixed(2);
-      const py = (-ny * 8).toFixed(2);
-      el.stageHeroImg.style.setProperty('--parallax-x', `${px}px`);
-      el.stageHeroImg.style.setProperty('--parallax-y', `${py}px`);
-      el.stageDoctorImg.style.setProperty('--parallax-x', `${px}px`);
-      el.stageDoctorImg.style.setProperty('--parallax-y', `${py}px`);
-    });
-
-    el.appShell.addEventListener('pointerleave', () => {
-      el.stageHeroImg.style.setProperty('--parallax-x', '0px');
-      el.stageHeroImg.style.setProperty('--parallax-y', '0px');
-      el.stageDoctorImg.style.setProperty('--parallax-x', '0px');
-      el.stageDoctorImg.style.setProperty('--parallax-y', '0px');
-    });
-  }
-
-  // =========================================================================
-  // Sheet 5: Friend Wool-Felt Arena PK (`openPkSheet`)
-  // =========================================================================
-  function computeMyHealthScore() {
-    const recent = state.logs.slice(0, 14);
-    const total = recent.length || 1;
-    const idealCount = recent.filter((l) => l.bristol === 3 || l.bristol === 4).length;
-    const idealScore = Math.min(40, Math.round((idealCount / total) * 40));
-
-    const avgSec = recent.reduce((s, l) => s + l.durationSec, 0) / total;
-    const speedScore =
-      avgSec <= 300
-        ? 25
-        : Math.max(8, Math.round(25 - ((avgSec - 300) / 300) * 17));
-
-    const streak = computeCalmStreak();
-    const streakScore = Math.min(20, streak * 3);
-
-    const survivedAssaults = recent.filter(
-      (l) =>
-        (l.bristol === 3 || l.bristol === 4) &&
-        (l.triggers.includes('重辣火锅') || l.triggers.includes('冰美式') || l.triggers.includes('熬夜'))
-    ).length;
-    const resilienceScore = Math.min(15, 10 + survivedAssaults * 2);
-
-    const totalScore = Math.min(100, idealScore + speedScore + streakScore + resilienceScore);
-    return {
-      total: totalScore,
-      breakdown: {
-        ideal: idealScore,
-        speed: speedScore,
-        streak: streakScore,
-        resilience: resilienceScore
+    const finish = () => {
+      clearTimeout(cutsceneTimer);
+      cutsceneTimer = null;
+      overlay.hidden = true;
+      overlay.dataset.onDone = '';
+      if (onComplete) {
+        const cb = onComplete;
+        onComplete = null;
+        cb();
       }
     };
-  }
 
-  function getActiveRival() {
-    return PK_RIVALS.find((r) => r.id === activeRivalId) || PK_RIVALS[0];
-  }
-
-  function computePkMatchSummary() {
-    const myLog = state.logs[0];
-    const myToy = getToy(myLog ? myLog.bristol : 4);
-    const myScoreObj = computeMyHealthScore();
-    const rival = getActiveRival();
-    const rivalToy = getToy(rival.bristol);
-
-    let verdict = '';
-    let outcomeStamp = '势均力敌';
-    if (myScoreObj.total > rival.score + 12) {
-      outcomeStamp = '本轮绝杀';
-      verdict = `「本轮绝杀！你的${myToy.type}型${myToy.name}丝滑碾压${rival.shortName}${rival.triggerStory}召唤的${rivalToy.type}型${rivalToy.shortName}！」`;
-    } else if (myScoreObj.total > rival.score) {
-      outcomeStamp = '小幅胜出';
-      verdict = `「惊险取胜！你的${myToy.name}以 ${myScoreObj.total - rival.score} 分优势力压${rival.shortName}的${rivalToy.shortName}！」`;
-    } else if (myScoreObj.total === rival.score) {
-      outcomeStamp = '握手言和';
-      verdict = `「双双打平！你和${rival.shortName}的毛毡团子旗鼓相当，各喝一杯温水再战！」`;
-    } else {
-      outcomeStamp = '惜败一筹';
-      verdict = `「${rival.shortName}靠${rival.triggerStory}暂居上风，快把温水续上，明天用四号金冠团翻盘！」`;
-    }
-
-    return { myToy, myScoreObj, rival, rivalToy, verdict, outcomeStamp };
-  }
-
-  function renderPkSheet() {
-    if (!el.pkSheet) return;
-    const pk = computePkMatchSummary();
-
-    el.pkRivalTabs.innerHTML = '';
-    PK_RIVALS.forEach((r) => {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'pk-rival-tab';
-      btn.setAttribute('role', 'tab');
-      btn.setAttribute('aria-selected', String(r.id === activeRivalId));
-      if (r.id === activeRivalId) btn.classList.add('is-active');
-      btn.innerHTML = `<strong>${r.shortName}</strong><small>${r.role} · ${r.score}分</small>`;
-      btn.addEventListener('click', () => {
-        activeRivalId = r.id;
-        FeltAudio.toyBounce();
-        renderPkSheet();
-      });
-      el.pkRivalTabs.appendChild(btn);
-    });
-
-    el.pkInviteCodePill.textContent = `口令：${pkInviteCode}`;
-    el.pkMyImg.src = pk.myToy.img;
-    el.pkMyToyName.textContent = `${pk.myToy.type}型 ${pk.myToy.name}`;
-    el.pkMyScore.textContent = `${pk.myScoreObj.total} 分`;
-
-    el.pkRivalImg.src = pk.rivalToy.img;
-    el.pkRivalName.textContent = pk.rival.shortName;
-    el.pkRivalToyName.textContent = `${pk.rivalToy.type}型 ${pk.rivalToy.name}`;
-    el.pkRivalScore.textContent = `${pk.rival.score} 分`;
-    el.pkVerdictBanner.textContent = pk.verdict;
-    el.pkBanterCounter.textContent = `本局互动 ${pkBanterCount} 次`;
-
-    const dims = [
-      { label: '黄金出货率', max: 40, mine: pk.myScoreObj.breakdown.ideal, rival: pk.rival.breakdown.ideal },
-      { label: '极速不伤痔', max: 25, mine: pk.myScoreObj.breakdown.speed, rival: pk.rival.breakdown.speed },
-      { label: '规律连胜', max: 20, mine: pk.myScoreObj.breakdown.streak, rival: pk.rival.breakdown.streak },
-      { label: '铁胃抗暴击', max: 15, mine: pk.myScoreObj.breakdown.resilience, rival: pk.rival.breakdown.resilience }
-    ];
-
-    el.pkBarsGrid.innerHTML = dims
-      .map((d) => {
-        const minePct = Math.round((d.mine / d.max) * 100);
-        const rivalPct = Math.round((d.rival / d.max) * 100);
-        return `
-          <div class="pk-bar-row">
-            <div class="pk-bar-labels">
-              <span>${d.mine}/${d.max}</span>
-              <span>${d.label}</span>
-              <span>${d.rival}/${d.max}</span>
-            </div>
-            <div class="pk-dual-track">
-              <div class="pk-track-half is-mine"><div class="pk-fill-mine" style="width:${minePct}%;"></div></div>
-              <div class="pk-track-half"><div class="pk-fill-rival" style="width:${rivalPct}%;"></div></div>
-            </div>
-          </div>
-        `;
-      })
-      .join('');
-  }
-
-  function openPkSheet(rivalId) {
-    if (rivalId && PK_RIVALS.some((r) => r.id === rivalId)) {
-      activeRivalId = rivalId;
-    }
-    renderPkSheet();
-    openSheet('pk');
-  }
-
-  // =========================================================================
-  // Sheet 6: 3-in-1 Privacy-Safe Share Hub (`openShareHub` / `openPostcardSheet`)
-  // =========================================================================
-  function computePostcardSummary() {
-    const logs = state.logs;
-    const total = logs.length;
-    const idealCount = logs.filter((l) => l.bristol === 3 || l.bristol === 4).length;
-    const idealRate = total ? Math.round((idealCount / total) * 100) : 79;
-
-    let bestStreak = 0;
-    let cur = 0;
-    for (const item of logs) {
-      const col = getColorObj(item.color);
-      if (!col.redFlag && item.bristol >= 3 && item.bristol <= 5) {
-        cur += 1;
-        if (cur > bestStreak) bestStreak = cur;
-      } else {
-        cur = 0;
-      }
-    }
-    bestStreak = Math.max(bestStreak, 6);
-
-    const spicyCount = Math.max(2, logs.filter((l) => l.triggers.includes('重辣火锅')).length + 1);
-    const now = new Date();
-    const monthLabel = `${now.getFullYear()} · ${now.getMonth() + 1} 月剧场月刊`;
-    const checkins = Math.max(28, total + 14);
-    const signatureToy = getToy(4);
-
-    let award = `「本月肠道稳如毛毡大师，成功化解 ${spicyCount} 次火锅突袭」`;
-    if (idealRate < 50) {
-      award = '「本月毛毡剧场跌宕起伏，下月多喝温水冲刺五星金冠团」';
-    } else if (idealRate >= 75) {
-      award = `「本月肠道稳如毛毡大师，丝滑金冠团高频卫冕 · 化解 ${spicyCount} 次火锅突袭」`;
-    }
-
-    return {
-      monthLabel,
-      checkins,
-      idealRate,
-      bestStreak,
-      signatureToy,
-      award
-    };
-  }
-
-  // =========================================================================
-  // Sheet 6: Game-Level Settlement & PK Share Hub (4 Tabs: single/weekly/monthly/pk)
-  // =========================================================================
-  function isEntryRedFlag(entry) {
-    if (!entry) return false;
-    const col = getColorObj(entry.color);
-    if (col.redFlag) return true;
-    // Check if consecutive Bristol 7 at top of logs
-    if (entry.bristol === 7 && state.logs[0] && state.logs[1] && entry.id === state.logs[0].id && state.logs[1].bristol === 7) {
-      return true;
-    }
-    return false;
-  }
-
-  function makePreviewEntry(bristolType) {
-    if (bristolType === 1) {
-      return {
-        id: 'preview-desert',
-        timestamp: new Date().toISOString(),
-        bristol: 1,
-        color: 'brown',
-        triggers: ['喝水少', '久坐'],
-        durationSec: 495,
-        ease: '费力',
-        headline: '“硬球小团拒绝配合演出，肠道联名发函：饮水机就在三米外！”',
-        stamp: '缺水警戒',
-        stampTone: 'dry'
+    const skipBtn = $('cutsceneSkipBtn');
+    if (skipBtn) {
+      skipBtn.onclick = () => {
+        FeltAudio.softTap();
+        finish();
       };
     }
-    if (bristolType === 6) {
-      return {
-        id: 'preview-storm',
-        timestamp: new Date().toISOString(),
-        bristol: 6,
-        color: 'brown',
-        triggers: ['重辣火锅', '冰美式'],
-        durationSec: 215,
-        ease: '急促',
-        headline: '“昨夜重辣火锅的账单今早到账，炸毛摊软团当场接管戏台！”',
-        stamp: '绒浪预警',
-        stampTone: 'soft'
-      };
-    }
-    return {
-      id: 'preview-gold',
-      timestamp: new Date().toISOString(),
-      bristol: 4,
-      color: 'golden',
-      triggers: ['重辣火锅'],
-      durationSec: 245,
-      ease: '顺畅',
-      headline: '“昨夜重辣火锅企图搞事，被四号金冠团优雅镇压！”',
-      stamp: '五星金绒',
-      stampTone: 'gold'
+
+    clearTimeout(cutsceneTimer);
+    cutsceneTimer = setTimeout(finish, 1850);
+  }
+
+  // --------------------------------------------------------------------------
+  // 13. Red-Flag Safety Triage Flow (`redFlagCard`)
+  // --------------------------------------------------------------------------
+  function startCareTriage(rawReason, entryId = null) {
+    const reason = normalizeCareReason(rawReason);
+    triageState = {
+      active: true,
+      reason,
+      step: 0,
+      answers: {},
+      entryId,
+      result: null
     };
+    closeAllSheets(true);
+    setAppMode('care');
+    setDoctorPose('checkup');
+    renderHomeTheater();
+    renderCareTriage();
+    FeltAudio.careBell();
   }
 
-  function computeSingleSettlement(entry) {
-    const target = entry || state.logs[0] || makePreviewEntry(4);
-    const toy = getToy(target.bristol);
-    const redFlag = isEntryRedFlag(target);
-    const theme = getSettlementMoodTheme(target.bristol, redFlag);
-    const deduction = inferLikelyDiet(target, state.logs.slice(1));
-    const safeSpeed = target.durationSec <= 480;
+  function exitCareTriage() {
+    triageState.active = false;
+    setAppMode('theater');
+    setHeroPose('default');
+    renderHomeTheater();
+  }
 
-    let grade = 'S';
-    let title = '黄金通关';
-    let score = 90;
-    let nextSupply = '保持当前温水与蔬果节奏，明天继续冲刺四号金冠连胜！';
+  function renderCareTriage() {
+    const card = $('redFlagCard');
+    if (!card || !triageState.active) return;
+    card.hidden = false;
 
-    if (target.bristol === 4 && target.durationSec <= 300 && target.ease === '顺畅') {
-      grade = 'SSS';
-      title = '完美通关';
-      score = 96;
-      nextSupply = '教科书级完美通关！今晚继续温热饮食，稳稳守住四号金冠王座。';
-    } else if (target.bristol === 4 || target.bristol === 3) {
-      grade = 'S';
-      title = '黄金通关';
-      score = target.bristol === 4 ? 91 : 86;
-      nextSupply =
-        target.bristol === 3
-          ? '距离 SSS 完美通关只差下午多喝 400ml 温水，明天稳冲四号金冠团！'
-          : '状态极佳！注意单次控制在 5 分钟内，给肛周静脉减负。';
-    } else if (target.bristol === 2) {
-      grade = 'B';
-      title = '干涸攻坚战';
-      score = 68;
-      nextSupply = '本关缺水耗血！下一关补给：温水 +400ml + 深绿叶菜，起身走动 5 分钟。';
-    } else if (target.bristol === 1) {
-      grade = 'B-';
-      title = '缺水持久战';
-      score = 60;
-      nextSupply = '本关缺水耗血！下一关补给：温水 +500ml + 燕麦/绿叶菜，切忌久蹲硬憋。';
-    } else if (target.bristol === 5) {
-      grade = 'C+';
-      title = '轻浪急行';
-      score = 66;
-      nextSupply = '肠道节拍稍快半拍，下餐清淡温热、少冰饮即可迅速回稳。';
-    } else if (target.bristol === 6) {
-      grade = 'C';
-      title = '暴风预警';
-      score = 56;
-      nextSupply = '暴风急行消耗不小！今天暂别冰美式与重辣，喝点温粥温水让肠胃喘口气。';
-    } else {
-      grade = 'C-';
-      title = '水帘急报';
-      score = 48;
-      nextSupply = '优先少量多次补充电解质水并注意保暖休息；若连续出现请重视身体信号。';
+    const banner = $('careEmergencyBanner');
+    const bannerTxt = $('careEmergencyText');
+    if (banner) banner.hidden = false;
+    if (bannerTxt) {
+      bannerTxt.textContent =
+        EMERGENCY_BANNER_COPY[triageState.reason] || EMERGENCY_BANNER_COPY.alarm;
     }
 
-    const easePretty =
-      target.ease === '顺畅' ? '顺畅无压' : target.ease === '费力' ? '有点费力' : '急促冲刺';
+    const triageView = $('careTriageView');
+    const resultView = $('careResultView');
 
-    return {
-      entry: target,
-      toy,
-      redFlag,
-      theme,
-      deduction,
-      safeSpeed,
-      grade,
-      title,
-      score,
-      nextSupply,
-      easePretty
+    if (triageState.result) {
+      if (triageView) triageView.hidden = true;
+      if (resultView) resultView.hidden = false;
+
+      const res = triageState.result;
+      setDoctorPose(res.pose || 'earnest');
+      const badge = $('careResultBadge');
+      const dept = $('careDepartmentBadge');
+      const title = $('careResultTitle');
+      const exp = $('careExplanation');
+
+      if (badge) {
+        badge.textContent = res.badge;
+        badge.dataset.level = res.level;
+      }
+      if (dept) dept.textContent = res.department;
+      if (title) title.textContent = res.title;
+      if (exp) exp.textContent = res.explanation;
+      return;
+    }
+
+    // Question view
+    if (triageView) triageView.hidden = false;
+    if (resultView) resultView.hidden = true;
+
+    const qList = CARE_TRIAGE_QUESTIONS[triageState.reason] || CARE_TRIAGE_QUESTIONS.alarm;
+    const current = qList[triageState.step] || qList[0];
+
+    const reasonTitleMap = {
+      blood: '鲜红/暗红便 · 快速分流',
+      black: '柏油黑便 · 快速分流',
+      pale: '陶土灰白便 · 快速分流',
+      alarm: '连续水样稀便 · 快速分流'
     };
-  }
 
-  function computeDominantMood(logs) {
-    let gold = 0;
-    let desert = 0;
-    let storm = 0;
-    logs.forEach((l) => {
-      if (l.bristol === 3 || l.bristol === 4) gold += 1;
-      else if (l.bristol <= 2) desert += 1;
-      else storm += 1;
-    });
-    if (gold >= desert && gold >= storm) return getSettlementMoodTheme(4, false);
-    if (desert >= storm) return getSettlementMoodTheme(2, false);
-    return getSettlementMoodTheme(6, false);
-  }
-
-  function computeWeeklySettlement() {
-    const recent7 = state.logs.slice(0, 7);
-    const moodTheme = computeDominantMood(recent7);
-    const scoreObj = computeMyHealthScore();
-    const rival = getActiveRival();
-    const delta = scoreObj.total - rival.score;
-
-    // Build 7-day Mon-Sun attendance track from most recent 7 entries
-    const weekdays = ['一', '二', '三', '四', '五', '六', '日'];
-    const ordered = [...recent7].reverse();
-    const track = weekdays.map((label, idx) => {
-      const log = ordered[idx] || null;
-      if (!log) {
-        return { label, text: '·', cls: 'day-token-empty' };
-      }
-      let cls = 'day-token-gold';
-      if (log.bristol <= 2) cls = 'day-token-desert';
-      else if (log.bristol >= 5) cls = 'day-token-storm';
-      return { label, text: `${log.bristol}型`, cls };
-    });
-
-    // Top trigger culprit in past 7 days
-    const trigCounts = {};
-    recent7.forEach((l) => {
-      (l.triggers || []).forEach((t) => {
-        trigCounts[t] = (trigCounts[t] || 0) + 1;
-      });
-    });
-    const topTrig = Object.keys(trigCounts).sort((a, b) => trigCounts[b] - trigCounts[a])[0];
-
-    const idealCount = recent7.filter((l) => l.bristol === 3 || l.bristol === 4).length;
-    const idealPct = recent7.length ? Math.round((idealCount / recent7.length) * 100) : 71;
-
-    let rankGrade = 'S';
-    let rankLabel = '黄金守门员';
-    if (scoreObj.total >= 86) {
-      rankGrade = 'SSS';
-      rankLabel = '金绒大满贯';
-    } else if (scoreObj.total < 68) {
-      rankGrade = 'B';
-      rankLabel = '韧性挑战者';
+    const stepBadge = $('careStepBadge');
+    if (stepBadge) {
+      stepBadge.textContent = `${reasonTitleMap[triageState.reason]}（${triageState.step + 1}/${qList.length}）`;
     }
 
-    const heroToy =
-      moodTheme.mood === 'desert' ? getToy(2) : moodTheme.mood === 'storm' ? getToy(6) : getToy(4);
-
-    const culpritText = topTrig
-      ? `${topTrig}（本周出现 ${trigCounts[topTrig]} 次）：注意搭配温水缓冲，防止偷袭肠道稳态。`
-      : '本周无明显饮食背刺，作息与饮水纪律堪称毛毡模范生！';
-
-    const verdictText =
-      idealPct >= 70
-        ? `本周 3–4 型黄金率高达 ${idealPct}%，稳居全勤舒适区，下周继续保持！`
-        : `本周 3–4 型黄金率 ${idealPct}%，多补温水少熬夜，下周稳稳冲回金绒剧场！`;
-
-    const leadText =
-      delta >= 0 ? `领先${rival.shortName} +${delta} 分` : `暂落后${rival.shortName} ${Math.abs(delta)} 分`;
-
-    return {
-      theme: moodTheme,
-      heroToy,
-      scoreObj,
-      rankGrade,
-      rankLabel,
-      track,
-      attendanceCount: recent7.length,
-      culpritText,
-      verdictText,
-      pkRibbon: `⚔️ 本周战力 ${scoreObj.total} 分（${leadText}）· 口令 ${pkInviteCode} 接战！`
-    };
-  }
-
-  function computeMonthlySettlement() {
-    const pc = computePostcardSummary();
-    const logs = state.logs;
-    const theme = computeDominantMood(logs);
-    const counts = [0, 0, 0, 0, 0, 0, 0];
-    logs.forEach((l) => {
-      if (l.bristol >= 1 && l.bristol <= 7) counts[l.bristol - 1] += 1;
+    document.querySelectorAll('[data-care-dot]').forEach((dot) => {
+      const idx = Number(dot.getAttribute('data-care-dot'));
+      dot.classList.toggle('is-active', idx <= triageState.step);
     });
 
-    // Scale softly to look like a rich full month alongside real recent entries
-    const displayCounts = counts.map((c, idx) => (idx === 3 ? c + 5 : idx === 2 ? c + 3 : c + (idx === 5 ? 1 : 0)));
-    const safeRuns = logs.filter((l) => l.durationSec <= 480).length;
-    const safeRate = logs.length ? Math.round((safeRuns / logs.length) * 100) : 92;
+    const qEl = $('careQuestionText');
+    if (qEl) qEl.textContent = current.q;
 
-    const trigCounts = {};
-    logs.forEach((l) => {
-      (l.triggers || []).forEach((t) => {
-        trigCounts[t] = (trigCounts[t] || 0) + 1;
-      });
-    });
-    const topTrig = Object.keys(trigCounts).sort((a, b) => trigCounts[b] - trigCounts[a])[0] || '重辣火锅';
-    const scoreObj = computeMyHealthScore();
-
-    const titleBadge =
-      theme.mood === 'gold'
-        ? '金绒收藏家'
-        : theme.mood === 'desert'
-        ? '荒漠补水侠'
-        : '暴风冲浪手';
-    const rankGrade = pc.idealRate >= 70 ? 'S+' : pc.idealRate >= 50 ? 'A' : 'B';
-
-    return {
-      ...pc,
-      theme,
-      displayCounts,
-      safeRate,
-      topTrig,
-      titleBadge,
-      rankGrade,
-      score: scoreObj.total,
-      pkRibbon: `⚔️ 月度战力 ${scoreObj.total} 分 · 口令 ${pkInviteCode} · 晒出你的本月团子图鉴！`
-    };
-  }
-
-  function syncMotionButtonUI() {
-    if (!el.postcardSheet || !el.toggleStageMotionBtn) return;
-    el.postcardSheet.classList.toggle('is-static-stage', stageStaticMode);
-    el.toggleStageMotionBtn.setAttribute('aria-pressed', String(!stageStaticMode));
-    el.toggleStageMotionBtn.textContent = stageStaticMode ? '🖼️ 静态海报' : '🎬 动态小剧场';
-  }
-
-  function renderShareHub(slamStamp = false) {
-    // Normalize legacy 'daily' alias -> 'single'
-    if (activeShareTab === 'daily') activeShareTab = 'single';
-
-    document.querySelectorAll('[data-share-tab]').forEach((btn) => {
-      const isAct = btn.dataset.shareTab === activeShareTab;
-      btn.classList.toggle('is-active', isAct);
-      btn.setAttribute('aria-selected', String(isAct));
-    });
-
-    if (el.shareCardSingle) el.shareCardSingle.hidden = activeShareTab !== 'single';
-    if (el.shareCardWeekly) el.shareCardWeekly.hidden = activeShareTab !== 'weekly';
-    if (el.shareCardMonthly) el.shareCardMonthly.hidden = activeShareTab !== 'monthly';
-    if (el.shareCardPk) el.shareCardPk.hidden = activeShareTab !== 'pk';
-
-    syncMotionButtonUI();
-
-    // 1. TAB SINGLE: Stage Clear Single Run
-    const single = computeSingleSettlement(settlementPreviewEntry || state.logs[0]);
-    if (el.shareCardSingle) {
-      el.shareCardSingle.dataset.mood = single.theme.mood;
-    }
-    if (el.singleStageKicker) {
-      el.singleStageKicker.textContent = single.redFlag
-        ? 'CLINICAL CARE · 静音诊室关护'
-        : `STAGE CLEAR · 第 ${state.episode} 关通关结算`;
-    }
-    if (el.singleMoodLabel) el.singleMoodLabel.textContent = single.theme.stageName;
-
-    if (single.redFlag) {
-      if (el.singleNormalStage) el.singleNormalStage.hidden = true;
-      if (el.singleNormalDetails) el.singleNormalDetails.hidden = true;
-      if (el.singleCareStage) el.singleCareStage.hidden = false;
-      const guide = RED_FLAG_GUIDE[single.entry.color] || RED_FLAG_GUIDE.bristol7_streak;
-      if (el.singleCareNote) el.singleCareNote.textContent = guide.explanation;
-    } else {
-      if (el.singleNormalStage) el.singleNormalStage.hidden = false;
-      if (el.singleNormalDetails) el.singleNormalDetails.hidden = false;
-      if (el.singleCareStage) el.singleCareStage.hidden = true;
-
-      if (el.shareDailyImg) el.shareDailyImg.src = single.toy.img;
-      if (el.singleRankGrade) el.singleRankGrade.textContent = single.grade;
-      if (el.singleRankTitle) el.singleRankTitle.textContent = single.title;
-      if (el.singleRankScore) el.singleRankScore.textContent = `${single.score} 分`;
-      if (el.shareDailyHeadline) el.shareDailyHeadline.textContent = single.entry.headline;
-      if (el.hudToyLabel) el.hudToyLabel.textContent = `${single.toy.type}型 ${single.toy.shortName}`;
-      if (el.hudTimeLabel) {
-        const compactDur = formatDurationCN(single.entry.durationSec).replace(/\s+/g, '');
-        el.hudTimeLabel.innerHTML = `${compactDur}<br><small style="font-size:10px;font-weight:700;opacity:0.84">${
-          single.safeSpeed ? '不伤痔 ✓' : '超时 ⚠️'
-        }</small>`;
-      }
-      if (el.hudEaseLabel) el.hudEaseLabel.textContent = single.easePretty;
-      if (el.shareDailyConf) el.shareDailyConf.textContent = `🔍 侦探归因 ${single.deduction.confidence}%`;
-      if (el.shareDailyDeduction) el.shareDailyDeduction.textContent = single.deduction.fullReason;
-      if (el.singleNextSupply) el.singleNextSupply.textContent = single.nextSupply;
-      if (el.singlePkRibbon) el.singlePkRibbon.hidden = !includePkRibbon;
-      if (el.singlePkRibbonText) {
-        el.singlePkRibbonText.textContent = `⚔️ 本关战力 ${single.score} 分 · 口令 ${pkInviteCode} · 不服来毛毡擂台晒你的团子！`;
-      }
-
-      if (slamStamp && el.singleRankStamp) {
-        el.singleRankStamp.classList.remove('is-stamp-slam');
-        void el.singleRankStamp.offsetWidth;
-        el.singleRankStamp.classList.add('is-stamp-slam');
-      }
-    }
-
-    // 2. TAB WEEKLY: 7-Day Season Settlement
-    const weekly = computeWeeklySettlement();
-    if (el.shareCardWeekly) el.shareCardWeekly.dataset.mood = weekly.theme.mood;
-    if (el.weeklyMoodTitle) {
-      el.weeklyMoodTitle.textContent = `${weekly.theme.stageName} · ${weekly.rankLabel}`;
-    }
-    if (el.weeklyPowerPill) el.weeklyPowerPill.textContent = `综合战力 ${weekly.scoreObj.total} 分`;
-    if (el.weeklyHeroImg) el.weeklyHeroImg.src = weekly.heroToy.img;
-    if (el.weeklyRankGrade) el.weeklyRankGrade.textContent = weekly.rankGrade;
-    if (el.weeklyRankLabel) el.weeklyRankLabel.textContent = weekly.rankLabel;
-    if (el.weeklyAttendanceSummary) {
-      el.weeklyAttendanceSummary.textContent = `本周出勤 ${weekly.attendanceCount}/7 日`;
-    }
-    if (el.weeklySevenDayTrack) {
-      el.weeklySevenDayTrack.innerHTML = weekly.track
+    const optWrap = $('careOptionsList');
+    if (optWrap) {
+      optWrap.innerHTML = current.options
         .map(
-          (d) => `
-          <div class="day-token-col">
-            <span class="day-token-circle ${d.cls}">${d.text}</span>
-            <span class="day-token-label">周${d.label}</span>
-          </div>
+          (opt) => `
+          <button class="care-option-btn" type="button" data-care-answer="${opt.value}">
+            ${opt.label}
+          </button>
         `
         )
         .join('');
     }
-    if (el.weeklyScorePills) {
-      const b = weekly.scoreObj.breakdown;
-      el.weeklyScorePills.innerHTML = `
-        <div class="weekly-score-pill"><strong>${b.ideal}/40</strong><span>黄金出货</span></div>
-        <div class="weekly-score-pill"><strong>${b.speed}/25</strong><span>不伤痔</span></div>
-        <div class="weekly-score-pill"><strong>${b.streak}/20</strong><span>规律连胜</span></div>
-        <div class="weekly-score-pill"><strong>${b.resilience}/15</strong><span>抗暴击</span></div>
+  }
+
+  function handleCareAnswer(val) {
+    const qList = CARE_TRIAGE_QUESTIONS[triageState.reason] || CARE_TRIAGE_QUESTIONS.alarm;
+    const current = qList[triageState.step];
+    if (!current) return;
+
+    triageState.answers[current.key] = val;
+    FeltAudio.softTap();
+
+    if (triageState.step + 1 < qList.length) {
+      triageState.step += 1;
+      renderCareTriage();
+    } else {
+      const result = evaluateCareTriage(triageState.reason, triageState.answers);
+      triageState.result = result;
+
+      if (triageState.entryId) {
+        const entry = state.logs.find((l) => l.id === triageState.entryId);
+        if (entry) {
+          entry.careTriage = {
+            reason: triageState.reason,
+            answers: { ...triageState.answers },
+            result
+          };
+          saveState();
+        }
+      }
+      renderCareTriage();
+    }
+  }
+
+  // --------------------------------------------------------------------------
+  // 14. Sheet 2: Insights & History (`insightsSheet`)
+  // --------------------------------------------------------------------------
+  function renderScopeBars() {
+    const isDemo = state.ui.dataScope === 'demo';
+    const personalCount = getPersonalLogs().length;
+    const demoCount = state.logs.filter((l) => l.isDemo).length;
+
+    const text = isDemo
+      ? `演示示例模式（${demoCount} 条示例 · 仅用于预览，不计入就诊摘要）`
+      : `个人真实记录（${personalCount} 条）`;
+    const toggleLabel = isDemo ? `切换个人记录 (${personalCount})` : `预览演示数据 (${demoCount})`;
+
+    [
+      ['insightsScopeBar', 'insightsScopeText', 'insightsScopeToggleBtn'],
+      ['reportScopeBar', 'reportScopeText', 'reportScopeToggleBtn']
+    ].forEach(([barId, txtId, btnId]) => {
+      const bar = $(barId);
+      const txt = $(txtId);
+      const btn = $(btnId);
+      if (bar) bar.classList.toggle('is-demo-scope', isDemo);
+      if (txt) txt.textContent = text;
+      if (btn) btn.textContent = toggleLabel;
+    });
+  }
+
+  function openInsightsSheet() {
+    renderInsightsSheet();
+    openSheet('insightsSheet');
+  }
+
+  function renderInsightsSheet() {
+    renderScopeBars();
+    const logs = getScopedLogs(state.ui.dataScope);
+    const s30 = compute30DayStats(logs);
+    const s7 = compute7DayStats(logs);
+
+    const kpi = $('insightsKpiStrip');
+    if (kpi) {
+      kpi.innerHTML = `
+        <div class="kpi-tile">
+          <span class="kpi-label">近30天排便</span>
+          <strong>${s30.totalBm} 次</strong>
+          <small>无排便标记 ${s30.totalNoBm} 天</small>
+        </div>
+        <div class="kpi-tile">
+          <span class="kpi-label">3-4型占比</span>
+          <strong>${s30.idealRate !== null ? s30.idealRate + '%' : '—'}</strong>
+          <small>已选形态 ${s30.knownBristolTotal} 次</small>
+        </div>
+        <div class="kpi-tile">
+          <span class="kpi-label">平均耗时</span>
+          <strong>${s30.avgDurationSec !== null ? formatDuration(s30.avgDurationSec) : '未记录'}</strong>
+          <small>已计时 ${s30.durationKnown} 次</small>
+        </div>
       `;
     }
-    if (el.weeklyTopCulprit) el.weeklyTopCulprit.textContent = weekly.culpritText;
-    if (el.weeklyTrendVerdict) el.weeklyTrendVerdict.textContent = weekly.verdictText;
-    if (el.weeklyPkRibbon) el.weeklyPkRibbon.hidden = !includePkRibbon;
-    if (el.weeklyPkRibbonText) el.weeklyPkRibbonText.textContent = weekly.pkRibbon;
 
-    // 3. TAB MONTHLY: Monthly Grand Finale + Bristol 1-7 Wool Bar Chart
-    const monthly = computeMonthlySettlement();
-    if (el.shareCardMonthly) el.shareCardMonthly.dataset.mood = monthly.theme.mood;
-    if (el.postcardMonthLabel) el.postcardMonthLabel.textContent = monthly.monthLabel;
-    if (el.monthlyTitleBadge) el.monthlyTitleBadge.textContent = monthly.titleBadge;
-    if (el.postcardSignatureImg) {
-      el.postcardSignatureImg.src = monthly.signatureToy.img;
-      el.postcardSignatureImg.alt = monthly.signatureToy.name;
-    }
-    if (el.monthlyRankGrade) el.monthlyRankGrade.textContent = monthly.rankGrade;
-    if (el.postcardRankPill) el.postcardRankPill.textContent = `${monthly.signatureToy.type}型头牌`;
-    if (el.postcardAwardQuote) el.postcardAwardQuote.textContent = monthly.award;
-    if (el.monthlyTopTriggerText) el.monthlyTopTriggerText.textContent = `头号考验：${monthly.topTrig}`;
-    if (el.pcTotalCheckins) el.pcTotalCheckins.textContent = `${monthly.checkins} 场`;
-    if (el.pcIdealRate) el.pcIdealRate.textContent = `${monthly.idealRate}%`;
-    if (el.pcBestStreak) el.pcBestStreak.textContent = `${monthly.safeRate}%`;
-    if (el.monthlyPkRibbon) el.monthlyPkRibbon.hidden = !includePkRibbon;
-    if (el.monthlyPkRibbonText) el.monthlyPkRibbonText.textContent = monthly.pkRibbon;
-
-    if (el.monthlyBristolBars) {
-      const maxVal = Math.max(1, ...monthly.displayCounts);
-      el.monthlyBristolBars.innerHTML = monthly.displayCounts
-        .map((cnt, idx) => {
-          const type = idx + 1;
-          const pct = Math.max(10, Math.round((cnt / maxVal) * 62));
-          const barCls = type <= 2 ? 'bar-desert' : type <= 4 ? 'bar-gold' : 'bar-storm';
+    // 7-day trend track
+    const chart = $('trendChart');
+    if (chart) {
+      chart.innerHTML = s7.days
+        .map((d) => {
+          const isSel = state.ui.selectedTrendDate === d.dateKey;
+          let badge = '未记';
+          let cls = 'day-token-nodata';
+          if (d.status === 'bm') {
+            badge = d.latestBm && d.latestBm.bristol ? `${d.latestBm.bristol}型` : '已记';
+            cls = d.hasRedFlag ? 'day-token-alert' : '';
+          } else if (d.status === 'no_bm') {
+            badge = '无便';
+            cls = 'day-token-nobm';
+          }
           return `
-            <div class="wool-bar-col">
-              <span class="wool-bar-count">${cnt}</span>
-              <div class="wool-bar-fill ${barCls}" style="height:${pct}px;"></div>
-              <span class="wool-bar-label">${type}型</span>
+            <button class="trend-bar-col ${cls} ${isSel ? 'is-selected' : ''}" type="button" data-trend-day="${d.dateKey}">
+              <span class="trend-pill">${badge}</span>
+              <small>周${d.weekday}</small>
+            </button>
+          `;
+        })
+        .join('');
+    }
+
+    const detailEl = $('trendSelectedDetail');
+    if (detailEl) {
+      const targetDay =
+        s7.days.find((d) => d.dateKey === state.ui.selectedTrendDate) || s7.days[s7.days.length - 1];
+      if (!targetDay || targetDay.status === 'nodata') {
+        detailEl.textContent = `${targetDay ? targetDay.label : '今日'}：未记录（与“无排便”区分）`;
+      } else if (targetDay.status === 'no_bm') {
+        detailEl.textContent = `${targetDay.label}：已主动标记为“当日未排便”`;
+      } else {
+        const desc = targetDay.bmEntries
+          .map((e) => {
+            const b = e.bristol ? `${e.bristol}型` : '形态未选';
+            const c = getColor(e.color)?.name || '颜色未选';
+            return `${formatFullDate(e.ts)}（${b} / ${c}）`;
+          })
+          .join('；');
+        detailEl.textContent = `${targetDay.label}：${desc}`;
+      }
+    }
+
+    // Honest personal tag co-occurrence (n counts ONLY)
+    const corr = $('correlationList');
+    if (corr) {
+      if (!s30.tagSummary.length) {
+        corr.innerHTML = `<p class="empty-note">暂无带标签记录。勾选“咖啡 / 辛辣 / 熬夜”等标签后，这里将如实展示共同出现次数（不做因果推断）。</p>`;
+      } else {
+        corr.innerHTML = s30.tagSummary
+          .slice(0, 5)
+          .map(
+            (item) => `
+            <div class="corr-row">
+              <strong>${item.tag}</strong>
+              <span>共出现 n=${item.total} 次（偏稀 ${item.loose} · 偏干 ${item.dry} · 成型 ${item.normal}）</span>
+            </div>
+          `
+          )
+          .join('');
+      }
+    }
+
+    // History list
+    const hist = $('historyList');
+    if (hist) {
+      if (!logs.length) {
+        hist.innerHTML = `<p class="empty-note">当前范围尚无记录。点击首页“开始大便”或“刚拉完 · 补记一笔”即可创建个人档案。</p>`;
+      } else {
+        hist.innerHTML = logs
+          .slice(0, 20)
+          .map((l) => {
+            const rf = isEntryRedFlag(l, logs);
+            if (l.entryType === 'no_bm') {
+              return `
+                <button class="history-row" type="button" data-open-archive="${l.id}">
+                  <div>
+                    <strong>无排便日</strong>
+                    <small>${formatFullDate(l.ts)}${l.isDemo ? ' · 示例' : ''}</small>
+                  </div>
+                  <span>主动标记</span>
+                </button>
+              `;
+            }
+            const toy = getToy(l.bristol);
+            const col = getColor(l.color);
+            const title = rf
+              ? `需留意 · ${col ? col.name : '水样稀便'}`
+              : toy
+                ? `${toy.type}型 ${toy.name}`
+                : '形态未选';
+            const sub = `${formatFullDate(l.ts)} · ${col ? col.name : '颜色未选'} · ${formatDuration(l.durationSec)}${l.isDemo ? ' · 示例' : ''}`;
+            return `
+              <button class="history-row ${rf ? 'is-redflag-entry' : ''}" type="button" data-open-archive="${l.id}">
+                <div>
+                  <strong>${title}</strong>
+                  <small>${sub}</small>
+                </div>
+                <span>${l.ease || '未选顺畅度'}</span>
+              </button>
+            `;
+          })
+          .join('');
+      }
+    }
+  }
+
+  // --------------------------------------------------------------------------
+  // 15. Sheet 3: 30-Day Personal Clinical Summary (`doctorSheet`) — 0% Demo Leakage!
+  // --------------------------------------------------------------------------
+  function openDoctorSummarySheet() {
+    renderDoctorSummarySheet();
+    openSheet('doctorSheet');
+  }
+
+  function renderDoctorSummarySheet() {
+    // HARD CLINICAL ISOLATION: NEVER mix isDemo: true into 30-Day Personal Summary!
+    const personalLogs = getPersonalLogs();
+    const s30 = compute30DayStats(personalLogs);
+
+    const end = new Date();
+    const start = new Date(Date.now() - 29 * 86400000);
+    const rangeEl = $('doctorDateRange');
+    if (rangeEl) {
+      rangeEl.textContent = `${start.getFullYear()}.${pad2(start.getMonth() + 1)}.${pad2(start.getDate())} — ${end.getFullYear()}.${pad2(end.getMonth() + 1)}.${pad2(end.getDate())} · 仅个人真实记录（已排除全部演示数据）`;
+    }
+
+    const alertEl = $('clinicalAlertBanner');
+    if (alertEl) {
+      if (s30.redFlagLogs.length > 0) {
+        alertEl.hidden = false;
+        const details = s30.redFlagLogs
+          .slice(0, 3)
+          .map((e) => {
+            const col = getColor(e.color)?.name || '连续7型水样便';
+            const lvl = e.careTriage?.result?.badge ? `（自查：${e.careTriage.result.badge}）` : '';
+            return `${formatFullDate(e.ts)} ${col}${lvl}`;
+          })
+          .join('；');
+        alertEl.textContent = `近 30 天含 ${s30.redFlagLogs.length} 条异常警示记录：${details}。本摘要仅供就诊沟通参考，不替代医生面诊。`;
+      } else {
+        alertEl.hidden = true;
+      }
+    }
+
+    const metricsEl = $('doctorMetricsGrid');
+    if (metricsEl) {
+      const sumCheck =
+        Object.values(s30.bristolCounts).reduce((a, b) => a + b, 0) + s30.unknownBristol;
+      metricsEl.innerHTML = `
+        <div class="doc-metric"><span>排便记录总次</span><strong>${s30.totalBm} 次</strong></div>
+        <div class="doc-metric"><span>主动标记无排便</span><strong>${s30.noBmDays} 天</strong></div>
+        <div class="doc-metric"><span>未记录天数</span><strong>${s30.unrecordedDays} 天</strong></div>
+        <div class="doc-metric"><span>形态已选 / 未选</span><strong>${s30.knownBristolTotal} / ${s30.unknownBristol}（核对 ${sumCheck}）</strong></div>
+        <div class="doc-metric"><span>颜色已选 / 未选</span><strong>${s30.colorKnown} / ${Math.max(0, s30.totalBm - s30.colorKnown)}</strong></div>
+        <div class="doc-metric"><span>平均记录耗时</span><strong>${s30.avgDurationSec !== null ? formatDuration(s30.avgDurationSec) : '未记录'}</strong></div>
+      `;
+    }
+
+    const tbody = $('doctorTableBody');
+    if (tbody) {
+      if (!s30.recent.length) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" style="text-align:center;padding:18px 8px;color:#6E5847;">
+              暂无个人真实排便记录（全部演示示例已自动排除）。完成一次真实记录或补记后，这里将按时间生成事实明细表。
+            </td>
+          </tr>
+        `;
+      } else {
+        tbody.innerHTML = s30.recent
+          .map((l) => {
+            if (l.entryType === 'no_bm') {
+              return `
+                <tr>
+                  <td>${formatFullDate(l.ts)}</td>
+                  <td>当日无排便</td>
+                  <td>—</td>
+                  <td>—</td>
+                  <td>${l.memo || '主动标记无排便'}</td>
+                </tr>
+              `;
+            }
+            const toy = getToy(l.bristol);
+            const col = getColor(l.color);
+            const rf = isEntryRedFlag(l, personalLogs);
+            const extra = [
+              l.ease ? `顺畅度:${l.ease}` : '',
+              l.triggers?.length ? `标签:${l.triggers.join('/')}` : '',
+              l.memo || '',
+              l.careTriage?.result?.badge ? `自查:${l.careTriage.result.badge}` : ''
+            ]
+              .filter(Boolean)
+              .join('；');
+            return `
+              <tr class="${rf ? 'is-clinical-alert-row' : ''}">
+                <td>${formatFullDate(l.ts)}</td>
+                <td>${toy ? toy.clinicalLabel : '未选形态'}</td>
+                <td>${col ? col.name : '未选颜色'}</td>
+                <td>${formatDuration(l.durationSec)}</td>
+                <td>${extra || '—'}</td>
+              </tr>
+            `;
+          })
+          .join('');
+      }
+    }
+  }
+
+  // --------------------------------------------------------------------------
+  // 16. Sheet 6: Archive, Factual 7D/30D Trends & Desensitive Aesthetic Poster Hub
+  // --------------------------------------------------------------------------
+  function openReportHub(tab = 'single', archiveEntryId = null) {
+    state.ui.activeShareTab = ['single', 'weekly', 'monthly', 'poster'].includes(tab) ? tab : 'single';
+    if (archiveEntryId) state.ui.selectedArchiveId = archiveEntryId;
+    saveState();
+    renderReportHub();
+    openSheet('postcardSheet');
+  }
+
+  function renderReportHub() {
+    renderScopeBars();
+    const tab = state.ui.activeShareTab || 'single';
+
+    document.querySelectorAll('[data-share-tab]').forEach((btn) => {
+      const isAct = btn.getAttribute('data-share-tab') === tab;
+      btn.classList.toggle('is-active', isAct);
+      btn.setAttribute('aria-selected', String(isAct));
+    });
+
+    const panes = {
+      single: $('shareCardSingle'),
+      weekly: $('shareCardWeekly'),
+      monthly: $('shareCardMonthly'),
+      poster: $('shareCardPk')
+    };
+    Object.entries(panes).forEach(([k, el]) => {
+      if (el) el.hidden = k !== tab;
+    });
+
+    // Strict footer separation: Archive footer on single/weekly/monthly; Export footer ONLY on decoupled Poster tab!
+    const archFooter = $('reportArchiveFooter');
+    const postFooter = $('reportPosterFooter');
+    if (archFooter) archFooter.hidden = tab === 'poster';
+    if (postFooter) postFooter.hidden = tab !== 'poster';
+
+    const replayBtn = $('replayCutsceneBtn');
+    const logs = getScopedLogs(state.ui.dataScope);
+    const activeEntry =
+      logs.find((l) => l.id === state.ui.selectedArchiveId) || logs[0] || null;
+    if (replayBtn) {
+      replayBtn.hidden =
+        tab !== 'single' ||
+        !activeEntry ||
+        activeEntry.entryType !== 'bm' ||
+        isEntryRedFlag(activeEntry, logs);
+    }
+
+    if (tab === 'single') renderSingleArchive(activeEntry, logs);
+    else if (tab === 'weekly') renderWeeklyArchive(logs);
+    else if (tab === 'monthly') renderMonthlyArchive(logs);
+    else if (tab === 'poster') renderPosterStudio();
+  }
+
+  function renderSingleArchive(entry, logs) {
+    const kicker = $('singleStageKicker');
+    const moodLbl = $('singleMoodLabel');
+    const normalStage = $('singleNormalStage');
+    const careStage = $('singleCareStage');
+    const normalDetails = $('singleNormalDetails');
+
+    if (!entry) {
+      if (kicker) kicker.textContent = '单次个人档案';
+      if (moodLbl) moodLbl.textContent = '暂无记录';
+      if (normalStage) normalStage.hidden = true;
+      if (normalDetails) normalDetails.hidden = true;
+      if (careStage) careStage.hidden = false;
+      const cTitle = $('singleCareTitle');
+      const cEmer = $('singleCareEmergency');
+      const cNote = $('singleCareNote');
+      if (cTitle) cTitle.textContent = '当前范围暂无单次记录';
+      if (cEmer) cEmer.hidden = true;
+      if (cNote) cNote.textContent = '你可以点击首页“开始大便”或“刚拉完 · 补记一笔”创建第一条个人档案，或切换查看演示示例。';
+      return;
+    }
+
+    const rfReason = getEntryRedFlagReason(entry, logs);
+    if (kicker) {
+      kicker.textContent = `${formatFullDate(entry.ts)}${entry.isDemo ? ' · 演示示例' : ' · 个人存档'}`;
+    }
+
+    // HARD RED-FLAG GUARD: ZERO jokes, ZERO SSS/scores, ZERO normal stage visible!
+    const motionBtn = $('toggleStageMotionBtn');
+    if (motionBtn) motionBtn.hidden = Boolean(rfReason) || entry.entryType === 'no_bm';
+
+    if (rfReason) {
+      if (moodLbl) moodLbl.textContent = '健康提醒模式';
+      if (normalStage) normalStage.hidden = true;
+      if (normalDetails) normalDetails.hidden = true;
+      if (careStage) careStage.hidden = false;
+
+      const col = getColor(entry.color);
+      const cTitle = $('singleCareTitle');
+      const cEmer = $('singleCareEmergency');
+      const cNote = $('singleCareNote');
+      if (cTitle) {
+        cTitle.textContent = `本次记录含异常提示：${col ? col.name : '连续水样稀便'}`;
+      }
+      if (cEmer) {
+        cEmer.hidden = false;
+        cEmer.textContent = EMERGENCY_BANNER_COPY[rfReason] || EMERGENCY_BANNER_COPY.alarm;
+      }
+      if (cNote) {
+        const tri = entry.careTriage?.result;
+        cNote.textContent = tri
+          ? `分流建议：${tri.badge}（${tri.department}）。${tri.explanation}`
+          : '该记录已自动屏蔽趣味动画与对外分享，请结合身体感受留意变化，必要时前往消化内科评估。';
+      }
+      return;
+    }
+
+    // No-BM record
+    if (entry.entryType === 'no_bm') {
+      if (moodLbl) moodLbl.textContent = '无排便日';
+      if (normalStage) normalStage.hidden = true;
+      if (normalDetails) normalDetails.hidden = false;
+      if (careStage) careStage.hidden = true;
+      if ($('shareDailyHeadline')) $('shareDailyHeadline').textContent = '已明确标记：当日无排便';
+      if ($('hudToyLabel')) $('hudToyLabel').textContent = '当日无排便';
+      if ($('hudTimeLabel')) $('hudTimeLabel').textContent = '—';
+      if ($('hudEaseLabel')) $('hudEaseLabel').textContent = '已与漏记天数区分';
+      if ($('shareDailyConf')) $('shareDailyConf').textContent = '事实存档';
+      if ($('shareDailyDeduction')) $('shareDailyDeduction').textContent = entry.memo || '主动标记无排便。';
+      if ($('singleNextSupply')) $('singleNextSupply').textContent = '保持温和饮水与日常活动，无需焦虑。';
+      return;
+    }
+
+    // Normal BM record (100% non-judgmental, zero SSS/96 score!)
+    if (normalStage) normalStage.hidden = false;
+    if (normalDetails) normalDetails.hidden = false;
+    if (careStage) careStage.hidden = true;
+
+    const toy = getToy(entry.bristol);
+    const col = getColor(entry.color);
+    if (moodLbl) moodLbl.textContent = toy ? toy.statusText : '已存档';
+
+    const img = $('shareDailyImg');
+    if (img) img.src = toy ? toy.img : 'assets/felt/bristol_4.jpg';
+
+    if ($('singleRankGrade')) $('singleRankGrade').textContent = toy ? `${toy.type}型` : '未选';
+    if ($('singleRankTitle')) $('singleRankTitle').textContent = toy ? toy.name : '跳过形态';
+    if ($('singleRankScore')) $('singleRankScore').textContent = formatDuration(entry.durationSec);
+
+    if ($('shareDailyHeadline')) {
+      $('shareDailyHeadline').textContent = toy
+        ? `${toy.type}型 · ${toy.physicalDesc}`
+        : '本次已跳过形态选择，仅保留时间与客观备注。';
+    }
+    if ($('hudToyLabel')) $('hudToyLabel').textContent = toy ? toy.clinicalLabel : '形态未选';
+    if ($('hudTimeLabel')) $('hudTimeLabel').textContent = formatDuration(entry.durationSec);
+    if ($('hudEaseLabel')) {
+      $('hudEaseLabel').textContent = `${col ? col.name : '颜色未选'} · ${entry.ease || '顺畅度未选'}`;
+    }
+    if ($('shareDailyConf')) {
+      $('shareDailyConf').textContent = entry.triggers?.length ? `标签 ${entry.triggers.length} 项` : '无附加标签';
+    }
+    if ($('shareDailyDeduction')) {
+      const parts = [];
+      if (entry.triggers?.length) parts.push(`记录标签：${entry.triggers.join('、')}`);
+      if (entry.memo) parts.push(`个人备注：${entry.memo}`);
+      $('shareDailyDeduction').textContent =
+        parts.length > 0 ? parts.join('；') : '未填写附加标签与备注（不会脑补或推断饮食诱因）。';
+    }
+    if ($('singleNextSupply')) {
+      $('singleNextSupply').textContent = toy ? toy.advice : '如需就诊沟通，可在近 30 天摘要中查看完整记录。';
+    }
+  }
+
+  function renderWeeklyArchive(logs) {
+    const s7 = compute7DayStats(logs);
+    if ($('weeklyKicker')) $('weeklyKicker').textContent = `近 7 天客观记录（${s7.days[0].label}–${s7.days[6].label}）`;
+    if ($('weeklyMoodTitle')) $('weeklyMoodTitle').textContent = `排便 ${s7.totalBm} 次 · 无排便 ${s7.noBmDaysCount} 天 · 未记录 ${s7.noDataDaysCount} 天`;
+    if ($('weeklyPowerPill')) {
+      $('weeklyPowerPill').textContent =
+        s7.redFlagCount > 0 ? `含 ${s7.redFlagCount} 条异常提醒` : `已记 ${s7.bmDaysCount + s7.noBmDaysCount}/7 天`;
+    }
+    if ($('weeklyAttendanceSummary')) {
+      $('weeklyAttendanceSummary').textContent = `排便天数 ${s7.bmDaysCount} · 无排便 ${s7.noBmDaysCount} · 未记录 ${s7.noDataDaysCount}`;
+    }
+
+    const track = $('weeklySevenDayTrack');
+    if (track) {
+      track.innerHTML = s7.days
+        .map((d) => {
+          let label = '未记';
+          let circleCls = 'day-token-nodata';
+          if (d.status === 'bm') {
+            const b = d.latestBm?.bristol;
+            label = b ? `${b}型` : '未选';
+            if (d.bmEntries.length > 1) label += `×${d.bmEntries.length}`;
+            if (d.hasRedFlag) circleCls = 'day-token-alert';
+            else if (b === 3 || b === 4) circleCls = 'day-token-gold';
+            else if (b === 1 || b === 2) circleCls = 'day-token-desert';
+            else circleCls = 'day-token-storm';
+          } else if (d.status === 'no_bm') {
+            label = '无便';
+            circleCls = 'day-token-nobm';
+          }
+          return `
+            <div class="day-token-col">
+              <div class="day-token-circle ${circleCls}">${label}</div>
+              <span class="day-token-label">周${d.weekday}</span>
             </div>
           `;
         })
         .join('');
     }
 
-    // 4. TAB PK: Head-to-Head Rival VS Card
-    const pk = computePkMatchSummary();
-    if (el.sharePkTitle) el.sharePkTitle.textContent = `好友毛毡擂台 · 你 VS ${pk.rival.shortName}`;
-    if (el.sharePkOutcomeStamp) el.sharePkOutcomeStamp.textContent = pk.outcomeStamp;
-    if (el.sharePkMyImg) el.sharePkMyImg.src = pk.myToy.img;
-    if (el.sharePkMyScore) el.sharePkMyScore.textContent = String(pk.myScoreObj.total);
-    if (el.sharePkMyToy) el.sharePkMyToy.textContent = `${pk.myToy.type}型 ${pk.myToy.name}`;
-    if (el.sharePkRivalImg) el.sharePkRivalImg.src = pk.rivalToy.img;
-    if (el.sharePkRivalName) el.sharePkRivalName.textContent = pk.rival.shortName;
-    if (el.sharePkRivalScore) el.sharePkRivalScore.textContent = String(pk.rival.score);
-    if (el.sharePkRivalToy) el.sharePkRivalToy.textContent = `${pk.rivalToy.type}型 ${pk.rivalToy.name}`;
-    if (el.sharePkVerdict) el.sharePkVerdict.textContent = pk.verdict;
-    if (el.sharePkCodeNote) el.sharePkCodeNote.textContent = `口令：${pkInviteCode} · 来战`;
-
-    // Footer PK Ribbon Toggle visibility (hide in red-flag care mode or on PK tab)
-    const hidePkToggle = (activeShareTab === 'single' && single.redFlag) || activeShareTab === 'pk';
-    if (el.pkRibbonToggleRow) el.pkRibbonToggleRow.hidden = hidePkToggle;
-    if (el.includePkRibbonToggle) {
-      el.includePkRibbonToggle.setAttribute('aria-checked', String(includePkRibbon));
-    }
-    if (el.savePostcardImgBtn) {
-      el.savePostcardImgBtn.hidden = activeShareTab === 'single' && single.redFlag;
-    }
-    if (el.copyPostcardTextBtn) {
-      el.copyPostcardTextBtn.hidden = activeShareTab === 'single' && single.redFlag;
+    const pills = $('weeklyScorePills');
+    if (pills) {
+      pills.innerHTML = `
+        <div class="weekly-score-pill"><span>颜色已填</span><strong>${s7.colorFilled}/${s7.totalBm}</strong></div>
+        <div class="weekly-score-pill"><span>顺畅已填</span><strong>${s7.easeFilled}/${s7.totalBm}</strong></div>
+        <div class="weekly-score-pill"><span>时长已记</span><strong>${s7.durationFilled}/${s7.totalBm}</strong></div>
+      `;
     }
 
-    syncDirectorRailActive();
+    if ($('weeklyTopCulprit')) {
+      $('weeklyTopCulprit').textContent =
+        s7.noDataDaysCount > 0
+          ? `本周有 ${s7.noDataDaysCount} 天未记录（不会按便秘计算）`
+          : '本周 7 天均有明确记录';
+    }
+    if ($('weeklyTrendVerdict')) {
+      $('weeklyTrendVerdict').textContent =
+        s7.totalBm === 0
+          ? '近 7 天尚无排便记录，完成一次真实记录或补记即可在此生成客观周视图。'
+          : `共记录 ${s7.totalBm} 次排便，其中颜色明确填写 ${s7.colorFilled} 次，顺畅度明确填写 ${s7.easeFilled} 次；未填写项保持“未选”而不自动补默认值。`;
+    }
   }
 
-  function openSettlement(tab = 'single', opts = {}) {
-    const normalized = tab === 'daily' ? 'single' : tab;
-    if (normalized === 'single' || normalized === 'weekly' || normalized === 'monthly' || normalized === 'pk') {
-      activeShareTab = normalized;
+  function renderMonthlyArchive(logs) {
+    const s30 = compute30DayStats(logs);
+    const now = new Date();
+    if ($('postcardMonthLabel')) {
+      $('postcardMonthLabel').textContent = `${now.getFullYear()}年${now.getMonth() + 1}月 · 近 30 天核对`;
     }
-    if (typeof opts.previewBristol === 'number') {
-      settlementPreviewEntry = makePreviewEntry(opts.previewBristol);
-    } else if (!opts.keepPreview) {
-      settlementPreviewEntry = null;
+    if ($('monthlyTitleBadge')) {
+      $('monthlyTitleBadge').textContent =
+        s30.totalBm > 0 ? `总计 ${s30.totalBm} 次排便` : '暂无排便记录';
     }
-    directorActiveHint = opts.directorHint || '';
-
-    renderShareHub(true);
-    openSheet('postcard');
-
-    if (opts.autoLaunch || opts.playMoodSound) {
-      const single = computeSingleSettlement(settlementPreviewEntry || state.logs[0]);
-      if (!single.redFlag) {
-        if (single.theme.mood === 'gold') FeltAudio.victoryFanfare();
-        else if (single.theme.mood === 'desert') FeltAudio.desertDrum();
-        else FeltAudio.stormPlop();
+    if ($('postcardAwardQuote')) {
+      $('postcardAwardQuote').textContent =
+        s30.totalBm > 0
+          ? `近 30 天内共记录 ${s30.totalBm} 次排便（含形态未选 ${s30.unknownBristol} 次）、主动标记无排便 ${s30.noBmDays} 天、未记录 ${s30.unrecordedDays} 天。柱状图总和与总次数 100% 一致。`
+          : '当前范围近 30 天尚无记录。';
+    }
+    if ($('monthlyTopTriggerText')) {
+      if (s30.tagSummary.length) {
+        const top = s30.tagSummary[0];
+        $('monthlyTopTriggerText').textContent = `最常出现标签：${top.tag}（共同出现 n=${top.total} 次，仅作频次记录）`;
+      } else {
+        $('monthlyTopTriggerText').textContent = '近 30 天暂无标签记录';
       }
     }
-  }
 
-  function openShareHub(tab = 'single') {
-    openSettlement(tab, {});
-  }
-
-  function openPostcardSheet() {
-    openSettlement('monthly', {});
-  }
-
-  function drawWrappedText(ctx, text, x, y, maxCharsPerLine, lineHeight) {
-    let cursorY = y;
-    for (let i = 0; i < text.length; i += maxCharsPerLine) {
-      ctx.fillText(text.slice(i, i + maxCharsPerLine), x, cursorY);
-      cursorY += lineHeight;
+    // Exact Bristol 1-7 Wool Bars + Unknown col (sum === s30.totalBm, ZERO fabrication!)
+    const bars = $('monthlyBristolBars');
+    if (bars) {
+      const maxVal = Math.max(1, ...Object.values(s30.bristolCounts), s30.unknownBristol);
+      const rows = [1, 2, 3, 4, 5, 6, 7].map((t) => {
+        const cnt = s30.bristolCounts[t];
+        const px = cnt > 0 ? Math.max(10, Math.round((cnt / maxVal) * 76)) : 4;
+        const tone = t <= 2 ? 'bar-desert' : t <= 4 ? 'bar-gold' : 'bar-storm';
+        return `
+          <div class="wool-bar-col">
+            <span class="wool-bar-count">${cnt}</span>
+            <div class="wool-bar-fill ${tone}" style="height:${px}px"></div>
+            <span class="wool-bar-label">${t}型</span>
+          </div>
+        `;
+      });
+      if (s30.unknownBristol > 0) {
+        const px = Math.max(10, Math.round((s30.unknownBristol / maxVal) * 76));
+        rows.push(`
+          <div class="wool-bar-col">
+            <span class="wool-bar-count">${s30.unknownBristol}</span>
+            <div class="wool-bar-fill bar-storm" style="height:${px}px;opacity:0.55"></div>
+            <span class="wool-bar-label">未选</span>
+          </div>
+        `);
+      }
+      bars.innerHTML = rows.join('');
     }
-    return cursorY;
+
+    if ($('pcTotalCheckins')) $('pcTotalCheckins').textContent = `${s30.totalBm} 次`;
+    if ($('pcIdealRate')) $('pcIdealRate').textContent = s30.idealRate !== null ? `${s30.idealRate}%` : '—';
+    if ($('pcBestStreak')) $('pcBestStreak').textContent = `${s30.noBmDays} 天`;
   }
 
-  function exportShareCardPng() {
-    FeltAudio.stampPublish();
-    const single = computeSingleSettlement(settlementPreviewEntry || state.logs[0]);
-    const weekly = computeWeeklySettlement();
-    const monthly = computeMonthlySettlement();
-    const pk = computePkMatchSummary();
+  // --------------------------------------------------------------------------
+  // 17. Decoupled Desensitive Aesthetic Poster Studio (`poster` tab)
+  // --------------------------------------------------------------------------
+  function getPosterCaptionText() {
+    const quote = POSTER_QUOTES[state.ui.posterQuoteIdx] || POSTER_QUOTES[0];
+    return `《便便日记》手工毛毡小剧场：${quote}`;
+  }
 
-    const activeTheme =
-      activeShareTab === 'single'
-        ? single.theme
-        : activeShareTab === 'weekly'
-        ? weekly.theme
-        : activeShareTab === 'monthly'
-        ? monthly.theme
-        : getSettlementMoodTheme(4, false);
+  function renderPosterStudio() {
+    const actor = getToy(state.ui.posterActor) || BRISTOL_TOYS[3];
+    const quote = POSTER_QUOTES[state.ui.posterQuoteIdx] || POSTER_QUOTES[0];
 
-    const feedbackToyImg =
-      activeShareTab === 'single'
-        ? single.toy.img
-        : activeShareTab === 'weekly'
-        ? weekly.heroToy.img
-        : activeShareTab === 'pk'
-        ? pk.myToy.img
-        : monthly.signatureToy.img;
+    if ($('posterHeroImg')) $('posterHeroImg').src = actor.img;
+    if ($('posterActorLabel')) $('posterActorLabel').textContent = `自选毛毡团子 · ${actor.name}`;
+    if ($('posterQuotePreview')) $('posterQuotePreview').textContent = quote;
+    if ($('posterCaptionPreview')) $('posterCaptionPreview').textContent = getPosterCaptionText();
+
+    const picker = $('posterActorPicker');
+    if (picker) {
+      picker.innerHTML = BRISTOL_TOYS.map((t) => {
+        const act = t.type === actor.type;
+        return `
+          <button class="v82-actor-chip ${act ? 'is-active' : ''}" type="button" data-poster-actor="${t.type}" aria-pressed="${act}">
+            <img src="${t.img}" alt="${t.name}" />
+            <span>${t.name}</span>
+          </button>
+        `;
+      }).join('');
+    }
+
+    const qWrap = $('posterQuoteChips');
+    if (qWrap) {
+      qWrap.innerHTML = POSTER_QUOTES.map((q, idx) => {
+        const act = idx === state.ui.posterQuoteIdx;
+        return `
+          <button class="trigger-chip ${act ? 'is-active' : ''}" type="button" data-poster-quote="${idx}" aria-pressed="${act}">
+            ${q}
+          </button>
+        `;
+      }).join('');
+    }
+  }
+
+  async function copyTextSafe(text) {
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text);
+        return true;
+      }
+    } catch (_) {}
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      ta.remove();
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  async function copyShareCaption() {
+    // HARD GUARD: Only ever copies the decoupled desensitive aesthetic poster caption!
+    if (state.ui.activeShareTab !== 'poster') {
+      showStampFeedback('为保护隐私，请先切换到“脱敏海报”页复制');
+      return { ok: false, blocked: true };
+    }
+    const text = getPosterCaptionText();
+    await copyTextSafe(text);
+    FeltAudio.gentleSave();
+    showStampFeedback('已复制脱敏美学海报文案');
+    return { ok: true, text };
+  }
+
+  async function exportShareCardPng() {
+    // HARD GUARD: Only ever exports the decoupled desensitive aesthetic poster!
+    if (state.ui.activeShareTab !== 'poster') {
+      showStampFeedback('健康档案不可直接晒图，请使用“脱敏海报”');
+      return { ok: false, blocked: true };
+    }
+
+    const actor = getToy(state.ui.posterActor) || BRISTOL_TOYS[3];
+    const quote = POSTER_QUOTES[state.ui.posterQuoteIdx] || POSTER_QUOTES[0];
+
+    const canvas = document.createElement('canvas');
+    canvas.width = 900;
+    canvas.height = 1200;
+    const ctx = canvas.getContext('2d');
+
+    // Warm wool-felt canvas background
+    ctx.fillStyle = '#FBF4E7';
+    ctx.fillRect(0, 0, 900, 1200);
+
+    // Subtle stitched inner frame
+    ctx.strokeStyle = '#C99B6B';
+    ctx.lineWidth = 4;
+    ctx.setLineDash([12, 10]);
+    ctx.strokeRect(46, 46, 808, 1108);
+    ctx.setLineDash([]);
+
+    // Brand Header (Unified 《便便日记》, ZERO Bristol number, ZERO score, ZERO timestamp!)
+    ctx.fillStyle = '#4A3728';
+    ctx.font = 'bold 42px -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('《便便日记》', 450, 138);
+
+    ctx.fillStyle = '#8C6B4E';
+    ctx.font = '26px -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif';
+    ctx.fillText('手工毛毡小剧场 · 脱敏美学卡片', 450, 186);
+
+    // Load plushie actor image
+    await new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(450, 500, 225, 0, Math.PI * 2);
+        ctx.closePath();
+        ctx.clip();
+        ctx.drawImage(img, 225, 275, 450, 450);
+        ctx.restore();
+        ctx.strokeStyle = '#E2C9A6';
+        ctx.lineWidth = 10;
+        ctx.beginPath();
+        ctx.arc(450, 500, 225, 0, Math.PI * 2);
+        ctx.stroke();
+        resolve();
+      };
+      img.onerror = resolve;
+      img.src = actor.img;
+    });
+
+    // Actor plushie title (no Bristol type number!)
+    ctx.fillStyle = '#5A3E2B';
+    ctx.font = 'bold 34px -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif';
+    ctx.fillText(`今日毛毡团子 · ${actor.name}`, 450, 815);
+
+    // Aesthetic quote
+    ctx.fillStyle = '#3B2C22';
+    ctx.font = '32px -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif';
+    ctx.fillText(`「${quote}」`, 450, 910);
+
+    // Footer zero-privacy note
+    ctx.fillStyle = '#9A826D';
+    ctx.font = '22px -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif';
+    ctx.fillText('不含任何排便形态、颜色、时间或健康评分', 450, 1085);
 
     try {
-      const canvas = document.createElement('canvas');
-      canvas.width = 900;
-      canvas.height = 1200;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) throw new Error('no-canvas');
+      const url = canvas.toDataURL('image/png');
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `便便日记_脱敏海报_${actor.name}.png`;
+      a.click();
+    } catch (_) {}
 
-      // Dynamic Mood Wool Gradient Background
-      const grad = ctx.createLinearGradient(0, 0, 0, 1200);
-      grad.addColorStop(0, activeTheme.bgTop);
-      grad.addColorStop(1, activeTheme.bgBottom);
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, 900, 1200);
-
-      // Stitched Mini-Curtain Side Accents at Top Proscenium
-      ctx.fillStyle = activeTheme.curtainColor;
-      ctx.fillRect(0, 0, 48, 420);
-      ctx.fillRect(852, 0, 48, 420);
-
-      // Outer Stitched Border
-      ctx.strokeStyle = 'rgba(138, 102, 68, 0.42)';
-      ctx.lineWidth = 4;
-      ctx.setLineDash([14, 10]);
-      ctx.strokeRect(36, 36, 828, 1128);
-      ctx.setLineDash([]);
-
-      if (activeShareTab === 'single') {
-        ctx.textAlign = 'left';
-        ctx.fillStyle = '#725B47';
-        ctx.font = '700 22px -apple-system, "PingFang SC", sans-serif';
-        ctx.fillText(`STAGE CLEAR · 第 ${state.episode} 关 · ${single.theme.stageName}`, 78, 104);
-
-        ctx.fillStyle = '#3E2D20';
-        ctx.font = '700 40px "Songti SC", "PingFang SC", serif';
-        ctx.fillText(`${single.toy.type}型 ${single.toy.name} · ${single.title}`, 78, 162);
-
-        // Stitched Rank Stamp
-        ctx.fillStyle = activeTheme.stampBg;
-        ctx.fillRect(670, 74, 150, 112);
-        ctx.strokeStyle = activeTheme.accentColor;
-        ctx.lineWidth = 3;
-        ctx.setLineDash([8, 6]);
-        ctx.strokeRect(670, 74, 150, 112);
-        ctx.setLineDash([]);
-        ctx.textAlign = 'center';
-        ctx.fillStyle = activeTheme.stampInk;
-        ctx.font = '900 44px "Songti SC", serif';
-        ctx.fillText(single.grade, 745, 132);
-        ctx.font = '700 22px -apple-system, "PingFang SC", sans-serif';
-        ctx.fillText(`${single.score} 分`, 745, 168);
-
-        if (el.shareDailyImg && el.shareDailyImg.complete && el.shareDailyImg.naturalWidth > 0) {
-          ctx.drawImage(el.shareDailyImg, 310, 215, 280, 280);
-        }
-
-        ctx.textAlign = 'center';
-        ctx.fillStyle = '#3E2D20';
-        ctx.font = '700 32px "Songti SC", "PingFang SC", serif';
-        drawWrappedText(ctx, single.entry.headline, 450, 565, 19, 48);
-
-        // 3 HUD Pills
-        const hudItems = [
-          ['本关团子', `${single.toy.type}型 ${single.toy.shortName}`],
-          ['通关用时', `${formatDurationCN(single.entry.durationSec)}`],
-          ['顺畅状态', single.easePretty]
-        ];
-        hudItems.forEach(([lbl, val], i) => {
-          const cx = 185 + i * 265;
-          ctx.fillStyle = 'rgba(255, 251, 242, 0.88)';
-          ctx.fillRect(cx - 112, 665, 224, 108);
-          ctx.fillStyle = '#725B47';
-          ctx.font = '600 20px -apple-system, "PingFang SC", sans-serif';
-          ctx.fillText(lbl, cx, 704);
-          ctx.fillStyle = '#3E2D20';
-          ctx.font = '800 26px -apple-system, "PingFang SC", sans-serif';
-          ctx.fillText(val, cx, 748);
-        });
-
-        ctx.fillStyle = '#9D3B1B';
-        ctx.font = '700 22px -apple-system, "PingFang SC", sans-serif';
-        ctx.fillText(`🔍 侦探归因 (${single.deduction.confidence}%)`, 450, 825);
-        ctx.fillStyle = '#3E2D20';
-        ctx.font = '600 22px -apple-system, "PingFang SC", sans-serif';
-        drawWrappedText(ctx, single.deduction.shortGuess, 450, 862, 26, 34);
-
-        ctx.fillStyle = '#3E6037';
-        ctx.font = '700 22px -apple-system, "PingFang SC", sans-serif';
-        drawWrappedText(ctx, `🧭 下关补给：${single.nextSupply}`, 450, 922, 26, 34);
-
-        if (includePkRibbon && !single.redFlag) {
-          ctx.fillStyle = 'rgba(255, 247, 224, 0.94)';
-          ctx.fillRect(72, 1002, 756, 62);
-          ctx.fillStyle = activeTheme.stampInk;
-          ctx.font = '700 23px -apple-system, "PingFang SC", sans-serif';
-          ctx.fillText(`⚔️ 本关战力 ${single.score} 分 · 口令 ${pkInviteCode} · 来毛毡擂台一战！`, 450, 1041);
-        }
-      } else if (activeShareTab === 'weekly') {
-        ctx.textAlign = 'left';
-        ctx.fillStyle = '#725B47';
-        ctx.font = '700 22px -apple-system, "PingFang SC", sans-serif';
-        ctx.fillText('WEEKLY SEASON · 每周毛毡赛季结算', 78, 104);
-
-        ctx.fillStyle = '#3E2D20';
-        ctx.font = '700 40px "Songti SC", "PingFang SC", serif';
-        ctx.fillText(`${weekly.theme.stageName} · ${weekly.rankLabel}`, 78, 162);
-
-        if (el.weeklyHeroImg && el.weeklyHeroImg.complete && el.weeklyHeroImg.naturalWidth > 0) {
-          ctx.drawImage(el.weeklyHeroImg, 330, 200, 240, 240);
-        }
-
-        // 7-Day Attendance Circles
-        ctx.textAlign = 'center';
-        weekly.track.forEach((d, idx) => {
-          const cx = 132 + idx * 106;
-          ctx.beginPath();
-          ctx.arc(cx, 530, 38, 0, Math.PI * 2);
-          ctx.fillStyle =
-            d.cls === 'day-token-gold'
-              ? '#FCEEC3'
-              : d.cls === 'day-token-desert'
-              ? '#F6DAC0'
-              : d.cls === 'day-token-storm'
-              ? '#D4E6F0'
-              : '#FAF3E4';
-          ctx.fill();
-          ctx.lineWidth = 3;
-          ctx.strokeStyle = 'rgba(138, 102, 68, 0.45)';
-          ctx.stroke();
-
-          ctx.fillStyle = '#3E2D20';
-          ctx.font = '800 22px -apple-system, "PingFang SC", sans-serif';
-          ctx.fillText(d.text, cx, 538);
-          ctx.fillStyle = '#725B47';
-          ctx.font = '600 20px -apple-system, "PingFang SC", sans-serif';
-          ctx.fillText(`周${d.label}`, cx, 600);
-        });
-
-        ctx.fillStyle = '#3E2D20';
-        ctx.font = '800 34px "Songti SC", serif';
-        ctx.fillText(`本周综合战力 ${weekly.scoreObj.total} 分 · 评级 ${weekly.rankGrade}`, 450, 682);
-
-        ctx.font = '600 23px -apple-system, "PingFang SC", sans-serif';
-        drawWrappedText(ctx, `⚠️ ${weekly.culpritText}`, 450, 754, 26, 38);
-        drawWrappedText(ctx, `📈 ${weekly.verdictText}`, 450, 846, 26, 38);
-
-        if (includePkRibbon) {
-          ctx.fillStyle = 'rgba(255, 247, 224, 0.94)';
-          ctx.fillRect(72, 988, 756, 66);
-          ctx.fillStyle = activeTheme.stampInk;
-          ctx.font = '700 23px -apple-system, "PingFang SC", sans-serif';
-          ctx.fillText(weekly.pkRibbon, 450, 1030);
-        }
-      } else if (activeShareTab === 'monthly') {
-        ctx.textAlign = 'left';
-        ctx.fillStyle = '#725B47';
-        ctx.font = '700 22px -apple-system, "PingFang SC", sans-serif';
-        ctx.fillText(`MONTHLY FINALE · ${monthly.titleBadge}`, 78, 104);
-
-        ctx.fillStyle = '#3E2D20';
-        ctx.font = '700 40px "Songti SC", "PingFang SC", serif';
-        ctx.fillText(monthly.monthLabel, 78, 162);
-
-        if (el.postcardSignatureImg && el.postcardSignatureImg.complete && el.postcardSignatureImg.naturalWidth > 0) {
-          ctx.drawImage(el.postcardSignatureImg, 330, 195, 240, 240);
-        }
-
-        ctx.textAlign = 'center';
-        ctx.fillStyle = '#3E2D20';
-        ctx.font = '700 30px "Songti SC", "PingFang SC", serif';
-        drawWrappedText(ctx, monthly.award, 450, 495, 20, 44);
-
-        // Bristol 1-7 Wool Distribution Bars
-        const maxV = Math.max(1, ...monthly.displayCounts);
-        monthly.displayCounts.forEach((cnt, idx) => {
-          const type = idx + 1;
-          const bx = 130 + idx * 102;
-          const bh = Math.max(18, Math.round((cnt / maxV) * 160));
-          ctx.fillStyle = type <= 2 ? '#C46C3B' : type <= 4 ? '#DC9F30' : '#5886A6';
-          ctx.fillRect(bx - 24, 790 - bh, 48, bh);
-          ctx.fillStyle = '#3E2D20';
-          ctx.font = '800 22px -apple-system, "PingFang SC", sans-serif';
-          ctx.fillText(String(cnt), bx, 778 - bh);
-          ctx.fillStyle = '#725B47';
-          ctx.font = '700 20px -apple-system, "PingFang SC", sans-serif';
-          ctx.fillText(`${type}型`, bx, 825);
-        });
-
-        ctx.fillStyle = '#3E2D20';
-        ctx.font = '700 26px -apple-system, "PingFang SC", sans-serif';
-        ctx.fillText(
-          `本月通关 ${monthly.checkins} 场 · 3–4型达标 ${monthly.idealRate}% · 不伤痔率 ${monthly.safeRate}%`,
-          450,
-          908
-        );
-
-        if (includePkRibbon) {
-          ctx.fillStyle = 'rgba(255, 247, 224, 0.94)';
-          ctx.fillRect(72, 988, 756, 66);
-          ctx.fillStyle = activeTheme.stampInk;
-          ctx.font = '700 23px -apple-system, "PingFang SC", sans-serif';
-          ctx.fillText(monthly.pkRibbon, 450, 1030);
-        }
-      } else {
-        ctx.textAlign = 'left';
-        ctx.fillStyle = '#725B47';
-        ctx.font = '700 22px -apple-system, "PingFang SC", sans-serif';
-        ctx.fillText('WOOL ARENA BATTLE CARD · 好友毛毡擂台 PK', 78, 104);
-
-        ctx.fillStyle = '#3E2D20';
-        ctx.font = '700 40px "Songti SC", "PingFang SC", serif';
-        ctx.fillText(`你 (${pk.myScoreObj.total}分)  VS  ${pk.rival.shortName} (${pk.rival.score}分)`, 78, 166);
-
-        if (el.sharePkMyImg && el.sharePkMyImg.complete && el.sharePkMyImg.naturalWidth > 0) {
-          ctx.drawImage(el.sharePkMyImg, 120, 250, 260, 260);
-        }
-        if (el.sharePkRivalImg && el.sharePkRivalImg.complete && el.sharePkRivalImg.naturalWidth > 0) {
-          ctx.drawImage(el.sharePkRivalImg, 520, 250, 260, 260);
-        }
-
-        ctx.textAlign = 'center';
-        ctx.fillStyle = '#D96E47';
-        ctx.font = '900 44px -apple-system, "PingFang SC", sans-serif';
-        ctx.fillText('VS', 450, 400);
-
-        ctx.fillStyle = '#3E2D20';
-        ctx.font = '700 34px "Songti SC", "PingFang SC", serif';
-        drawWrappedText(ctx, pk.verdict, 450, 640, 18, 54);
-
-        ctx.fillStyle = '#4A6A46';
-        ctx.font = '700 26px -apple-system, "PingFang SC", sans-serif';
-        ctx.fillText(`PK 邀请口令：${pkInviteCode} · 只比健康分不泄露隐私`, 450, 920);
-      }
-
-      ctx.textAlign = 'center';
-      ctx.fillStyle = '#4A6A46';
-      ctx.font = '600 21px -apple-system, "PingFang SC", sans-serif';
-      ctx.fillText('已自动隐去具体排便时间与敏感细节 · 噗通剧场手工毛毡结算小剧场', 450, 1126);
-
-      const link = document.createElement('a');
-      link.download = `putong-settlement-${activeShareTab}-${Date.now()}.png`;
-      link.href = canvas.toDataURL('image/png');
-      link.click();
-      showStampFeedback('高清毛毡结算分享图已保存！', feedbackToyImg);
-    } catch (_err) {
-      showStampFeedback('结算分享卡已就绪（截图或复制文案即可发好友/小红书）', feedbackToyImg);
-    }
+    FeltAudio.gentleSave();
+    showStampFeedback('脱敏美学海报 PNG 已生成');
+    return { ok: true };
   }
 
-  function copyShareCaption() {
-    FeltAudio.softTap();
-    const single = computeSingleSettlement(settlementPreviewEntry || state.logs[0]);
-    const weekly = computeWeeklySettlement();
-    const monthly = computeMonthlySettlement();
-    const pk = computePkMatchSummary();
-
-    let text = '';
-    let img = monthly.signatureToy.img;
-    if (activeShareTab === 'single') {
-      img = single.toy.img;
-      text = `【噗通剧场 · 第 ${state.episode} 关 ${single.theme.stageName}】通关评级 ${single.grade}（${single.score}分）！出场团子：${single.toy.type}型 ${single.toy.name}。${single.entry.headline} ${includePkRibbon ? `⚔️ 好友 PK 口令【${pkInviteCode}】，来晒你的毛毡团子！` : ''} #噗通剧场 #手工毛毡`;
-    } else if (activeShareTab === 'weekly') {
-      img = weekly.heroToy.img;
-      text = `【噗通剧场 · 每周赛季结算】本周达成「${weekly.rankLabel}」，综合战力 ${weekly.scoreObj.total} 分！${weekly.verdictText} ${includePkRibbon ? `⚔️ 接战口令【${pkInviteCode}】` : ''} #噗通剧场 #每周肠道结算`;
-    } else if (activeShareTab === 'pk') {
-      img = pk.myToy.img;
-      text = `【噗通剧场 · 好友毛毡擂台 PK】我 (${pk.myScoreObj.total}分·${pk.myToy.name}) VS ${pk.rival.shortName} (${pk.rival.score}分·${pk.rivalToy.name})！${pk.verdict} 邀请口令【${pkInviteCode}】敢来接招吗？ #噗通剧场 #好友PK`;
-    } else {
-      text = `【噗通剧场 · ${monthly.monthLabel}】${monthly.award} 本月通关 ${monthly.checkins} 场，3–4型达标率 ${monthly.idealRate}%，不伤痔率 ${monthly.safeRate}%！${includePkRibbon ? `⚔️ 月度战帖口令【${pkInviteCode}】` : ''} #噗通剧场 #月度结算`;
-    }
-
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard
-        .writeText(text)
-        .then(() => showStampFeedback('小红书 / 微信脱敏文案已复制！', img))
-        .catch(() => showStampFeedback('文案已就绪，可直接粘贴分享！', img));
-    } else {
-      showStampFeedback('文案已就绪，可直接粘贴分享！', img);
-    }
+  // --------------------------------------------------------------------------
+  // 18. Sheet 5: 1v1 Zero-Privacy Wool-Felt Care Stickers (`pkSheet`)
+  // --------------------------------------------------------------------------
+  function openCareStickerSheet() {
+    renderCareStickerSheet();
+    openSheet('pkSheet');
   }
 
-  function resetDemoData() {
-    state = createSeedState();
-    saveState();
-    currentMode = 'theater';
-    pkBanterCount = 0;
-    activeRivalId = 'azhe';
-    settlementPreviewEntry = null;
-    directorActiveHint = '';
-    resetSquatTimer();
-    closeAllSheets();
-    renderHomeStage(true);
-    FeltAudio.stampPublish();
-    showStampFeedback('已恢复 14 日初始演示档案', getToy(4).img);
-  }
+  function renderCareStickerSheet() {
+    const key = CARE_STICKERS[state.ui.activeSticker] ? state.ui.activeSticker : 'tissue';
+    const st = CARE_STICKERS[key];
+    if ($('careStickerImg')) $('careStickerImg').src = st.img;
+    if ($('careStickerTitle')) $('careStickerTitle').textContent = st.title;
+    if ($('careStickerBody')) $('careStickerBody').textContent = st.body;
+    if ($('careStickerCaptionPreview')) $('careStickerCaptionPreview').textContent = st.caption;
 
-  // =========================================================================
-  // V7: Toilet Check-In & Must-Go Ranking (`必拉榜`)
-  // =========================================================================
-  const SEED_TOILETS = [
-    {
-      id: 'spot-office-18f',
-      name: '公司 18F 西侧礼宾间',
-      area: '写字楼西翼走廊尽头',
-      air: 5,
-      clean: 5,
-      tags: ['智能马桶', '信号满格', '纸巾充足'],
-      note: '清风香氛 + 独立隔间，摸鱼护痔圣地',
-      visits: 16
-    },
-    {
-      id: 'spot-home-main',
-      name: '家里主卫 · 专属宝座',
-      area: '居家私密主场',
-      air: 5,
-      clean: 5,
-      tags: ['隔音极佳', '恒温座圈', '无异味'],
-      note: '熟悉的光线与温度，4 型金冠团高发地',
-      visits: 24
-    },
-    {
-      id: 'spot-mall-b1',
-      name: '国贸商城 B1 东南角',
-      area: '高端商场礼宾区',
-      air: 4,
-      clean: 5,
-      tags: ['无异味', '纸巾充足', '有挂钩'],
-      note: '保洁阿姨每小时巡检，逛街救急首选',
-      visits: 7
-    },
-    {
-      id: 'spot-cafe-downstairs',
-      name: '楼下精品咖啡馆单间',
-      area: '一层后院拐角',
-      air: 4,
-      clean: 4,
-      tags: ['隔音极佳', '有挂钩'],
-      note: '自带爵士背景音，冰美式发作 30 秒直达',
-      visits: 5
-    },
-    {
-      id: 'spot-subway-exit2',
-      name: '地铁换乘站 2 号口',
-      area: '站厅 B1 层',
-      air: 2,
-      clean: 2,
-      tags: ['仅限应急'],
-      note: '空气略闷且排队偏长，非紧急情况建议绕道',
-      visits: 2
-    }
-  ];
-
-  const TOILET_TAG_POOL = ['智能马桶', '信号满格', '纸巾充足', '隔音极佳', '无异味', '有挂钩'];
-  const AIR_LABELS = ['', '毒气预警', '略闷有味', '中规中矩', '清新舒适', '清风如林'];
-  const CLEAN_LABELS = ['', '劝退避雷', '勉强救急', '基本干净', '清爽整洁', '一尘不染'];
-
-  const toiletDraft = {
-    air: 5,
-    clean: 5,
-    tags: ['无异味', '纸巾充足']
-  };
-
-  function ensureToilets() {
-    if (!Array.isArray(state.toilets) || state.toilets.length === 0) {
-      state.toilets = SEED_TOILETS.map((t) => ({ ...t, tags: [...t.tags] }));
-    }
-    if (!state.selectedToiletId || !state.toilets.some((t) => t.id === state.selectedToiletId)) {
-      state.selectedToiletId = state.toilets[0].id;
-    }
-  }
-
-  function getSelectedToiletSpot() {
-    ensureToilets();
-    return state.toilets.find((t) => t.id === state.selectedToiletId) || state.toilets[0];
-  }
-
-  function computeToiletScore(spot) {
-    const airScore = (Number(spot.air) || 3) * 0.9;
-    const cleanScore = (Number(spot.clean) || 3) * 0.9;
-    const bonus = Math.min(1.0, (spot.tags ? spot.tags.length : 0) * 0.34);
-    return Math.min(10, Number((airScore + cleanScore + bonus).toFixed(1)));
-  }
-
-  function getToiletVerdict(score) {
-    if (score >= 9.2) return '必拉殿堂';
-    if (score >= 8.2) return '强烈推荐';
-    if (score >= 6.8) return '稳妥可用';
-    return '慎入避雷';
-  }
-
-  function syncSessionToiletBadge() {
-    const spot = getSelectedToiletSpot();
-    const elName = document.getElementById('sessionToiletName');
-    if (elName && spot) elName.textContent = spot.name.split('·')[0].trim();
-  }
-
-  function renderLogToiletChips() {
-    const wrap = document.getElementById('logToiletChips');
-    if (!wrap) return;
-    ensureToilets();
-    wrap.innerHTML = '';
-    const ranked = [...state.toilets]
-      .sort((a, b) => computeToiletScore(b) - computeToiletScore(a))
-      .slice(0, 4);
-    ranked.forEach((spot) => {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'trigger-chip';
-      if (spot.id === state.selectedToiletId) btn.classList.add('is-active');
-      btn.textContent = `📍 ${spot.name.split('·')[0].trim()}`;
-      btn.addEventListener('click', () => {
-        FeltAudio.softTap();
-        state.selectedToiletId = spot.id;
-        saveState();
-        syncSessionToiletBadge();
-        renderLogToiletChips();
-      });
-      wrap.appendChild(btn);
+    document.querySelectorAll('[data-sticker]').forEach((btn) => {
+      const act = btn.getAttribute('data-sticker') === key;
+      btn.classList.toggle('is-active', act);
+      btn.setAttribute('aria-pressed', String(act));
     });
   }
 
-  function renderToiletMustGoList() {
-    const listEl = document.getElementById('toiletMustGoList');
-    if (!listEl) return;
-    ensureToilets();
-    const ranked = [...state.toilets].sort((a, b) => computeToiletScore(b) - computeToiletScore(a));
-    listEl.innerHTML = '';
-    ranked.forEach((spot, idx) => {
-      const score = computeToiletScore(spot);
-      const isSelected = spot.id === state.selectedToiletId;
-      const card = document.createElement('article');
-      card.className = `toilet-card${isSelected ? ' is-selected' : ''}`;
-      const rankClass = idx === 0 ? 'is-top1' : idx === 1 ? 'is-top2' : idx === 2 ? 'is-top3' : '';
-      const rankText = idx === 0 ? '🏆' : `#${idx + 1}`;
-      card.innerHTML = `
-        <div class="toilet-card-top v8-toilet-summary" role="button" tabindex="0" aria-expanded="false">
-          <div class="toilet-rank-wrap">
-            <span class="toilet-rank-badge ${rankClass}">${rankText}</span>
-            <div class="toilet-title-col">
-              <strong class="toilet-name">${spot.name}</strong>
-              <span class="toilet-area">空气 ${spot.air}★ · 清洁 ${spot.clean}★${isSelected ? ' · 当前坑位' : ''}</span>
-            </div>
-          </div>
-          <div class="toilet-score-box">
-            <span class="toilet-score-num">${score.toFixed(1)}</span>
-            <span class="toilet-score-verdict">${getToiletVerdict(score)} ▾</span>
-          </div>
-        </div>
-        <div class="v8-toilet-details">
-          <div class="toilet-area" style="margin-bottom:6px;">${spot.area || '日常常去点位'} · 已打卡 ${spot.visits || 1} 次</div>
-          <div class="toilet-tags-row" style="margin-bottom:8px;">
-            ${(spot.tags || []).map((t) => `<span class="toilet-tag">${t}</span>`).join('')}
-          </div>
-          <div class="toilet-card-foot">
-            <span class="toilet-note">${spot.note || '用户实地打卡验证'}</span>
-            <button class="toilet-use-btn" type="button">${isSelected ? '当前坑位 ✓' : '设为当前坑位'}</button>
-          </div>
-        </div>
-      `;
-      const summaryEl = card.querySelector('.v8-toilet-summary');
-      summaryEl.addEventListener('click', () => {
-        FeltAudio.softTap();
-        const willOpen = !card.classList.contains('is-expanded');
-        card.classList.toggle('is-expanded', willOpen);
-        summaryEl.setAttribute('aria-expanded', String(willOpen));
-      });
-      const useBtn = card.querySelector('.toilet-use-btn');
-      useBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        FeltAudio.toyBounce();
-        state.selectedToiletId = spot.id;
-        saveState();
-        syncSessionToiletBadge();
-        renderToiletMustGoList();
-        renderLogToiletChips();
-        showStampFeedback(`已定位当前厕所：${spot.name.split('·')[0].trim()}`);
-      });
-      listEl.appendChild(card);
-    });
-  }
-
-  function renderToiletFormControls() {
-    const airEl = document.getElementById('toiletAirStars');
-    const cleanEl = document.getElementById('toiletCleanStars');
-    const airLabel = document.getElementById('toiletAirLabel');
-    const cleanLabel = document.getElementById('toiletCleanLabel');
-    const tagWrap = document.getElementById('toiletTagPicker');
-
-    if (airEl) {
-      airEl.innerHTML = '';
-      for (let i = 1; i <= 5; i += 1) {
-        const b = document.createElement('button');
-        b.type = 'button';
-        b.className = `star-btn${i <= toiletDraft.air ? ' is-on' : ''}`;
-        b.textContent = '★';
-        b.addEventListener('click', () => {
-          toiletDraft.air = i;
-          FeltAudio.softTap();
-          renderToiletFormControls();
-        });
-        airEl.appendChild(b);
-      }
-      if (airLabel) airLabel.textContent = AIR_LABELS[toiletDraft.air] || '';
-    }
-
-    if (cleanEl) {
-      cleanEl.innerHTML = '';
-      for (let i = 1; i <= 5; i += 1) {
-        const b = document.createElement('button');
-        b.type = 'button';
-        b.className = `star-btn${i <= toiletDraft.clean ? ' is-on' : ''}`;
-        b.textContent = '★';
-        b.addEventListener('click', () => {
-          toiletDraft.clean = i;
-          FeltAudio.softTap();
-          renderToiletFormControls();
-        });
-        cleanEl.appendChild(b);
-      }
-      if (cleanLabel) cleanLabel.textContent = CLEAN_LABELS[toiletDraft.clean] || '';
-    }
-
-    if (tagWrap) {
-      tagWrap.innerHTML = '';
-      TOILET_TAG_POOL.forEach((tag) => {
-        const b = document.createElement('button');
-        b.type = 'button';
-        b.className = `trigger-chip${toiletDraft.tags.includes(tag) ? ' is-active' : ''}`;
-        b.textContent = tag;
-        b.addEventListener('click', () => {
-          FeltAudio.softTap();
-          if (toiletDraft.tags.includes(tag)) {
-            toiletDraft.tags = toiletDraft.tags.filter((x) => x !== tag);
-          } else if (toiletDraft.tags.length < 4) {
-            toiletDraft.tags.push(tag);
-          }
-          renderToiletFormControls();
-        });
-        tagWrap.appendChild(b);
-      });
-    }
-  }
-
-  function switchToiletTab(tab = 'rank') {
-    const rankBtn = document.getElementById('toiletTabRankBtn');
-    const addBtn = document.getElementById('toiletTabAddBtn');
-    const rankPane = document.getElementById('toiletRankPane');
-    const form = document.getElementById('toiletCheckinForm');
-    const footBtn = document.getElementById('toiletQuickAddFooterBtn');
-    const isRank = tab !== 'add';
-
-    if (rankBtn) {
-      rankBtn.classList.toggle('is-active', isRank);
-      rankBtn.setAttribute('aria-selected', String(isRank));
-    }
-    if (addBtn) {
-      addBtn.classList.toggle('is-active', !isRank);
-      addBtn.setAttribute('aria-selected', String(!isRank));
-    }
-    if (rankPane) rankPane.hidden = !isRank;
-    if (form) form.hidden = isRank;
-    if (footBtn) footBtn.hidden = !isRank;
-
-    if (isRank) renderToiletMustGoList();
-    else renderToiletFormControls();
-  }
+  // --------------------------------------------------------------------------
+  // 19. Sheet 7: Private & Public Toilet Spots (`toiletSheet`)
+  // --------------------------------------------------------------------------
+  const SPOT_TAGS = ['有纸', '通风好', '温水马桶', '安静', '有信号', '保洁勤', '有挂钩'];
 
   function openToiletSheet(tab = 'rank') {
-    ensureToilets();
     switchToiletTab(tab);
-    openSheet('toilet');
+    renderToiletSheet();
+    openSheet('toiletSheet');
   }
 
-  // =========================================================================
-  // V7: Live Poop Session State Machine (`开始大便` -> Timing -> `结束大便`)
-  // =========================================================================
-  let sessionActive = false;
-
-  function syncHomeSessionView() {
-    const idleView = document.getElementById('homeIdleView');
-    const sessView = document.getElementById('homeSessionView');
-    if (idleView) idleView.hidden = sessionActive;
-    if (sessView) sessView.hidden = !sessionActive;
-    syncSessionToiletBadge();
+  function switchToiletTab(tab) {
+    const isAdd = tab === 'add';
+    const rankBtn = $('toiletTabRankBtn');
+    const addBtn = $('toiletTabAddBtn');
+    const rankPane = $('toiletRankPane');
+    const addForm = $('toiletCheckinForm');
+    if (rankBtn) rankBtn.classList.toggle('is-active', !isAdd);
+    if (addBtn) addBtn.classList.toggle('is-active', isAdd);
+    if (rankPane) rankPane.hidden = isAdd;
+    if (addForm) addForm.hidden = !isAdd;
   }
 
-  function startPoopSession() {
-    ensureToilets();
-    if (currentMode === 'redflag') {
-      currentMode = 'theater';
+  function renderToiletSheet() {
+    const list = $('toiletMustGoList');
+    if (list) {
+      list.innerHTML = state.toilets
+        .map((sp, idx) => {
+          const scopeLbl = sp.scope === 'public' ? '公共备选' : '私人备忘';
+          return `
+            <div class="toilet-card">
+              <div class="toilet-card-top">
+                <div class="toilet-rank-wrap">
+                  <span class="toilet-rank-badge ${idx === 0 ? 'is-top1' : idx === 1 ? 'is-top2' : 'is-top3'}">${idx + 1}</span>
+                  <div class="toilet-title-col">
+                    <strong class="toilet-name">${sp.name}</strong>
+                    <span class="toilet-area">${sp.area || '日常'}</span>
+                  </div>
+                </div>
+                <span class="v82-spot-scope-tag ${sp.scope === 'public' ? 'is-public' : ''}">${scopeLbl}</span>
+              </div>
+              <div class="toilet-metrics-row">
+                <span>空气 <strong>${'★'.repeat(sp.air)}</strong></span>
+                <span>整洁 <strong>${'★'.repeat(sp.clean)}</strong></span>
+              </div>
+              <div class="toilet-tags-row">${(sp.tags || []).map((t) => `<span class="toilet-tag">${t}</span>`).join('')}</div>
+              ${sp.note ? `<p class="toilet-note">${sp.note}</p>` : ''}
+            </div>
+          `;
+        })
+        .join('');
     }
-    sessionActive = true;
-    activeHeroPose = 'sitting';
-    renderHomeStage(false);
-    resetSquatTimer();
-    timer.running = true;
-    timer.intervalId = setInterval(() => {
-      timer.seconds += 1;
-      updateTimerUI();
-      if (timer.seconds === 480 && !timer.alertShown) {
-        timer.alertShown = true;
-        showEightMinToast(true);
-      }
-    }, 1000);
-    FeltAudio.toyBounce();
-    updateTimerUI();
-    syncHomeSessionView();
+
+    // Scope picker
+    document.querySelectorAll('[data-spot-scope]').forEach((btn) => {
+      const act = btn.getAttribute('data-spot-scope') === spotFormState.scope;
+      btn.classList.toggle('is-active', act);
+      btn.setAttribute('aria-pressed', String(act));
+    });
+
+    // Stars
+    renderStarPicker('toiletAirStars', 'toiletAirLabel', spotFormState.air, 'air');
+    renderStarPicker('toiletCleanStars', 'toiletCleanLabel', spotFormState.clean, 'clean');
+
+    // Tags
+    const tagWrap = $('toiletTagPicker');
+    if (tagWrap) {
+      tagWrap.innerHTML = SPOT_TAGS.map((t) => {
+        const act = spotFormState.tags.includes(t);
+        return `<button class="trigger-chip ${act ? 'is-active' : ''}" type="button" data-spot-tag="${t}">${t}</button>`;
+      }).join('');
+    }
   }
 
-  function finishPoopSession() {
-    const elapsed = timer.seconds;
-    if (timer.intervalId) {
-      clearInterval(timer.intervalId);
-      timer.intervalId = null;
-    }
-    timer.running = false;
-    sessionActive = false;
-    syncHomeSessionView();
-    updateTimerUI();
-    FeltAudio.softTap();
-    // Pass exact elapsed seconds if >= 5s; otherwise give a clean 2m15s default for rapid demo clicking
-    openLogDrawer(4, elapsed >= 5 ? elapsed : 135);
+  function renderStarPicker(wrapId, labelId, value, field) {
+    const wrap = $(wrapId);
+    const lbl = $(labelId);
+    if (lbl) lbl.textContent = `${value} / 5`;
+    if (!wrap) return;
+    wrap.innerHTML = [1, 2, 3, 4, 5]
+      .map(
+        (n) => `
+        <button class="star-btn ${n <= value ? 'is-on' : ''}" type="button" data-star-field="${field}" data-star-val="${n}" aria-label="${n}分">★</button>
+      `
+      )
+      .join('');
   }
 
-  function resetPoopSessionUI() {
-    sessionActive = false;
-    activeHeroPose = 'default';
-    resetSquatTimer();
-    syncHomeSessionView();
-    if (currentMode !== 'redflag') setHeroStagePose('default');
+  // --------------------------------------------------------------------------
+  // 20. Sheet 4: Privacy & Demo Data Controls (`privacySheet`)
+  // --------------------------------------------------------------------------
+  function renderPrivacySheet() {
+    applyCamouflage();
+    const grid = $('camouflageGrid');
+    if (grid) {
+      grid.innerHTML = CAMOUFLAGE_SKINS.map((sk) => {
+        const act = state.settings.camouflage === sk.id;
+        return `
+          <button class="camo-option-btn ${act ? 'is-active' : ''}" type="button" data-camo-id="${sk.id}" aria-pressed="${act}">
+            <strong>${sk.name}</strong>
+            <small>${sk.badge}</small>
+          </button>
+        `;
+      }).join('');
+    }
   }
 
-  // =========================================================================
-  // V7: Stop-Motion Felt Archive Cutscene (`完成录入` -> 过场动画+音效 -> 定格档案)
-  // =========================================================================
-  let cutsceneTimers = [];
-  let cutsceneFinishCb = null;
-
-  function getCutscenePersona(entry) {
-    const toy = getToy(entry ? entry.bristol : 4);
-    const single = computeSingleSettlement(entry || state.logs[0]);
-    if (toy.type === 4) {
-      return {
-        persona: 'champion',
-        title: '丝滑金冠团 · 优雅滑行登场！',
-        sub: entry?.headline || '“丝滑收工，今日肠道状态满分。”',
-        grade: single.grade,
-        img: toy.img,
-        sound: 'gold'
-      };
-    }
-    if (toy.type === 3) {
-      return {
-        persona: 'steady',
-        title: '缝线稳重团 · 准时稳健打卡！',
-        sub: entry?.headline || '“踏实靠谱，今天肠道运转顺滑。”',
-        grade: single.grade,
-        img: toy.img,
-        sound: 'gold'
-      };
-    }
-    if (toy.type <= 2) {
-      return {
-        persona: 'desert',
-        title: '硬核憋劲团 · 顶风突围成功！',
-        sub: entry?.headline || '“顶着荒漠逆风完成任务，快补杯温水！”',
-        grade: single.grade,
-        img: toy.img,
-        sound: 'desert'
-      };
-    }
-    return {
-      persona: 'storm',
-      title: `${toy.name} · 踏浪急行抢滩！`,
-      sub: entry?.headline || '“暴风急行完赛，今天让肠胃好好歇歇！”',
-      grade: single.grade,
-      img: toy.img,
-      sound: 'storm'
-    };
-  }
-
-  function stopFeltCutscene(runCallback = true) {
-    cutsceneTimers.forEach((t) => clearTimeout(t));
-    cutsceneTimers = [];
-    const overlay = document.getElementById('feltCutsceneOverlay');
-    if (overlay) {
-      overlay.hidden = true;
-      overlay.classList.remove('is-playing', 'is-sealed');
-    }
-    const cb = cutsceneFinishCb;
-    cutsceneFinishCb = null;
-    if (runCallback && typeof cb === 'function') cb();
-  }
-
-  function playFeltArchiveCutscene(entry, onDone) {
-    const overlay = document.getElementById('feltCutsceneOverlay');
-    if (!overlay) {
-      if (typeof onDone === 'function') onDone();
-      return;
-    }
-
-    stopFeltCutscene(false);
-    cutsceneFinishCb = onDone || null;
-
-    const info = getCutscenePersona(entry);
-    overlay.dataset.persona = info.persona;
-    const epEl = document.getElementById('cutsceneEpisodeTag');
-    const imgEl = document.getElementById('cutsceneMascotImg');
-    const titleEl = document.getElementById('cutscenePersonaTitle');
-    const subEl = document.getElementById('cutscenePersonaSub');
-    const gradeEl = document.getElementById('cutsceneSealGrade');
-
-    if (epEl) epEl.textContent = `第 ${state.episode} 场 · 毛毡定格过场小剧场`;
-    if (imgEl) imgEl.src = info.img;
-    if (titleEl) titleEl.textContent = info.title;
-    if (subEl) subEl.textContent = info.sub;
-    if (gradeEl) gradeEl.textContent = info.grade;
-
-    overlay.hidden = false;
-    overlay.classList.remove('is-playing', 'is-sealed');
-    void overlay.offsetWidth;
-    overlay.classList.add('is-playing');
-
-    // Synced Persona Soundscape
-    if (info.sound === 'gold') FeltAudio.victoryFanfare();
-    else if (info.sound === 'desert') FeltAudio.desertDrum();
-    else FeltAudio.stormPlop();
-
-    // Freeze-frame wax-stamp slam at 1.35s
-    cutsceneTimers.push(
-      setTimeout(() => {
-        overlay.classList.add('is-sealed');
-        FeltAudio.stampPublish();
-      }, 1350)
-    );
-
-    // Transition seamlessly into Today's Frozen Poop Archive at 2.65s
-    cutsceneTimers.push(
-      setTimeout(() => {
-        stopFeltCutscene(true);
-      }, 2650)
-    );
-  }
-
-  // =========================================================================
-  // Event Bindings
-  // =========================================================================
-  function bindEvents() {
-    // V6 Minimalist Top More Menu & Collapsible Desktop Demo Drawer
-    const moreMenuBtn = document.getElementById('moreMenuBtn');
-    const moreMenuPopover = document.getElementById('moreMenuPopover');
-    const closeMoreMenu = () => {
-      if (!moreMenuPopover || moreMenuPopover.hidden) return;
-      moreMenuPopover.hidden = true;
-      if (moreMenuBtn) moreMenuBtn.setAttribute('aria-expanded', 'false');
-    };
-    if (moreMenuBtn && moreMenuPopover) {
-      moreMenuBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        FeltAudio.softTap();
-        const willOpen = moreMenuPopover.hidden;
-        moreMenuPopover.hidden = !willOpen;
-        moreMenuBtn.setAttribute('aria-expanded', String(willOpen));
-      });
-      moreMenuPopover.addEventListener('click', (e) => {
-        if (e.target.closest('button')) closeMoreMenu();
-      });
-      document.addEventListener('click', (e) => {
-        if (!moreMenuPopover.hidden && !e.target.closest('.more-menu-wrap')) {
-          closeMoreMenu();
-        }
-      });
-    }
-
-    const directorToggleBtn = document.getElementById('directorToggleBtn');
-    const directorCloseBtn = document.getElementById('directorCloseBtn');
-    const directorRail = document.getElementById('directorRail');
-    const setDirectorDrawer = (open) => {
-      if (!directorRail) return;
-      directorRail.classList.toggle('is-collapsed', !open);
-      if (directorToggleBtn) {
-        directorToggleBtn.setAttribute('aria-expanded', String(open));
-        directorToggleBtn.hidden = open;
-      }
-    };
-    if (directorToggleBtn && directorRail) {
-      directorToggleBtn.addEventListener('click', () => {
-        FeltAudio.softTap();
-        setDirectorDrawer(true);
-      });
-    }
-    if (directorCloseBtn && directorRail) {
-      directorCloseBtn.addEventListener('click', () => {
-        FeltAudio.softTap();
-        setDirectorDrawer(false);
-      });
-    }
-
-    const careSkipExitBtn = document.getElementById('careSkipExitBtn');
-    if (careSkipExitBtn) {
-      careSkipExitBtn.addEventListener('click', exitRedFlagMode);
-    }
-    const careRetakeBtn = document.getElementById('careRetakeBtn');
-    if (careRetakeBtn) {
-      careRetakeBtn.addEventListener('click', () => {
-        FeltAudio.softTap();
-        startCareTriage(activeRedFlagReason);
-        renderCareTriageView();
-      });
-    }
-
-    el.soundToggleBtn.addEventListener('click', () => {
-      state.settings.soundEnabled = !state.settings.soundEnabled;
-      saveState();
-      renderTopBarAndSkin();
-      if (state.settings.soundEnabled) FeltAudio.toyBounce();
-    });
-
-    el.brandButton.addEventListener('click', () => {
-      FeltAudio.softTap();
-      if (currentMode === 'redflag') {
-        exitRedFlagMode();
-      } else {
-        showStampFeedback('手工毛毡戏台 · 100% 本地运行');
-      }
-    });
-
-    el.privacyBtn.addEventListener('click', () => {
-      FeltAudio.softTap();
-      renderPrivacySheet();
-      openSheet('privacy');
-    });
-
-    el.timerPillBtn.addEventListener('click', toggleSquatTimer);
-    el.demoEightMinBtn.addEventListener('click', triggerEightMinAlert);
-
-    el.closeToastBtn.addEventListener('click', () => {
-      FeltAudio.softTap();
-      hideEightMinToast();
-    });
-
-    el.toastLogNowBtn.addEventListener('click', () => {
-      FeltAudio.softTap();
-      hideEightMinToast();
-      openLogDrawer(4);
-    });
-
-    el.toastResetTimerBtn.addEventListener('click', () => {
-      FeltAudio.softTap();
-      resetSquatTimer();
-      showStampFeedback('计时器已归零');
-    });
-
-    // Feature 1: Home Detective Feedback Chips
-    if (el.detectiveHitBtn) {
-      el.detectiveHitBtn.addEventListener('click', () => {
-        const latest = state.logs[0];
-        if (!latest) return;
-        const ded = inferLikelyDiet(latest, state.logs.slice(1));
-        const merged = Array.from(new Set([...(latest.triggers || []), ...ded.suggestedTags]));
-        latest.triggers = merged;
-        latest.detectiveConfirmed = true;
-        saveState();
-        renderHomeDetectiveStrip();
-        FeltAudio.stampPublish();
-        showStampFeedback('破案成功！已将饮食线索钉上 14 日背刺榜！', getToy(latest.bristol).img);
-      });
-    }
-
-    if (el.detectiveMissBtn) {
-      el.detectiveMissBtn.addEventListener('click', () => {
-        FeltAudio.softTap();
-        const willOpen = el.detectiveOverrideRow.hidden;
-        el.detectiveOverrideRow.hidden = !willOpen;
-        if (willOpen && el.detectiveOverrideChips) {
-          el.detectiveOverrideChips.innerHTML = '';
-          ['冰美式', '重辣火锅', '奶茶乳糖', '喝水少', '熬夜', '久坐'].forEach((tag) => {
-            const c = document.createElement('button');
-            c.type = 'button';
-            c.className = 'detective-chip';
-            c.textContent = tag;
-            c.addEventListener('click', () => {
-              const latest = state.logs[0];
-              if (!latest) return;
-              latest.triggers = Array.from(new Set([...(latest.triggers || []), tag]));
-              latest.detectiveConfirmed = true;
-              saveState();
-              renderHomeDetectiveStrip();
-              FeltAudio.toyBounce();
-              showStampFeedback(`侦探笔记已修正：记录「${tag}」`, getToy(latest.bristol).img);
-            });
-            el.detectiveOverrideChips.appendChild(c);
-          });
-        }
-      });
-    }
-
-    if (el.adoptDetectiveTagsBtn) {
-      el.adoptDetectiveTagsBtn.addEventListener('click', () => {
-        const pred = inferLikelyDiet(
-          {
-            bristol: draft.bristol,
-            color: draft.color,
-            durationSec: draft.durationSec,
-            ease: draft.ease,
-            triggers: draft.triggers,
-            timestamp: new Date().toISOString()
-          },
-          state.logs
-        );
-        if (pred.suggestedTags.length > 0) {
-          draft.triggers = Array.from(new Set([...draft.triggers, ...pred.suggestedTags]));
-          FeltAudio.toyBounce();
-          renderTriggerChips();
-          showStampFeedback(`已采纳侦探线索：${pred.suggestedTags.join(' + ')}`);
-        }
-      });
-    }
-
-    el.openLogBtn.addEventListener('click', () => {
-      startPoopSession();
-    });
-
-    const finishPoopBtn = document.getElementById('finishPoopBtn');
-    if (finishPoopBtn) finishPoopBtn.addEventListener('click', finishPoopSession);
-
-    const cancelPoopBtn = document.getElementById('cancelPoopBtn');
-    if (cancelPoopBtn) {
-      cancelPoopBtn.addEventListener('click', () => {
-        FeltAudio.softTap();
-        resetPoopSessionUI();
-      });
-    }
-
-    const sessionDirectLogBtn = document.getElementById('sessionDirectLogBtn');
-    if (sessionDirectLogBtn) {
-      sessionDirectLogBtn.addEventListener('click', () => {
-        FeltAudio.softTap();
-        resetPoopSessionUI();
-        openLogDrawer(4);
-      });
-    }
-
-    const openToiletBtn = document.getElementById('openToiletBtn');
-    if (openToiletBtn) {
-      openToiletBtn.addEventListener('click', () => {
-        FeltAudio.toyBounce();
-        openToiletSheet('rank');
-      });
-    }
-
-    const sessionToiletChip = document.getElementById('sessionToiletChip');
-    if (sessionToiletChip) {
-      sessionToiletChip.addEventListener('click', () => {
-        FeltAudio.softTap();
-        openToiletSheet('rank');
-      });
-    }
-
-    const logOpenToiletBtn = document.getElementById('logOpenToiletBtn');
-    if (logOpenToiletBtn) {
-      logOpenToiletBtn.addEventListener('click', () => {
-        FeltAudio.softTap();
-        openToiletSheet('add');
-      });
-    }
-
-    const toiletTabRankBtn = document.getElementById('toiletTabRankBtn');
-    if (toiletTabRankBtn) {
-      toiletTabRankBtn.addEventListener('click', () => {
-        FeltAudio.softTap();
-        switchToiletTab('rank');
-      });
-    }
-
-    const toiletTabAddBtn = document.getElementById('toiletTabAddBtn');
-    if (toiletTabAddBtn) {
-      toiletTabAddBtn.addEventListener('click', () => {
-        FeltAudio.softTap();
-        switchToiletTab('add');
-      });
-    }
-
-    const toiletQuickAddFooterBtn = document.getElementById('toiletQuickAddFooterBtn');
-    if (toiletQuickAddFooterBtn) {
-      toiletQuickAddFooterBtn.addEventListener('click', () => {
-        FeltAudio.softTap();
-        switchToiletTab('add');
-      });
-    }
-
-    const toiletForm = document.getElementById('toiletCheckinForm');
-    if (toiletForm) {
-      toiletForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const nameInput = document.getElementById('toiletNameInput');
-        const areaInput = document.getElementById('toiletAreaInput');
-        const noteInput = document.getElementById('toiletNoteInput');
-        const name = nameInput ? nameInput.value.trim() : '';
-        if (!name) return;
-        ensureToilets();
-        const newSpot = {
-          id: `spot-${Date.now()}`,
-          name,
-          area: areaInput ? areaInput.value.trim() || '自定义打卡点' : '自定义打卡点',
-          air: toiletDraft.air,
-          clean: toiletDraft.clean,
-          tags: [...toiletDraft.tags],
-          note: noteInput ? noteInput.value.trim() || '实地打卡收录' : '实地打卡收录',
-          visits: 1
-        };
-        state.toilets.unshift(newSpot);
-        state.selectedToiletId = newSpot.id;
-        saveState();
-        if (nameInput) nameInput.value = '';
-        if (areaInput) areaInput.value = '';
-        if (noteInput) noteInput.value = '';
-        FeltAudio.stampPublish();
-        syncSessionToiletBadge();
-        switchToiletTab('rank');
-        showStampFeedback(`已收录「${name}」进入必拉榜！`);
-      });
-    }
-
-    const cutsceneSkipBtn = document.getElementById('cutsceneSkipBtn');
-    if (cutsceneSkipBtn) {
-      cutsceneSkipBtn.addEventListener('click', () => {
-        FeltAudio.softTap();
-        stopFeltCutscene(true);
-      });
-    }
-
-    const replayCutsceneBtn = document.getElementById('replayCutsceneBtn');
-    if (replayCutsceneBtn) {
-      replayCutsceneBtn.addEventListener('click', () => {
-        const entry = settlementPreviewEntry || state.logs[0];
-        closeAllSheets();
-        playFeltArchiveCutscene(entry, () => {
-          openSettlement('single', { keepPreview: Boolean(settlementPreviewEntry) });
-        });
-      });
-    }
-
-    if (el.openPkBtn) {
-      el.openPkBtn.addEventListener('click', () => {
-        FeltAudio.toyBounce();
-        openPkSheet();
-      });
-    }
-
-    el.openInsightsBtn.addEventListener('click', () => {
-      FeltAudio.softTap();
-      renderInsightsSheet();
-      openSheet('insights');
-    });
-
-    if (el.openShareDailyBtn) {
-      el.openShareDailyBtn.addEventListener('click', () => {
-        FeltAudio.toyBounce();
-        openSettlement('single', { playMoodSound: false });
-      });
-    }
-
-    el.openRedFlagDemoBtn.addEventListener('click', () => {
-      enterRedFlagMode('blood', false);
-    });
-
-    el.careOpenReportBtn.addEventListener('click', () => {
-      FeltAudio.softTap();
-      renderDoctorReport();
-      openSheet('doctor');
-    });
-
-    el.careExitBtn.addEventListener('click', exitRedFlagMode);
-
-    el.sheetScrim.addEventListener('click', () => {
-      FeltAudio.softTap();
-      closeAllSheets();
-    });
-
-    document.querySelectorAll('[data-close-sheet]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        FeltAudio.softTap();
-        closeAllSheets();
-      });
-    });
-
-    if (el.bristolPrevBtn) {
-      el.bristolPrevBtn.addEventListener('click', () => {
-        const prev = draft.bristol <= 1 ? 7 : draft.bristol - 1;
-        selectBristolType(prev, true);
-      });
-    }
-
-    if (el.bristolNextBtn) {
-      el.bristolNextBtn.addEventListener('click', () => {
-        const next = draft.bristol >= 7 ? 1 : draft.bristol + 1;
-        selectBristolType(next, true);
-      });
-    }
-
-    if (el.bristolRail) {
-      el.bristolRail.addEventListener(
-        'wheel',
-        (evt) => {
-          if (Math.abs(evt.deltaY) > Math.abs(evt.deltaX)) {
-            el.bristolRail.scrollLeft += evt.deltaY;
-            evt.preventDefault();
-          }
-        },
-        { passive: false }
-      );
-    }
-
-    el.cycleDurationBtn.addEventListener('click', () => {
-      FeltAudio.softTap();
-      draft.durationPresetIdx = (draft.durationPresetIdx + 1) % DURATION_PRESETS.length;
-      draft.durationSec = DURATION_PRESETS[draft.durationPresetIdx];
-      el.logDurationLabel.textContent = formatDurationCN(draft.durationSec);
-      renderDraftDetective();
-    });
-
-    el.publishLogBtn.addEventListener('click', publishCurrentDraft);
-
-    el.easterEggToggleBtn.addEventListener('click', () => {
-      FeltAudio.softTap();
-      const willOpen = el.easterEggBody.hidden;
-      el.easterEggBody.hidden = !willOpen;
-      el.easterEggToggleBtn.setAttribute('aria-expanded', String(willOpen));
-      el.easterEggChevron.textContent = willOpen ? '收起' : '展开';
-    });
-
-    if (el.insightsToPkBtn) {
-      el.insightsToPkBtn.addEventListener('click', () => {
-        FeltAudio.toyBounce();
-        openPkSheet();
-      });
-    }
-
-    if (el.insightsToPostcardBtn) {
-      el.insightsToPostcardBtn.addEventListener('click', () => {
-        FeltAudio.toyBounce();
-        openShareHub('monthly');
-      });
-    }
-
-    el.insightsToDoctorBtn.addEventListener('click', () => {
-      FeltAudio.softTap();
-      renderDoctorReport();
-      openSheet('doctor');
-    });
-
-    el.insightsToLogBtn.addEventListener('click', () => {
-      FeltAudio.softTap();
-      openLogDrawer(4);
-    });
-
-    el.printReportBtn.addEventListener('click', () => {
-      FeltAudio.softTap();
-      window.print();
-    });
-
-    el.doctorBackBtn.addEventListener('click', () => {
-      FeltAudio.softTap();
-      closeAllSheets();
-    });
-
-    el.faceIdToggleBtn.addEventListener('click', () => {
-      state.settings.faceIdEnabled = !state.settings.faceIdEnabled;
-      saveState();
-      FeltAudio.softTap();
-      renderPrivacySheet();
-    });
-
-    el.resetDemoDataBtn.addEventListener('click', resetDemoData);
-
-    // Feature 2: PK Banter & Share Actions
-    if (el.pkSendTissueBtn) {
-      el.pkSendTissueBtn.addEventListener('click', () => {
-        const r = getActiveRival();
-        pkBanterCount += 1;
-        renderPkSheet();
-        FeltAudio.toyBounce();
-        showStampFeedback(`已隔空递给${r.shortName}一张加厚毛毡纸巾！`, getToy(r.bristol).img);
-      });
-    }
-
-    if (el.pkSendWaterBtn) {
-      el.pkSendWaterBtn.addEventListener('click', () => {
-        const r = getActiveRival();
-        pkBanterCount += 1;
-        renderPkSheet();
-        FeltAudio.stampPublish();
-        showStampFeedback(`已向${r.shortName}投喂 45°C 温水一杯，友谊 +10！`, getToy(4).img);
-      });
-    }
-
-    if (el.pkCopyInviteBtn) {
-      el.pkCopyInviteBtn.addEventListener('click', () => {
-        const rand = 100 + Math.floor(Math.random() * 899);
-        pkInviteCode = `PUTONG-PK-${rand}`;
-        renderPkSheet();
-        FeltAudio.softTap();
-        const inviteMsg = `来「噗通剧场」毛毡擂台 PK 肠道健康分！不晒隐私只比团子，邀请口令：${pkInviteCode}`;
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard
-            .writeText(inviteMsg)
-            .then(() => showStampFeedback(`邀请口令 ${pkInviteCode} 已复制！`))
-            .catch(() => showStampFeedback(`已生成邀请口令：${pkInviteCode}`));
-        } else {
-          showStampFeedback(`已生成邀请口令：${pkInviteCode}`);
-        }
-      });
-    }
-
-    if (el.pkToShareBtn) {
-      el.pkToShareBtn.addEventListener('click', () => {
-        FeltAudio.toyBounce();
-        openShareHub('pk');
-      });
-    }
-
-    // Feature 3: 4-Tab Settlement & PK Share Hub Controls
-    document.querySelectorAll('[data-share-tab]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        activeShareTab = btn.dataset.shareTab;
-        directorActiveHint = '';
-        FeltAudio.softTap();
-        renderShareHub(true);
-      });
-    });
-
-    if (el.toggleStageMotionBtn) {
-      el.toggleStageMotionBtn.addEventListener('click', () => {
-        stageStaticMode = !stageStaticMode;
-        FeltAudio.softTap();
-        syncMotionButtonUI();
-      });
-    }
-
-    if (el.includePkRibbonToggle) {
-      el.includePkRibbonToggle.addEventListener('click', () => {
-        includePkRibbon = !includePkRibbon;
-        FeltAudio.softTap();
-        renderShareHub(false);
-      });
-    }
-
-    if (el.singleCareOpenDoctorBtn) {
-      el.singleCareOpenDoctorBtn.addEventListener('click', () => {
-        FeltAudio.softTap();
-        renderDoctorReport();
-        openSheet('doctor');
-      });
-    }
-
-    if (el.savePostcardImgBtn) {
-      el.savePostcardImgBtn.addEventListener('click', exportShareCardPng);
-    }
-    if (el.copyPostcardTextBtn) {
-      el.copyPostcardTextBtn.addEventListener('click', copyShareCaption);
-    }
-
-    // Desktop-Only Director Quick Demo Rail bindings (11 Instant Preview Buttons)
-    if (el.directorRail) {
-      el.directorRail.querySelectorAll('[data-demo-action]').forEach((btn) => {
-        btn.addEventListener('click', () => {
-          const action = btn.dataset.demoAction;
-          if (action === 'home') {
-            FeltAudio.softTap();
-            window.__poopApp.showHome();
-          } else if (action === 'log') {
-            FeltAudio.softTap();
-            window.__poopApp.openLogDrawer(4);
-          } else if (action === 'settle_gold') {
-            openSettlement('single', { previewBristol: 4, playMoodSound: true, directorHint: 'settle_gold' });
-          } else if (action === 'settle_desert') {
-            openSettlement('single', { previewBristol: 1, playMoodSound: true, directorHint: 'settle_desert' });
-          } else if (action === 'settle_storm') {
-            openSettlement('single', { previewBristol: 6, playMoodSound: true, directorHint: 'settle_storm' });
-          } else if (action === 'settle_weekly') {
-            FeltAudio.toyBounce();
-            openSettlement('weekly', { directorHint: 'settle_weekly' });
-          } else if (action === 'settle_monthly') {
-            FeltAudio.toyBounce();
-            openSettlement('monthly', { directorHint: 'settle_monthly' });
-          } else if (action === 'pk') {
-            FeltAudio.toyBounce();
-            window.__poopApp.openPkSheet();
-          } else if (action === 'eightmin') {
-            window.__poopApp.triggerEightMinAlert();
-          } else if (action === 'redflag') {
-            enterRedFlagMode('black', false);
-          } else if (action === 'reset') {
-            resetDemoData();
-          }
-        });
-      });
-    }
-
-    document.addEventListener('keydown', (evt) => {
-      if (evt.key === 'Escape' && activeSheet) {
-        closeAllSheets();
-      }
-    });
-  }
-
-  // =========================================================================
-  // Automation & QA Hooks (`window.__poopApp`)
-  // =========================================================================
-  window.__poopApp = {
-    showHome() {
-      closeAllSheets();
-      hideEightMinToast();
-      settlementPreviewEntry = null;
-      directorActiveHint = '';
-      currentMode = 'theater';
-      renderHomeStage(false);
-      return { mode: currentMode, episode: state.episode };
-    },
-    openLogDrawer(preselectBristol = 4) {
-      currentMode = 'theater';
-      renderHomeStage(false);
-      openLogDrawer(preselectBristol);
-      return { sheet: activeSheet, bristol: draft.bristol };
-    },
-    triggerRedFlagDemo(reason = 'black') {
-      enterRedFlagMode(reason, true);
-      return { mode: currentMode, reason: activeRedFlagReason };
-    },
-    openInsights() {
-      renderInsightsSheet();
-      openSheet('insights');
-      return { sheet: activeSheet, logsCount: state.logs.length };
-    },
-    openDoctorReport() {
-      renderDoctorReport();
-      openSheet('doctor');
-      return { sheet: activeSheet, logsCount: state.logs.length };
-    },
-    openPrivacySheet() {
-      renderPrivacySheet();
-      openSheet('privacy');
-      return { sheet: activeSheet, camouflage: state.settings.camouflage };
-    },
-    openPkSheet(rivalId) {
-      openPkSheet(rivalId);
-      const pk = computePkMatchSummary();
-      return { sheet: activeSheet, myScore: pk.myScoreObj.total, rivalScore: pk.rival.score };
-    },
-    openSettlement(tab = 'single', opts = {}) {
-      openSettlement(tab, opts);
-      return { sheet: activeSheet, tab: activeShareTab, includePkRibbon, stageStaticMode };
-    },
-    openShareHub(tab = 'single') {
-      openShareHub(tab);
-      return { sheet: activeSheet, tab: activeShareTab };
-    },
-    openPostcardSheet() {
-      openPostcardSheet();
-      return { sheet: activeSheet, tab: activeShareTab, summary: computePostcardSummary().award };
-    },
-    exportShareCardPng() {
-      exportShareCardPng();
-      return { tab: activeShareTab };
-    },
-    getSettlementMoodTheme(type, isRedFlag = false) {
-      return getSettlementMoodTheme(type, isRedFlag);
-    },
-    triggerEightMinAlert() {
-      triggerEightMinAlert();
-      return { toastVisible: !el.eightMinToast.hidden, timer: formatMMSS(timer.seconds) };
-    },
-    resetDemoData() {
-      resetDemoData();
-      return { mode: currentMode, episode: state.episode, logsCount: state.logs.length };
-    },
-    inferLikelyDiet(entry) {
-      return inferLikelyDiet(entry || state.logs[0], state.logs);
-    },
-    startPoopSession() {
-      startPoopSession();
-      return { sessionActive, timerRunning: timer.running };
-    },
-    finishPoopSession() {
-      finishPoopSession();
-      return { sheet: activeSheet };
-    },
-    openToiletSheet(tab = 'rank') {
-      openToiletSheet(tab);
-      return { sheet: activeSheet, count: state.toilets.length };
-    },
-    playCutscenePreview(bristol = 4) {
-      const sample = makePreviewEntry(bristol);
-      closeAllSheets();
-      playFeltArchiveCutscene(sample, null);
-      return { persona: getCutscenePersona(sample).persona };
-    },
-    setHeroStagePose(pose) {
-      activeHeroPose = pose;
-      setHeroStagePose(pose);
-      return { activeHeroPose };
-    }
-  };
-
-  // =========================================================================
-  // V8: Access Gate (`Tiger`) & Hover/Tap Progressive Disclosure
-  // =========================================================================
-  const GATE_SESSION_KEY = 'bb_diary_gate_unlocked_v8';
-  const GATE_EXPECTED_HASH = 0x95d40b46;
-
+  // --------------------------------------------------------------------------
+  // 21. Access Gate (`tiger` -> FNV-1a `0x95d40b46`)
+  // --------------------------------------------------------------------------
   function fnv1aHash(str) {
     let h = 2166136261;
     for (let i = 0; i < str.length; i += 1) {
@@ -4476,10 +2523,10 @@
   }
 
   function initAccessGate() {
-    const overlay = document.getElementById('accessGateOverlay');
-    const form = document.getElementById('accessGateForm');
-    const input = document.getElementById('gatePasswordInput');
-    const errEl = document.getElementById('gateErrorText');
+    const overlay = $('accessGateOverlay');
+    const form = $('accessGateForm');
+    const input = $('gatePasswordInput');
+    const errEl = $('gateErrorText');
     if (!overlay || !form || !input) return;
 
     try {
@@ -4492,7 +2539,7 @@
     overlay.hidden = false;
     setTimeout(() => {
       try { input.focus(); } catch (_) {}
-    }, 120);
+    }, 100);
 
     form.addEventListener('submit', (e) => {
       e.preventDefault();
@@ -4504,7 +2551,7 @@
         overlay.classList.add('is-unlocked');
         setTimeout(() => {
           overlay.hidden = true;
-        }, 280);
+        }, 240);
       } else {
         if (errEl) errEl.hidden = false;
         FeltAudio.softTap();
@@ -4516,52 +2563,545 @@
     });
   }
 
-  function initZenDisclosures() {
-    // 1. Home Whisper Quote Disclosure (tap on mobile + hover on desktop)
-    const wrap = document.getElementById('homeQuoteDisclosure');
-    const toggle = document.getElementById('homeQuoteToggleBtn');
-    if (wrap && toggle) {
-      toggle.addEventListener('click', (e) => {
-        e.stopPropagation();
-        FeltAudio.softTap();
-        const willOpen = !wrap.classList.contains('is-open');
-        wrap.classList.toggle('is-open', willOpen);
-        toggle.setAttribute('aria-expanded', String(willOpen));
-      });
-      document.addEventListener('click', (e) => {
-        if (wrap.classList.contains('is-open') && !e.target.closest('#homeQuoteDisclosure')) {
-          wrap.classList.remove('is-open');
-          toggle.setAttribute('aria-expanded', 'false');
-        }
-      });
-    }
+  // --------------------------------------------------------------------------
+  // 22. Event Bindings
+  // --------------------------------------------------------------------------
+  function bindEvents() {
+    // Global close-sheet delegation
+    document.addEventListener('click', (e) => {
+      const closeBtn = e.target.closest('[data-close-sheet]');
+      if (closeBtn) {
+        closeAllSheets();
+        return;
+      }
 
-    // 2. Smooth hover-to-open on desktop pointers for .v8-hover-fold <details>
-    if (window.matchMedia && window.matchMedia('(hover: hover)').matches) {
-      document.querySelectorAll('details.v8-hover-fold').forEach((det) => {
-        let closeTimer = null;
-        det.addEventListener('mouseenter', () => {
-          if (closeTimer) clearTimeout(closeTimer);
-          det.open = true;
-        });
-        det.addEventListener('mouseleave', () => {
-          closeTimer = setTimeout(() => {
-            det.open = false;
-          }, 180);
-        });
+      // Bristol rail card
+      const bCard = e.target.closest('[data-bristol-type]');
+      if (bCard) {
+        draft.bristol = Number(bCard.getAttribute('data-bristol-type'));
+        FeltAudio.toyBounce();
+        renderLogDrawer();
+        return;
+      }
+
+      // Color chip
+      const cChip = e.target.closest('[data-color-id]');
+      if (cChip) {
+        const cid = cChip.getAttribute('data-color-id');
+        draft.color = draft.color === cid ? null : cid;
+        FeltAudio.softTap();
+        renderLogDrawer();
+        return;
+      }
+
+      // Ease pill (toggleable)
+      const eBtn = e.target.closest('[data-ease-val]');
+      if (eBtn) {
+        const val = eBtn.getAttribute('data-ease-val');
+        draft.ease = draft.ease === val ? null : val;
+        FeltAudio.softTap();
+        renderLogDrawer();
+        return;
+      }
+
+      // Trigger chip
+      const tChip = e.target.closest('[data-trigger-val]');
+      if (tChip) {
+        const val = tChip.getAttribute('data-trigger-val');
+        const idx = draft.triggers.indexOf(val);
+        if (idx >= 0) draft.triggers.splice(idx, 1);
+        else draft.triggers.push(val);
+        FeltAudio.softTap();
+        renderLogDrawer();
+        return;
+      }
+
+      // Log toilet chip
+      const ltChip = e.target.closest('[data-log-toilet]');
+      if (ltChip) {
+        const tid = ltChip.getAttribute('data-log-toilet');
+        draft.toiletId = draft.toiletId === tid ? null : tid;
+        FeltAudio.softTap();
+        renderLogDrawer();
+        return;
+      }
+
+      // Reminder threshold pills
+      const remBtn = e.target.closest('[data-reminder-min]');
+      if (remBtn) {
+        const m = Number(remBtn.getAttribute('data-reminder-min'));
+        state.settings.reminderMin = m;
+        if (state.activeSession) {
+          state.activeSession.reminderMin = m;
+        }
+        saveState();
+        syncSettingsUI();
+        FeltAudio.softTap();
+        showStampFeedback(`已设提醒阈值：${m} 分钟`);
+        return;
+      }
+
+      // Care triage answer
+      const careAns = e.target.closest('[data-care-answer]');
+      if (careAns) {
+        handleCareAnswer(careAns.getAttribute('data-care-answer'));
+        return;
+      }
+
+      // Trend day click
+      const trendDay = e.target.closest('[data-trend-day]');
+      if (trendDay) {
+        state.ui.selectedTrendDate = trendDay.getAttribute('data-trend-day');
+        renderInsightsSheet();
+        return;
+      }
+
+      // Open archive entry from history
+      const archBtn = e.target.closest('[data-open-archive]');
+      if (archBtn) {
+        openReportHub('single', archBtn.getAttribute('data-open-archive'));
+        return;
+      }
+
+      // Report tabs
+      const shareTab = e.target.closest('[data-share-tab]');
+      if (shareTab) {
+        state.ui.activeShareTab = shareTab.getAttribute('data-share-tab');
+        saveState();
+        renderReportHub();
+        FeltAudio.softTap();
+        return;
+      }
+
+      // Poster actor & quote chips
+      const pActor = e.target.closest('[data-poster-actor]');
+      if (pActor) {
+        state.ui.posterActor = Number(pActor.getAttribute('data-poster-actor'));
+        saveState();
+        renderPosterStudio();
+        FeltAudio.toyBounce();
+        return;
+      }
+      const pQuote = e.target.closest('[data-poster-quote]');
+      if (pQuote) {
+        state.ui.posterQuoteIdx = Number(pQuote.getAttribute('data-poster-quote'));
+        saveState();
+        renderPosterStudio();
+        FeltAudio.softTap();
+        return;
+      }
+
+      // 1v1 Care Sticker choices
+      const stBtn = e.target.closest('[data-sticker]');
+      if (stBtn) {
+        state.ui.activeSticker = stBtn.getAttribute('data-sticker');
+        saveState();
+        renderCareStickerSheet();
+        FeltAudio.toyBounce();
+        return;
+      }
+
+      // Camouflage skin
+      const camoBtn = e.target.closest('[data-camo-id]');
+      if (camoBtn) {
+        state.settings.camouflage = camoBtn.getAttribute('data-camo-id');
+        saveState();
+        renderPrivacySheet();
+        FeltAudio.softTap();
+        return;
+      }
+
+      // Toilet tab & form controls
+      const tTab = e.target.closest('[data-toilet-tab]');
+      if (tTab) {
+        switchToiletTab(tTab.getAttribute('data-toilet-tab'));
+        return;
+      }
+      const spScope = e.target.closest('[data-spot-scope]');
+      if (spScope) {
+        spotFormState.scope = spScope.getAttribute('data-spot-scope');
+        renderToiletSheet();
+        return;
+      }
+      const starBtn = e.target.closest('[data-star-field]');
+      if (starBtn) {
+        const f = starBtn.getAttribute('data-star-field');
+        spotFormState[f] = Number(starBtn.getAttribute('data-star-val'));
+        renderToiletSheet();
+        return;
+      }
+      const spTag = e.target.closest('[data-spot-tag]');
+      if (spTag) {
+        const tg = spTag.getAttribute('data-spot-tag');
+        const idx = spotFormState.tags.indexOf(tg);
+        if (idx >= 0) spotFormState.tags.splice(idx, 1);
+        else spotFormState.tags.push(tg);
+        renderToiletSheet();
+        return;
+      }
+
+      // Director rail quick jumps (QA / Demo)
+      const demoBtn = e.target.closest('[data-demo-action]');
+      if (demoBtn) {
+        runDemoAction(demoBtn.getAttribute('data-demo-action'));
+      }
+    });
+
+    // Scrim click closes sheet
+    $('sheetScrim')?.addEventListener('click', () => closeAllSheets());
+
+    // Top bar & More menu
+    $('moreMenuBtn')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const pop = $('moreMenuPopover');
+      if (!pop) return;
+      const willOpen = pop.hidden;
+      pop.hidden = !willOpen;
+      $('moreMenuBtn')?.setAttribute('aria-expanded', String(willOpen));
+    });
+
+    document.addEventListener('click', (e) => {
+      const pop = $('moreMenuPopover');
+      if (pop && !pop.hidden && !e.target.closest('#moreMenuPopover') && !e.target.closest('#moreMenuBtn')) {
+        pop.hidden = true;
+        $('moreMenuBtn')?.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    $('soundToggleBtn')?.addEventListener('click', () => {
+      state.settings.soundEnabled = !state.settings.soundEnabled;
+      saveState();
+      syncSettingsUI();
+      showStampFeedback(state.settings.soundEnabled ? '已开启音效' : '已静音');
+    });
+
+    $('cutsceneMuteBtn')?.addEventListener('click', () => {
+      state.settings.soundEnabled = !state.settings.soundEnabled;
+      saveState();
+      syncSettingsUI();
+    });
+
+    $('cutscenePrefToggleBtn')?.addEventListener('click', () => {
+      state.settings.cutsceneEnabled = !state.settings.cutsceneEnabled;
+      saveState();
+      syncSettingsUI();
+      showStampFeedback(state.settings.cutsceneEnabled ? '保存后播放毛毡过场' : '已设为保存后直达档案');
+    });
+
+    $('privacyBtn')?.addEventListener('click', () => {
+      renderPrivacySheet();
+      openSheet('privacySheet');
+    });
+    $('openDoctorQuickBtn')?.addEventListener('click', openDoctorSummarySheet);
+    $('openInsightsBtn')?.addEventListener('click', openInsightsSheet);
+    $('demoEightMinBtn')?.addEventListener('click', () => {
+      const pop = $('moreMenuPopover');
+      if (pop) pop.hidden = true;
+      if (!state.activeSession) startPoopSession();
+      showSittingReminderToast(state.settings.reminderMin || 8);
+    });
+    $('openRedFlagDemoBtn')?.addEventListener('click', () => {
+      const pop = $('moreMenuPopover');
+      if (pop) pop.hidden = true;
+      startCareTriage('blood', null);
+    });
+
+    // Home whisper popover toggle
+    $('homeQuoteToggleBtn')?.addEventListener('click', () => {
+      const pop = $('homeQuotePopover');
+      if (!pop) return;
+      const open = pop.hidden;
+      pop.hidden = !open;
+      $('homeQuoteToggleBtn')?.setAttribute('aria-expanded', String(open));
+    });
+
+    // Primary Home Dock actions
+    $('openLogBtn')?.addEventListener('click', startPoopSession);
+    $('quickBackfillBtn')?.addEventListener('click', () => openLogDrawer({ mode: 'backfill' }));
+    $('markNoBmTodayBtn')?.addEventListener('click', markNoBmToday);
+    $('openShareDailyBtn')?.addEventListener('click', () => openReportHub('single'));
+    $('openPkBtn')?.addEventListener('click', openCareStickerSheet);
+    $('openToiletBtn')?.addEventListener('click', () => openToiletSheet('rank'));
+    $('timerPillBtn')?.addEventListener('click', () => {
+      if (state.activeSession && state.activeSession.running) {
+        finishSessionAndOpenLog();
+      } else {
+        startPoopSession();
+      }
+    });
+
+    // Active session controls
+    $('finishPoopBtn')?.addEventListener('click', finishSessionAndOpenLog);
+    $('sessionDirectLogBtn')?.addEventListener('click', finishSessionAndOpenLog);
+    $('cancelPoopBtn')?.addEventListener('click', cancelPoopSession);
+    $('sessionToiletChip')?.addEventListener('click', () => openToiletSheet('rank'));
+
+    // Sitting reminder toast
+    $('closeToastBtn')?.addEventListener('click', snoozeSittingReminder);
+    $('toastResetTimerBtn')?.addEventListener('click', snoozeSittingReminder);
+    $('toastLogNowBtn')?.addEventListener('click', finishSessionAndOpenLog);
+
+    // Red-flag triage buttons
+    $('careSkipExitBtn')?.addEventListener('click', exitCareTriage);
+    $('careExitBtn')?.addEventListener('click', exitCareTriage);
+    $('careQuickSummaryBtn')?.addEventListener('click', () => {
+      exitCareTriage();
+      openDoctorSummarySheet();
+    });
+    $('careOpenReportBtn')?.addEventListener('click', () => {
+      exitCareTriage();
+      openDoctorSummarySheet();
+    });
+    $('careRetakeBtn')?.addEventListener('click', () => {
+      triageState.step = 0;
+      triageState.answers = {};
+      triageState.result = null;
+      renderCareTriage();
+    });
+
+    // Log Drawer controls
+    $('cycleDurationBtn')?.addEventListener('click', () => {
+      const curIdx = DURATION_CYCLE.indexOf(draft.durationSec);
+      draft.durationSec = DURATION_CYCLE[(curIdx + 1) % DURATION_CYCLE.length];
+      FeltAudio.softTap();
+      renderLogDrawer();
+    });
+    $('bristolUncertainBtn')?.addEventListener('click', () => {
+      draft.bristol = draft.bristol === null ? 4 : null;
+      FeltAudio.softTap();
+      renderLogDrawer();
+    });
+    $('colorUncertainBtn')?.addEventListener('click', () => {
+      draft.color = null;
+      FeltAudio.softTap();
+      renderLogDrawer();
+    });
+    $('bristolPrevBtn')?.addEventListener('click', () => {
+      draft.bristol = draft.bristol ? Math.max(1, draft.bristol - 1) : 4;
+      FeltAudio.toyBounce();
+      renderLogDrawer();
+    });
+    $('bristolNextBtn')?.addEventListener('click', () => {
+      draft.bristol = draft.bristol ? Math.min(7, draft.bristol + 1) : 4;
+      FeltAudio.toyBounce();
+      renderLogDrawer();
+    });
+    $('logOpenToiletBtn')?.addEventListener('click', () => openToiletSheet('rank'));
+    $('publishLogBtn')?.addEventListener('click', publishCurrentDraft);
+
+    // Scope toggle buttons
+    const toggleScope = () => {
+      state.ui.dataScope = state.ui.dataScope === 'demo' ? 'personal' : 'demo';
+      saveState();
+      renderHomeTheater();
+      if (activeSheetId === 'insightsSheet') renderInsightsSheet();
+      if (activeSheetId === 'postcardSheet') renderReportHub();
+      FeltAudio.softTap();
+    };
+    $('insightsScopeToggleBtn')?.addEventListener('click', toggleScope);
+    $('reportScopeToggleBtn')?.addEventListener('click', toggleScope);
+
+    // Insights sheet footer links
+    $('insightsToPkBtn')?.addEventListener('click', openCareStickerSheet);
+    $('insightsToPostcardBtn')?.addEventListener('click', () => openReportHub('weekly'));
+    $('insightsToDoctorBtn')?.addEventListener('click', openDoctorSummarySheet);
+    $('insightsToLogBtn')?.addEventListener('click', () => openLogDrawer({ mode: 'backfill' }));
+
+    // Doctor summary controls
+    $('printReportBtn')?.addEventListener('click', () => window.print());
+    $('doctorBackBtn')?.addEventListener('click', () => closeAllSheets());
+
+    // Privacy sheet controls
+    $('faceIdToggleBtn')?.addEventListener('click', () => {
+      state.settings.faceIdBlur = !state.settings.faceIdBlur;
+      saveState();
+      applyCamouflage();
+      FeltAudio.softTap();
+    });
+    $('clearDemoOnlyBtn')?.addEventListener('click', () => {
+      state.logs = state.logs.filter((l) => !l.isDemo);
+      state.ui.dataScope = 'personal';
+      saveState();
+      renderHomeTheater();
+      closeAllSheets(true);
+      showStampFeedback('已清空演示数据，保留你的个人记录');
+    });
+    $('resetDemoDataBtn')?.addEventListener('click', () => {
+      const personal = state.logs.filter((l) => !l.isDemo);
+      state.logs = [...personal, ...buildSeedDemoLogs()].sort((a, b) => b.ts - a.ts);
+      state.ui.dataScope = 'demo';
+      saveState();
+      renderHomeTheater();
+      closeAllSheets(true);
+      showStampFeedback('已恢复 14 天演示示例数据');
+    });
+
+    // 1v1 Care Stickers sheet
+    $('copyCareStickerBtn')?.addEventListener('click', async () => {
+      const st = CARE_STICKERS[state.ui.activeSticker] || CARE_STICKERS.tissue;
+      await copyTextSafe(st.caption);
+      FeltAudio.gentleSave();
+      showStampFeedback('已复制零隐私轻关心文案');
+    });
+    $('openPosterFromStickerBtn')?.addEventListener('click', () => openReportHub('poster'));
+
+    // Report Hub controls
+    $('singleCareOpenDoctorBtn')?.addEventListener('click', openDoctorSummarySheet);
+    $('reportOpenSummaryBtn')?.addEventListener('click', openDoctorSummarySheet);
+    $('reportSwitchPosterBtn')?.addEventListener('click', () => openReportHub('poster'));
+    $('savePostcardImgBtn')?.addEventListener('click', exportShareCardPng);
+    $('copyPostcardTextBtn')?.addEventListener('click', copyShareCaption);
+    $('replayCutsceneBtn')?.addEventListener('click', () => {
+      const logs = getScopedLogs(state.ui.dataScope);
+      const entry = logs.find((l) => l.id === state.ui.selectedArchiveId) || logs[0];
+      if (entry && entry.entryType === 'bm' && !isEntryRedFlag(entry, logs)) {
+        closeAllSheets(true);
+        playFeltCutscene(entry, () => openReportHub('single', entry.id));
+      }
+    });
+
+    // Toilet add form
+    $('toiletQuickAddFooterBtn')?.addEventListener('click', () => switchToiletTab('add'));
+    $('toiletSubmitBtn')?.addEventListener('click', () => {
+      const name = ($('toiletNameInput')?.value || '').trim();
+      if (!name) {
+        showStampFeedback('请先填写坑位名称');
+        return;
+      }
+      const area = ($('toiletAreaInput')?.value || '').trim() || (spotFormState.scope === 'public' ? '公共备选' : '私人备忘');
+      const note = ($('toiletNoteInput')?.value || '').trim();
+      state.toilets.unshift({
+        id: `spot_${Date.now()}`,
+        name,
+        area,
+        scope: spotFormState.scope,
+        air: spotFormState.air,
+        clean: spotFormState.clean,
+        tags: spotFormState.tags.slice(),
+        note
       });
+      saveState();
+      if ($('toiletNameInput')) $('toiletNameInput').value = '';
+      if ($('toiletAreaInput')) $('toiletAreaInput').value = '';
+      if ($('toiletNoteInput')) $('toiletNoteInput').value = '';
+      spotFormState = { scope: 'private', air: 4, clean: 4, tags: [] };
+      switchToiletTab('rank');
+      renderToiletSheet();
+      FeltAudio.gentleSave();
+      showStampFeedback('已添加坑位备忘');
+    });
+
+    // Director Rail (Desktop QA Panel)
+    $('directorToggleBtn')?.addEventListener('click', () => {
+      const rail = $('directorRail');
+      if (rail) rail.hidden = !rail.hidden;
+    });
+    $('directorCloseBtn')?.addEventListener('click', () => {
+      const rail = $('directorRail');
+      if (rail) rail.hidden = true;
+    });
+    $('directorResetBtn')?.addEventListener('click', () => runDemoAction('reset'));
+  }
+
+  function runDemoAction(action) {
+    switch (action) {
+      case 'home':
+        exitCareTriage();
+        closeAllSheets(true);
+        renderHomeTheater();
+        break;
+      case 'log':
+        openLogDrawer({ mode: 'backfill' });
+        break;
+      case 'eightmin':
+        if (!state.activeSession) startPoopSession();
+        showSittingReminderToast(state.settings.reminderMin || 8);
+        break;
+      case 'redflag_clay':
+        startCareTriage('clay', null);
+        break;
+      case 'redflag_black':
+        startCareTriage('black', null);
+        break;
+      case 'redflag_red':
+        startCareTriage('red', null);
+        break;
+      case 'settle_weekly':
+        openReportHub('weekly');
+        break;
+      case 'settle_monthly':
+        openReportHub('monthly');
+        break;
+      case 'poster':
+        openReportHub('poster');
+        break;
+      case 'pk':
+        openCareStickerSheet();
+        break;
+      case 'summary':
+        openDoctorSummarySheet();
+        break;
+      case 'reset':
+        localStorage.removeItem(STORAGE_KEY);
+        state = createDefaultState();
+        saveState();
+        exitCareTriage();
+        closeAllSheets(true);
+        applyCamouflage();
+        syncSettingsUI();
+        renderHomeTheater();
+        showStampFeedback('已重置为干净初始演示状态');
+        break;
+      default:
+        break;
     }
   }
 
-  // =========================================================================
-  // Bootstrap
-  // =========================================================================
-  ensureToilets();
-  bindStageParallax();
-  bindEvents();
-  initZenDisclosures();
-  syncHomeSessionView();
-  updateTimerUI();
-  renderHomeStage(false);
-  initAccessGate();
+  // --------------------------------------------------------------------------
+  // 23. QA & Automated Red-Team Verification Hooks (`window.__poopApp`)
+  // --------------------------------------------------------------------------
+  window.__poopApp = {
+    version: '8.2',
+    getState: () => state,
+    normalizeCareReason,
+    evaluateCareTriage,
+    compute7DayStats: (scope) => compute7DayStats(getScopedLogs(scope)),
+    compute30DayStats: (scope) => compute30DayStats(getScopedLogs(scope)),
+    getPersonal30DayStats: () => compute30DayStats(getPersonalLogs()),
+    startPoopSession,
+    snoozeSittingReminder,
+    finishSessionAndOpenLog,
+    openLogDrawer,
+    markNoBmToday,
+    startCareTriage,
+    openReportHub,
+    openDoctorSummarySheet,
+    openCareStickerSheet,
+    copyShareCaption,
+    exportShareCardPng,
+    setSessionElapsedForTest(sec) {
+      if (!state.activeSession) startPoopSession();
+      state.activeSession.startedAt = Date.now() - sec * 1000;
+      saveState();
+      updateSessionTick();
+    }
+  };
+
+  // --------------------------------------------------------------------------
+  // 24. Boot
+  // --------------------------------------------------------------------------
+  function boot() {
+    initAccessGate();
+    applyCamouflage();
+    syncSettingsUI();
+    bindEvents();
+    renderHomeTheater();
+    ensureTimerLoop();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
 })();
